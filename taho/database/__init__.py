@@ -1,4 +1,11 @@
+from __future__ import annotations
 from tortoise import Tortoise
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from discord.ext.commands import AutoShardedBot
+    from sshtunnel import SSHTunnelForwarder
+
 
 _models = [
     "taho.database.models.user",
@@ -6,14 +13,14 @@ _models = [
     "taho.database.models.bank",
     ]
 
-async def init_db(bot, tunnel):
+async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, db: str=None):
     await Tortoise.init(
         config={
             "connections": {
                 "default": {
                     "engine": "tortoise.backends.asyncpg",
                     "credentials": {
-                        "database": bot.config["DB_NAME"],
+                        "database": db or bot.config["DB_NAME"],
                         "host": bot.config["DB_HOST"],
                         "password": bot.config["DB_PASSWORD"],
                         "port": tunnel.local_bind_port,
