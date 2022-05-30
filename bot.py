@@ -1,3 +1,4 @@
+from __future__ import annotations
 from discord.ext import commands 
 import discord
 from tortoise import Tortoise, run_async
@@ -6,6 +7,10 @@ from taho.babel import Babel, _
 from taho.utils import TahoContext
 from taho.database import init_db
 import os
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sshtunnel import SSHTunnelForwarder
 
 class Bot(commands.AutoShardedBot):
     def __init__(self, intents: discord.Intents, **kwargs):
@@ -13,11 +18,11 @@ class Bot(commands.AutoShardedBot):
         self.uptime = discord.utils.utcnow()
         self.config = vars(config)
         self.root_path = os.getcwd()
-        self.ssh_server = None
+        self.ssh_server: SSHTunnelForwarder
     
     def start_ssh_server(self):
         from sshtunnel import SSHTunnelForwarder
-        self.ssh_server = SSHTunnelForwarder(
+        self.ssh_server: SSHTunnelForwarder = SSHTunnelForwarder(
             (self.config["SSH_HOST"], self.config["SSH_PORT"]),
             ssh_username=self.config["SSH_USERNAME"],
             ssh_password=self.config["SSH_PASSWORD"],
