@@ -1,7 +1,9 @@
-from email.policy import default
-from typing import Any
+from __future__ import annotations
+from typing import Any, Optional, Tuple
 from tortoise.models import Model
 from tortoise import fields
+from tortoise.signals import post_save
+from .user import User
 
 __all__ = (
     "Bank",
@@ -11,6 +13,13 @@ __all__ = (
 )
 
 class Bank(Model):
+    """
+    Represents owned by a user and have a default account.
+    The default account is purely indicative, it is useful to make 
+    the balance bewteen charges and interests.
+    All accounts charges are transfered to the default account;
+    All accounts interests are transfered from the default account.
+    """
     class Meta:
         table = "banks"
 
@@ -22,7 +31,6 @@ class Bank(Model):
     emote = fields.CharField(max_length=255)
 
     infos: fields.ReverseRelation["BankInfo"]
-    operations: fields.ReverseRelation["BankOperation"]
     accounts: fields.ReverseRelation["BankAccount"]
 
     async def get_info(self, key: str) -> Any:
@@ -31,7 +39,57 @@ class Bank(Model):
                 return info.value
         return None
 
+    async def get_account(self, account_id: int=None) -> Optional[BankAccount]:
+        """
+        Get an account from the Bank.
+        If no account_id is provided, the default account is returned.
+        """
+        if account_id is None:
+            return await get_or_create_bank_default_account(self)
+        async for account in self.accounts:
+            if account.id == account_id:
+                return account
+        return None
+
+    async def get_operations(self) -> Tuple[BankOperation]:
+        """
+        Get all operations from the Bank.
+        If no account_id is provided, all operations are returned.
+        The operations are sorted by date (desc).
+        """
+        operations = []
+        async for account in self.accounts:
+            async for operation in account.operations:
+                operations.append(operation)
+        operations.sort(key=lambda operation: operation.date, reverse=True)
+        return tuple(operations)
+
+@post_save(Bank)
+async def bank_post_save(_, instance: Bank, created: bool, *args, **kwargs) -> None:
+    """
+    Automatically create the default account for the bank when it is created.
+    """
+    if created:
+        await get_or_create_bank_default_account(instance)
+
+async def get_or_create_bank_default_account(bank:Bank, user:User=None) -> BankAccount:
+    """
+    Get or create the default account for the bank.
+    """
+    if not user:
+        user = await User.get_or_create(cluster=bank.cluster, user_id=0)
+        user = user[0]
+    return (await BankAccount.get_or_create(bank=bank, user=user))[0]
+    
+
+
 class BankInfo(Model):
+    """
+    Represents a bank info.
+    A bank info is an information that can be set by the bank owner.
+    This is useful to store the bank's configuration
+    (ex: the interest rate).
+    """
     class Meta:
         table = "bank_infos"
 
@@ -52,7 +110,29 @@ class BankInfo(Model):
         elif self.type == "float":
             return float(self.value)
 
+async def create_transaction_operation(
+    from_account: BankAccount, 
+    to_account: BankAccount, 
+    amount: int, description: str=None
+    ) -> Tuple[BankOperation]:
+    """
+    Create a transaction operation between two accounts.
+    """
+    operations = (
+        BankOperation(account=from_account, amount=-amount, description=description),
+        BankOperation(account=to_account, amount=amount, description=description)
+    )
+    await BankOperation.bulk_create(operations)
+    return operations
+
 class BankAccount(Model):
+    """
+    Represents a bank account.
+    A bank account is a bank account that can be used to store money.
+    A bank account is owned by a user, or a bank (cf. Bank -> default account).
+
+    You can transfer money from one account to another.
+    """
     class Meta:
         table = "bank_accounts"
 
@@ -65,15 +145,42 @@ class BankAccount(Model):
 
     operations: fields.ReverseRelation["BankOperation"]
 
+    async def receive(self, amount: float) -> None:
+        """
+        Receive money from another account.
+        """
+        self.balance += amount
+        await self.save()
+
+    async def transfer(self, to: BankAccount, amount: float, description: str=None) -> None:
+        """
+        Transfer money from this account to another one.
+
+        Raises:
+            ValueError: If the account doesn't have enought money (balance < amount).
+        """
+        if self.balance < amount:
+            raise ValueError(f"Not enough money in account {self.id}")
+        self.balance -= amount
+        await self.save()
+        await to.receive(amount)
+        await create_transaction_operation(self, to, amount, description)
+
 class BankOperation(Model):
+    """
+    Represents a bank operation.
+    A bank operation is a bank operation that can be done on a bank account.
+
+    When a transaction is done between two accounts, two bank operations are created:
+    - One for the source account, with a negative amount;
+    - One for the destination account, with a positive amount.
+    """
     class Meta:
         table = "bank_operations"
 
     id = fields.IntField(pk=True)
 
-    bank = fields.ForeignKeyField("main.Bank", related_name="operations")
     account = fields.ForeignKeyField("main.BankAccount", related_name="operations")
     amount = fields.DecimalField(max_digits=32, decimal_places=2)
-    type = fields.CharField(max_length=255, default="transfer")
     date = fields.DatetimeField(auto_now_add=True)
     description = fields.CharField(max_length=255, default="")

@@ -11,6 +11,12 @@ _models = [
     "taho.database.models.user",
     "taho.database.models.guild",
     "taho.database.models.bank",
+    "taho.database.models.item",
+    "taho.database.models.inventory",
+    "taho.database.models.role",
+    "taho.database.models.stat",
+    "taho.database.models.job",
+    "taho.database.models.npc",
     ]
 
 async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, db: str=None):
@@ -44,7 +50,19 @@ async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, db: str=None)
     DROP TABLE IF EXISTS cluster_infos CASCADE;
     DROP TABLE IF EXISTS bank_accounts CASCADE;
     DROP TABLE IF EXISTS bank_operations CASCADE;
-    DROP TABLE IF EXISTS bank_infos CASCADE;""")
+    DROP TABLE IF EXISTS bank_infos CASCADE;
+    DROP TABLE IF EXISTS items CASCADE;
+    DROP TABLE IF EXISTS inventories CASCADE;
+    DROP TABLE IF EXISTS roles CASCADE;
+    DROP TABLE IF EXISTS stats CASCADE;
+    DROP TABLE IF EXISTS item_roles CASCADE;
+    DROP TABLE IF EXISTS item_stats CASCADE;
+    DROP TABLE IF EXISTS jobs CASCADE;
+    DROP TABLE IF EXISTS job_rewards CASCADE;
+    DROP TABLE IF EXISTS npcs CASCADE;
+    DROP TABLE IF EXISTS npc_roles CASCADE;
+    DROP TABLE IF EXISTS npc_owners CASCADE;
+    """)
 
     # Generate the schema
     await Tortoise.generate_schemas()
