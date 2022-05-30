@@ -63,6 +63,7 @@ class Bot(commands.AutoShardedBot):
 if __name__ == "__main__":
     intents = discord.Intents.default()
     intents.message_content = True
+    intents.members = True
     bot = Bot(intents=intents)
 
     babel = Babel(bot)
