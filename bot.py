@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 from discord.ext import commands 
 import discord
 from tortoise import Tortoise, run_async
@@ -74,8 +75,9 @@ if __name__ == "__main__":
     except Exception as e:
         raise e
     finally:
+        asyncio.set_event_loop(asyncio.new_event_loop())
         run_async(Tortoise.close_connections())
         bot.stop_ssh_server()
-        
+        asyncio.get_event_loop().close()
         print("finish")
 
