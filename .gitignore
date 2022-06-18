@@ -31,3 +31,6 @@ config.py
 .vscode/
 .env/
 *.mo
+*.log
+annonce.md
+annoucment.md

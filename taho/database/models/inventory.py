@@ -21,6 +21,13 @@ class Inventory(Model):
     ammo = fields.IntField(null=True)
     hotbar = fields.IntField(null=True)
 
+    @property
+    def dura(self) -> Optional[int]:
+        """
+        Shortcut for <Inventory>.durability
+        """
+        return self.durability
+
     async def save(
         self,
         using_db: Optional[BaseDBAsyncClient] = None,
@@ -33,14 +40,14 @@ class Inventory(Model):
             self.durability = None
             self.hotbar = None
         elif self.item.type == ItemType.CONSUMABLE:
-            self.durability = self.durability if self.durability <= self.item.durability else self.item.durability
+            self.durability = self.dura if (self.dura <= self.item.dura) else self.item.dura #TODO better
             self.ammo = None
             self.hotbar = None
         elif self.item.type == ItemType.EQUIPMENT:
-            self.ammo = self.ammo if self.ammo <= self.item.charger_size else self.item.charger_size
-        await super().save(
+            self.ammo = self.ammo if (self.ammo<=self.item.charger_size) else self.item.charger_size #TODO better       
+            await super().save(
             using_db=using_db,
             update_fields=update_fields,
             force_create=force_create,
             force_update=force_update,
-        )
+            )

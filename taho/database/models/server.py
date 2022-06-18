@@ -1,14 +1,15 @@
 from __future__ import annotations
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 from tortoise.models import Model
 from tortoise import fields
-from .role import GuildRole, Role
+from .role import ServerRole, Role
 from .user import User
 from .bank import Bank
 from .item import Item
 import discord
 from typing import TYPE_CHECKING
 from taho.exceptions import RoleException
+from enum import IntEnum
 
 if TYPE_CHECKING:
     from discord.ext.commands import AutoShardedBot
@@ -16,32 +17,91 @@ if TYPE_CHECKING:
     from .role import RoleType
 
 __all__ = (
-    "GuildCluster",
-    "Guild",
+    "ServerCluster",
+    "Server",
     "ClusterInfo",
-    "GuildInfo",
+    "ServerInfo",
 )
 
-class GuildCluster(Model):
+class InfoType(IntEnum):
+    NULL = 0
+    BOOL = 1
+    INT = 2
+    STRING = 3
+    FLOAT = 4
+
+def convert_to_type(value: Any, type_: InfoType) -> Any:
+    if type_ == InfoType.NULL:
+        return None
+    converters = {
+        InfoType.BOOL: bool,
+        InfoType.INT: int,
+        InfoType.STRING: str,
+        InfoType.FLOAT: float
+    }
+    return converters[type_](value)
+
+def get_type(value: Any) -> InfoType:
+    if value is None:
+        return InfoType.NULL
+    types = {
+        bool: InfoType.BOOL,
+        int: InfoType.INT,
+        str: InfoType.STRING,
+        float: InfoType.FLOAT
+    }
+    return types[type(value)]
+
+class ServerCluster(Model):
     class Meta:
-        table = "guild_clusters"
+        table = "server_clusters"
     
     id = fields.IntField(pk=True)
 
     name = fields.CharField(max_length=255)
 
     infos: fields.ReverseRelation["ClusterInfo"]
-    guilds: fields.ReverseRelation["Guild"]
+    servers: fields.ReverseRelation["Server"]
     users: fields.ReverseRelation["User"]
     banks: fields.ReverseRelation["Bank"]
     items: fields.ReverseRelation["Item"]
     roles: fields.ReverseRelation["Role"]
 
-    async def get_info(self, key: str) -> Any:
+    async def get_info(self, key: str) -> Optional[Union[str, int, float, None]]:
+        """
+        Gets the value of a key in the cluster's info.
+
+        Raises KeyError if the key does not exist.
+        """
         async for info in self.infos:
             if info.key == key:
-                return info.value
-        return None
+                return info.py_value
+        raise KeyError(f"No info with key {key}")
+    
+    async def set_info(self, key: str, value: Optional[Union[str, int, float, None]]) -> None:
+        """
+        Sets the value of a key in the cluster's info.
+        If the value is None, the info is deleted.
+
+        Raises KeyError if the key does not exist (only for deletion).
+        """
+        if value is None:
+            try:
+                await self.infos.filter(key=key).delete()
+            except:
+                raise KeyError(f"No info with key {key}")
+        async for info in self.infos:
+            if info.key == key:
+                info.value = value
+                info.type = get_type(value)
+                await info.save()
+                return
+        await ClusterInfo.create(
+            cluster=self,
+            key=key,
+            value=value,
+            type=get_type(value)
+        )
 
     def __str__(self):
         return self.name
@@ -51,13 +111,13 @@ class GuildCluster(Model):
         Returns a list of discord.Member objects for all the members of the guild.
         """
         members = []
-        async for guild in self.guilds:
-            members.append(await guild.get_member(bot, user_id))
+        async for server in self.servers:
+            members.append(await server.get_member(bot, user_id))
         return [m for m in members if m]
 
     async def get_roles(self, bot: AutoShardedBot) -> Dict[Role, List[discord.Role]]:
         """
-        Returns a dictionary of roles and their guilds.
+        Returns a dictionary of roles on all guilds.
         """
         return {role:await role.get_discord_roles(bot) async for role in self.roles}
         
@@ -67,20 +127,20 @@ class GuildCluster(Model):
         A role is common if it is named the same way in all the guilds.
         """
         # Fetch all guilds from the cluster
-        guilds = await self.guilds.all()
+        servers = await self.servers.all()
         # Pick one guild to get the roles from
         # All roles will be compared to the ones on the guild
-        guild: Guild = guilds.first()
+        server: Server = servers.first()
         # For each role in the guild, check if it is common to all the guilds
         # We use the get_common_discord_role function to check if the role is common
         roles = {
-            role.name: await self.get_common_discord_role(bot, role, guilds) 
-            for role in (await guild.discord_guild(bot)).roles
+            role.name: await self.get_common_discord_role(bot, role, servers) 
+            for role in (await server.get_guild(bot)).roles
         }
         # Remove empty lists corresponding to roles that are not common to all the guilds
         return {k: v for k, v in roles.items() if v is not None}
 
-    async def get_commun_discord_role(self, bot: AutoShardedBot, role: discord.Role, guilds: List[Guild]=None) -> List[discord.Role]:
+    async def get_commun_discord_role(self, bot: AutoShardedBot, role: discord.Role, servers: List[Server]=None) -> List[discord.Role]:
         """
         Returns a list of discord.Role objects that are common to all the guilds in the cluster.
         A role is common if it is named the same way in all the guilds.
@@ -89,14 +149,14 @@ class GuildCluster(Model):
         returns the roles in common with the one given as parameter, whereas get_common_discord_roles
         returns all the roles that are common to all the guilds in the cluster.
         """
-        if guilds is None:
-            guilds = await self.guilds.all()
-        if len(guilds) == 1:
+        if servers is None:
+            servers = await self.servers.all()
+        if len(servers) == 1:
             return [role]
         else:
             roles = []
             guild_roles = [
-                (await guild.discord_guild(bot)).roles for guild in guilds
+                (await server.get_guild(bot)).roles for server in servers
             ]
             for guild_role in guild_roles:
                 r = discord.utils.find(lambda r: r.name == role.name, guild_role)
@@ -109,7 +169,7 @@ class GuildCluster(Model):
         """
         Returns a list of discord.Guild objects for all the guilds in the cluster.
         """
-        return [await (await guild).discord_guild(bot) async for guild in self.guilds]
+        return [await (await server).get_guild(bot) async for server in self.servers]
 
     async def create_role(self, bot: AutoShardedBot, role: discord.Role, type: RoleType) -> Role:
         """
@@ -129,35 +189,63 @@ class GuildCluster(Model):
         # Create the Role instance
         role_obj = await Role.create(cluster=self, type=type)
         from taho.utils.database import get_db_guild # Avoid circular import
-        # For each guild of the cluster, create the GuildRole instance
-        print()
+        # For each guild of the cluster, create the ServerRole instance
         objects = [
-            GuildRole(role=role_obj, guild=await get_db_guild(r.guild), discord_role_id=r.id)
+            ServerRole(role=role_obj, server=await get_db_guild(r.guild), discord_role_id=r.id)
             for r in common_roles
         ]
-        print(objects)
-        # Save the Role and GuildRole instances
-        await GuildRole.bulk_create(objects=objects)
+        # Save the Role and ServerRole instances
+        await ServerRole.bulk_create(objects=objects)
         return role_obj
 
-class Guild(Model):
+class Server(Model):
     class Meta:
-        table = "guilds"
+        table = "servers"
 
     id = fields.BigIntField(pk=True)
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="guilds")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="servers")
 
-    infos: fields.ReverseRelation["GuildInfo"]
+    infos: fields.ReverseRelation["ServerInfo"]
 
-    async def get_info(self, key: str) -> Any:
+    async def get_info(self, key: str) -> Optional[Union[str, int, float, None]]:
+        """
+        Gets the value of a key in the cluster's info.
+
+        Raises KeyError if the key does not exist.
+        """
         async for info in self.infos:
             if info.key == key:
-                return info.value
+                return info.py_value
         return await self.cluster.get_info(key)
-
-    async def discord_guild(self, bot: AutoShardedBot) -> discord.Guild:
+    
+    async def set_info(self, key: str, value: Optional[Union[str, int, float, None]]) -> None:
         """
-        Get the discord.Guild object for this guild.
+        Sets the value of a key in the cluster's info.
+        If the value is None, the info is deleted.
+
+        Raises KeyError if the key does not exist (only for deletion).
+        """
+        if value is None:
+            try:
+                await self.infos.filter(key=key).delete()
+            except:
+                raise KeyError(f"No info with key {key}")
+        async for info in self.infos:
+            if info.key == key:
+                info.value = value
+                info.type = get_type(value)
+                await info.save()
+                return
+        await ServerInfo.create(
+            server=self,
+            key=key,
+            value=value,
+            type=get_type(value)
+        )
+
+    async def get_guild(self, bot: AutoShardedBot) -> discord.Guild:
+        """
+        Get the discord.Guild object for this server.
         """
         guild = bot.get_guild(self.id)
         if guild and not guild.chunked:
@@ -168,13 +256,13 @@ class Guild(Model):
         """
         Returns a discord.Member object for the user.
         """
-        return (await self.discord_guild(bot)).get_member(user_id)
+        return (await self.get_guild(bot)).get_member(user_id)
     
     async def get_role(self, bot: AutoShardedBot, role_id: int) -> Optional[discord.Role]:
         """
         Returns a discord.Role object for the role.
         """
-        return (await self.discord_guild(bot)).get_role(role_id)
+        return (await self.get_guild(bot)).get_role(role_id)
 
 class ClusterInfo(Model):
     class Meta:
@@ -182,7 +270,7 @@ class ClusterInfo(Model):
     
     id = fields.IntField(pk=True)
 
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="infos")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="infos")
     key = fields.CharField(max_length=255)
     type = fields.CharField(max_length=255)
     value = fields.CharField(max_length=255)
@@ -195,24 +283,15 @@ class ClusterInfo(Model):
         """
         Get the value in Python format.
         """
-        if self.type == "int":
-            return int(self.value)
-        elif self.type == "float":
-            return float(self.value)
-        elif self.type == "bool":
-            return bool(self.value)
-        elif self.type == "list":
-            return list(self.value)
-        else:
-            return self.value
+        return convert_to_type(self.value, self.type)
 
-class GuildInfo(Model):
+class ServerInfo(Model):
     class Meta:
-        table = "guild_infos"
+        table = "server_infos"
 
     id = fields.IntField(pk=True)
 
-    guild = fields.ForeignKeyField("main.Guild", related_name="infos")
+    server = fields.ForeignKeyField("main.Server", related_name="infos")
     key = fields.CharField(max_length=255)
     type = fields.CharField(max_length=255)
     value = fields.CharField(max_length=255)
@@ -225,13 +304,4 @@ class GuildInfo(Model):
         """
         Get the value in Python format.
         """
-        if self.type == "int":
-            return int(self.value)
-        elif self.type == "float":
-            return float(self.value)
-        elif self.type == "bool":
-            return bool(self.value)
-        elif self.type == "list":
-            return list(self.value)
-        else:
-            return self.value
+        return convert_to_type(self.value, self.type)

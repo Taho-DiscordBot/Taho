@@ -32,13 +32,13 @@ class Item(Model):
 
     id = fields.IntField(pk=True)
     
-    cluster = fields.ForeignKeyField('main.GuildCluster', related_name='items')
+    cluster = fields.ForeignKeyField('main.ServerCluster', related_name='items')
     name = fields.CharField(max_length=255)
     emoji = fields.CharField(max_length=255, null=True)
     description = fields.TextField(null=True)
     type = fields.IntEnumField(ItemType, default=ItemType.RESOURCE)
-    durability = fields.IntField(null=True)
-    cooldown = fields.IntField(null=True)
+    durability: Optional[int] = fields.IntField(null=True)
+    cooldown = fields.IntField(null=True) #TODO typing in fields
     ammo_id = fields.IntField(null=True)
     charger_size = fields.IntField(null=True)
 
@@ -49,6 +49,12 @@ class Item(Model):
         super().__init__(**kwargs)
         self._ammo = None
     
+    @property
+    def dura(self) -> Optional[int]:
+        """
+        Shortcut for <Item>.durability
+        """
+        return self.durability
     
     async def ammo(self) -> Optional["Item"]:
         if self._ammo:

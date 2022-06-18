@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from .item import Item, ItemStat, ItemRole
     from .stat import Stat
     from .npc import NPCOwner
-    from .guild import GuildCluster
+    from .server import ServerCluster
     from discord.ext.commands import AutoShardedBot
     import discord
 
@@ -46,7 +46,7 @@ class User(Model):
     # if you haven't done it yourself
     id = fields.IntField(pk=True)
     user_id = fields.BigIntField()
-    cluster: GuildCluster = fields.ForeignKeyField("main.GuildCluster", related_name="users")
+    cluster: ServerCluster = fields.ForeignKeyField("main.ServerCluster", related_name="users")
 
     banks: fields.ReverseRelation["Bank"] # The banks owned by the user
     accounts: fields.ReverseRelation["BankAccount"] # The accounts owned by the user

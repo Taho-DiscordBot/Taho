@@ -5,6 +5,7 @@ __all__ = (
     "QuantityException",
     "NPCException",
     "RoleException",
+    "Unknown",
 )
 
 class TahoException(Exception):
@@ -32,5 +33,12 @@ class NPCException(TahoException):
 class RoleException(TahoException):
     """
     Raised when an exception concerns roles.
+    """
+    pass
+
+class Unknown(TahoException):
+    """
+    Raised when you are trying to get something
+    that doesn't exist.
     """
     pass

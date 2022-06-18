@@ -33,7 +33,7 @@ class Job(Model):
     
     id = fields.IntField(pk=True)
 
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="jobs")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="jobs")
     name = fields.CharField(max_length=255)
     role = fields.ForeignKeyField("main.Role", related_name="jobs")
     salary = fields.DecimalField(max_digits=32, decimal_places=2, null=True)

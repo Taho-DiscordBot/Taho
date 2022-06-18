@@ -19,27 +19,37 @@ _models = [
     "taho.database.models.npc",
     ]
 
-async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, db: str=None):
+async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, config: dict=None, _create_db: bool=False) -> None:
+    if not config:
+        config = bot.config
+    # If the SSH tunnel is not used, we can use the default port
+    # The SSH tunnel creates a new port for the DB
+    port = tunnel.local_bind_port if tunnel else config["DB_PORT"]
     await Tortoise.init(
         config={
             "connections": {
                 "default": {
                     "engine": "tortoise.backends.asyncpg",
                     "credentials": {
-                        "database": db or bot.config["DB_NAME"],
-                        "host": bot.config["DB_HOST"],
-                        "password": bot.config["DB_PASSWORD"],
-                        "port": tunnel.local_bind_port,
-                        "user": bot.config["DB_USERNAME"],
-                        "schema": bot.config["DB_SCHEMA"],
+                        "database": config["DB_NAME"],
+                        "host": config["DB_HOST"],
+                        "password": config["DB_PASSWORD"],
+                        "port": port,
+                        "user": config["DB_USERNAME"],
+                        "schema": config["DB_SCHEMA"],
                     },
                 }
             },
             "apps": {
                 "main": {"models": _models, "default_connection": "default"}
             },
-        }
+        },
+        _create_db=_create_db
     )
+
+    if _create_db:
+        await Tortoise.generate_schemas()
+    #print(Tortoise)
     conn = Tortoise.get_connection('default')
     await conn.execute_script("""
     DROP TABLE IF EXISTS guild_clusters CASCADE;
@@ -63,8 +73,4 @@ async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, db: str=None)
     DROP TABLE IF EXISTS npc_roles CASCADE;
     DROP TABLE IF EXISTS npc_owners CASCADE;
     """)
-
-    # Generate the schema
-    await Tortoise.generate_schemas()
-
     return True

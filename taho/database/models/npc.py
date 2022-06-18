@@ -19,7 +19,7 @@ class NPC(Model):
         table = "npcs"
 
     id = fields.IntField(pk=True)
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="npcs")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="npcs")
     name = fields.CharField(max_length=255)
     avatar = fields.CharField(max_length=255, null=True)
 

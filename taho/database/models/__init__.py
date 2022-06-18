@@ -1,5 +1,5 @@
 from .user import *
-from .guild import *
+from .server import *
 from .bank import *
 from .item import *
 from .inventory import *

@@ -34,7 +34,7 @@ class Stat(Model):
 
     id = fields.IntField(pk=True)
 
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="stats")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="stats")
     name = fields.CharField(max_length=255)
     emoji = fields.CharField(max_length=255, null=True)
     rp_effect = fields.IntEnumField(RPEffect, null=True)

@@ -5,10 +5,23 @@ import discord
 from tortoise import Tortoise, run_async
 import config
 from taho.babel import Babel, _
-from taho.utils import TahoContext
+from taho.utils import TahoContext, init_ssh_tunnel
 from taho.database import init_db
 import os
 from typing import TYPE_CHECKING
+
+import logging
+fmt = logging.Formatter(
+    fmt="%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+sh = logging.FileHandler(filename='logs/tortoise.log', encoding='utf-8', mode='w')
+sh.setLevel(logging.DEBUG)
+sh.setFormatter(fmt)
+
+logger_tortoise = logging.getLogger("tortoise")
+logger_tortoise.setLevel(logging.DEBUG)
+logger_tortoise.addHandler(sh)
 
 if TYPE_CHECKING:
     from sshtunnel import SSHTunnelForwarder
@@ -22,18 +35,17 @@ class Bot(commands.AutoShardedBot):
         self.ssh_server: SSHTunnelForwarder
     
     def start_ssh_server(self):
-        from sshtunnel import SSHTunnelForwarder
-        self.ssh_server: SSHTunnelForwarder = SSHTunnelForwarder(
-            (self.config["SSH_HOST"], self.config["SSH_PORT"]),
-            ssh_username=self.config["SSH_USERNAME"],
-            ssh_password=self.config["SSH_PASSWORD"],
-            remote_bind_address=(self.config["SSH_REMOTE_HOST"], self.config["SSH_REMOTE_PORT"]),
-        )
-        self.ssh_server.start()
+        # The ssh server is only stared if wanted
+        if self.config.get("USE_SSH_TUNNEL", False):
+            self.ssh_server = init_ssh_tunnel(self.config)
+            self.ssh_server.start()
+        else:
+            self.ssh_server = None
         return True
     
     def stop_ssh_server(self):
-        self.ssh_server.stop()
+        if self.config.get("USE_SSH_TUNNEL", False):
+            self.ssh_server.stop()
         return True
 
     async def setup_hook(self):
@@ -43,8 +55,14 @@ class Bot(commands.AutoShardedBot):
             except Exception as exc:
                 print(f'Could not load extension {cog} due to {exc.__class__.__name__}: {exc}')
         
+        # The SSH Tunnel will start only if configured
         self.start_ssh_server()
+
+        # Database initialization
         await init_db(self, self.ssh_server)
+        # Generate the schema for the database
+        await Tortoise.generate_schemas()
+
 
         MY_GUILD = discord.Object(724535633283907639)
         self.tree.copy_global_to(guild=MY_GUILD)

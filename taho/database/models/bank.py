@@ -1,31 +1,55 @@
 from __future__ import annotations
-from typing import Any, Optional, Tuple
+from typing import Any, AsyncGenerator, Optional, Tuple, Union
 from tortoise.models import Model
 from tortoise import fields
 from tortoise.signals import post_save
 from .user import User
+from taho.exceptions import Unknown
 
 __all__ = (
     "Bank",
     "BankInfo",
     "BankAccount",
-    "BankOperation"
+    "BankOperation",
 )
 
 class Bank(Model):
     """
-    Represents owned by a user and have a default account.
+    Represents a bank.
+
+    The bank have a default account (the one that is used when no account_id is provided).
     The default account is purely indicative, it is useful to make 
     the balance bewteen charges and interests.
     All accounts charges are transfered to the default account;
     All accounts interests are transfered from the default account.
+
+    .. container:: operations
+        .. describe:: x == y
+            Checks if two banks are equal.
+
+        .. describe:: x != y
+            Checks if two banks are not equal.
+        
+        ..describe:: hash(x)
+            Returns the bank's hash.
+
+        ..describe:: aiter(x)
+            Returns an async iterator on the bank's accounts.
+    
+    Attributes
+    -----------
+    id: :class:`int`
+        The bank's ID (DB primary key).
+    name: :class:`str`
+        The bank's name.
+    
     """
     class Meta:
         table = "banks"
 
     id = fields.IntField(pk=True)
     
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="banks")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="banks")
     user = fields.ForeignKeyField("main.User", related_name="banks")
     name = fields.CharField(max_length=255)
     emote = fields.CharField(max_length=255)
@@ -33,25 +57,76 @@ class Bank(Model):
     infos: fields.ReverseRelation["BankInfo"]
     accounts: fields.ReverseRelation["BankAccount"]
 
-    async def get_info(self, key: str) -> Any:
+    def __repr__(self) -> str:
+        return f"<Bank {self.id}>"
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Bank):
+            return self.id == other.id
+        return False
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+    
+    async def __aiter__(self) -> AsyncGenerator[BankAccount]:
+
+        async for account in self.accounts:
+            yield account
+
+    async def get_info(self, key: str) -> Union[str, int, float, None]:
+        """|coro|
+
+        Get an info from the Bank.
+
+        Parameters
+        ----------
+        key: :class:`str`
+            The key of the info.
+        
+        Raises
+        ------
+        KeyError
+            If the info does not exist.
+        
+        Returns
+        --------
+        Union[:class:`str`, :class:`int`, :class:`float`, :class:`None`, :class:`bool`]
+        """
         async for info in self.infos:
             if info.key == key:
                 return info.value
         return None
 
-    async def get_account(self, account_id: int=None) -> Optional[BankAccount]:
-        """
+    async def get_account(self, account_id: Optional[int]=None) -> BankAccount:
+        """|coro|
+
         Get an account from the Bank.
+
         If no account_id is provided, the default account is returned.
+
+        Parameters
+        ----------
+        account_id: Optional[:class:`int`]
+
+        Raises
+        ------
+        Unknown
+            If the account does not exist.
+
+        Returns
+        --------
+        :class:`.BankAccount`
+            The account.
         """
+
         if account_id is None:
             return await get_or_create_bank_default_account(self)
         async for account in self.accounts:
             if account.id == account_id:
                 return account
-        return None
+        raise Unknown("Account not found.")
 
-    async def get_operations(self) -> Tuple[BankOperation]:
+    async def get_operations(self, **kwargs) -> Tuple[BankOperation]:
         """
         Get all operations from the Bank.
         If no account_id is provided, all operations are returned.
@@ -72,7 +147,7 @@ async def bank_post_save(_, instance: Bank, created: bool, *args, **kwargs) -> N
     if created:
         await get_or_create_bank_default_account(instance)
 
-async def get_or_create_bank_default_account(bank:Bank, user:User=None) -> BankAccount:
+async def get_or_create_bank_default_account(bank: Bank, user: User=None) -> BankAccount:
     """
     Get or create the default account for the bank.
     """
@@ -81,8 +156,6 @@ async def get_or_create_bank_default_account(bank:Bank, user:User=None) -> BankA
         user = user[0]
     return (await BankAccount.get_or_create(bank=bank, user=user))[0]
     
-
-
 class BankInfo(Model):
     """
     Represents a bank info.

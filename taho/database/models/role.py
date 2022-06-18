@@ -27,32 +27,38 @@ class Role(Model):
 
     id = fields.IntField(pk=True)
 
-    cluster = fields.ForeignKeyField("main.GuildCluster", related_name="roles")
+    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="roles")
     type = fields.IntEnumField(RoleType, default=RoleType.DEFAULT)
 
-    guild_roles: fields.ReverseRelation["GuildRole"]
+    server_roles: fields.ReverseRelation["ServerRole"]
 
     async def get_discord_roles(self, bot: AutoShardedBot) -> List[discord.Role]:
         """
         Returns a list of discord.Role objects.
         """
         return [
-            await (await guild_role.guild).get_role(bot, guild_role.discord_role_id) 
-            async for guild_role in self.guild_roles
+            await (await server_role.server).get_role(bot, server_role.d_role_id) 
+            async for server_role in self.server_roles
             ]
 
-class GuildRole(Model):
+class ServerRole(Model):
     class Meta:
-        table = "guild_roles"
+        table = "server_roles"
 
     id = fields.IntField(pk=True)
 
-    role = fields.ForeignKeyField("main.Role", related_name="guild_roles")
-    guild = fields.ForeignKeyField("main.Guild", related_name="guild_roles")
+    role = fields.ForeignKeyField("main.Role", related_name="server_roles")
+    server = fields.ForeignKeyField("main.Server", related_name="server_roles")
     discord_role_id = fields.BigIntField()
+
+    @property
+    def d_role_id(self) -> int:
+        return self.discord_role_id
 
     async def discord_role(self, bot: AutoShardedBot) -> discord.Role:
         """
         Get the discord.Role object for this role in the guild.
         """
-        return (await self.guild.discord_guild(bot)).get_role(self.role_id)
+        server = await self.server
+        guild = await server.get_guild(bot)
+        return guild.get_role(self.d_role_id)
