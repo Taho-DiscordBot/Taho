@@ -1,5 +1,6 @@
 from .user import *
 from .server import *
+from .cluster import *
 from .bank import *
 from .item import *
 from .inventory import *

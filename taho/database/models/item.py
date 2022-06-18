@@ -1,30 +1,17 @@
-from typing import Any, Iterable, Optional
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from tortoise.models import Model
-from tortoise import BaseDBAsyncClient, fields
-from enum import IntEnum
+from tortoise import fields
+from ..enums import ItemType, ItemReason
+
+if TYPE_CHECKING:
+    from typing import Any, Iterable, Optional
+    from tortoise import BaseDBAsyncClient
 
 __all__ = (
-    "ItemType",
-    "ItemReason",
     "Item",
     "ItemStat"
 )
-
-class ItemType(IntEnum):
-    RESOURCE = 0
-    CONSUMABLE = 1
-    EQUIPMENT = 2
-
-class ItemReason(IntEnum):
-    ITEM_USED = 1
-    ITEM_EQUIPPED = 2
-    ITEM_IN_INVENTORY = 3
-
-class ItemUse(IntEnum):
-    USE = 1
-    EQUIP = 2
-    GIVE = 3
-
 
 class Item(Model):
     class Meta:

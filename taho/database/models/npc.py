@@ -1,10 +1,11 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from tortoise.models import Model
 from tortoise import fields
 from tortoise.signals import post_save
-from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
+    from typing import List
     from .user import User
     from .role import Role
 

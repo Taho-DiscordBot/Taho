@@ -1,7 +1,14 @@
-from typing import Iterable, Optional
+from __future__ import annotations
 from tortoise.models import Model
-from tortoise import BaseDBAsyncClient, fields
-from .item import ItemType
+from tortoise import fields
+from ..enums import ItemType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Iterable, Optional
+    from tortoise import BaseDBAsyncClient
+
+
 
 __all__ = (
     "Inventory",

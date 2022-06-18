@@ -1,32 +1,12 @@
 from tortoise.models import Model
 from tortoise import fields
-from enum import IntEnum
+from ..enums import RPEffect, RegenerationType
 
 __all__ = (
-    "RPEffect",
-    "RegenerationType",
     "Stat",
 )
 
-class RPEffect(IntEnum):
-    """
-    Represents the RP effects of a stat.
-    """
-    HP = 0
-    ENDURANCE = 1
-    STRENGTH = 2
-    PROTECTION = 3
-    SPEED = 4
-    AGILITY = 5
-    COMPETENCE = 6
 
-class RegenerationType(IntEnum):
-    """
-    Represents the regeneration types of a stat.
-    """
-    NO_REGENERATION = 0
-    REGENERATION = 1
-    NOT_NATURAL_REGENERATION = 2
 
 class Stat(Model):
     class Meta:

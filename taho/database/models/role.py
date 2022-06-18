@@ -1,26 +1,17 @@
 from __future__ import annotations
+from ..enums import RoleType
 from tortoise.models import Model
 from tortoise import fields
-from enum import IntEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from discord.ext.commands import AutoShardedBot
-    import discord
+    from discord import Role as DRole
     from typing import List
 
 __all__ = (
-    "RoleType",
     "Role",
 )
-
-
-class RoleType(IntEnum):
-    DEFAULT = 0
-    JOB = 1
-    CLASS = 2
-    OTHER = 3
-
 class Role(Model):
     class Meta:
         table = "roles"
@@ -32,7 +23,7 @@ class Role(Model):
 
     server_roles: fields.ReverseRelation["ServerRole"]
 
-    async def get_discord_roles(self, bot: AutoShardedBot) -> List[discord.Role]:
+    async def get_discord_roles(self, bot: AutoShardedBot) -> List[DRole]:
         """
         Returns a list of discord.Role objects.
         """
@@ -55,7 +46,7 @@ class ServerRole(Model):
     def d_role_id(self) -> int:
         return self.discord_role_id
 
-    async def discord_role(self, bot: AutoShardedBot) -> discord.Role:
+    async def discord_role(self, bot: AutoShardedBot) -> DRole:
         """
         Get the discord.Role object for this role in the guild.
         """

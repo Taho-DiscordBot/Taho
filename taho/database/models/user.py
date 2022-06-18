@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, Any, List
+from typing import TYPE_CHECKING
 from tortoise.models import Model
 from tortoise import fields
-from .item import ItemType, ItemReason
 from taho.exceptions import QuantityException, NPCException
-from enum import IntEnum
-from .npc import NPC
+from ..enums import ItemUse, ItemType, ItemReason
 
 if TYPE_CHECKING:
+    from typing import Any, List
+    from .npc import NPC
     from .bank import Bank, BankAccount
     from .role import Role
     from .inventory import Inventory
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from .npc import NPCOwner
     from .server import ServerCluster
     from discord.ext.commands import AutoShardedBot
-    import discord
+    from discord import Member
 
 
 
@@ -24,12 +24,7 @@ __all__ = (
     "User",
 )
 
-class UseType(IntEnum):
-    USE = 1
-    EQUIP = 2
-    UNEQUIP = 3
-    GIVE = 4
-    DEFAULT = 4
+
 
 
 class User(Model):
@@ -87,7 +82,7 @@ class User(Model):
             raise NPCException("The user is not an NPC")
         return await NPC.get(id=self.user_id)
 
-    async def get_discord_member(self, bot: AutoShardedBot) -> List[discord.Member]:
+    async def get_discord_member(self, bot: AutoShardedBot) -> List[Member]:
         """
         Get all Member instances of the user from the guilds of the cluster.
         Raises an exception if:
@@ -125,7 +120,7 @@ class User(Model):
             if inventory.hotbar == slot: # Check if the slot is already occupied
                 inventory.hotbar = None
                 await inventory.save()
-                await self.item_after_use(inventory, use_type=UseType.UNEQUIP)
+                await self.item_after_use(inventory, use_type=ItemUse.UNEQUIP)
         if hotbar.amount > 1: # Check if the item is stacked
             # If the item is stacked, we need to create a new item
             # We split the two items :
@@ -135,7 +130,7 @@ class User(Model):
             hotbar.amount = 1
         hotbar.hotbar = slot # Set the hotbar slot and save the item
         await hotbar.save()
-        await self.item_after_use(hotbar, use_type=UseType.EQUIP)
+        await self.item_after_use(hotbar, use_type=ItemUse.EQUIP)
         return True
 
     async def give_item(self, item: Inventory, amount: int=1) -> bool:
@@ -183,7 +178,7 @@ class User(Model):
 
         """
         item: Item = inventory.item
-        if use_type == UseType.USE:
+        if use_type == ItemUse.USE:
             stats: List[ItemStat] = item.stats
             for stat in stats:
                 if stat.type == ItemReason.ITEM_USED:
@@ -192,7 +187,7 @@ class User(Model):
             for role in roles:
                 if role.type == ItemReason.ITEM_USED:
                     await self.add_role(role.role)
-        elif use_type == UseType.EQUIP:
+        elif use_type == ItemUse.EQUIP:
             pass
             #stats: List[ItemStat] = item.stats
             #for stat in stats:
@@ -202,7 +197,7 @@ class User(Model):
             #for role in roles:
             #    if role.type == ItemReason.ITEM_EQUIPPED:
             #        await self.add_role(role.role)
-        elif use_type == UseType.UNEQUIP:
+        elif use_type == ItemUse.UNEQUIP:
             pass
 
     async def add_stat(self, stat: Stat, amount: int=1, regen: bool=True) -> None:

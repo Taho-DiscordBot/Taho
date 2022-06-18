@@ -1,31 +1,12 @@
 from tortoise.models import Model
 from tortoise import fields
-from enum import IntEnum
+from ..enums import SalaryCondition, RewardType
 
 __all__ = (
-    "SalaryCondition",
-    "RewardType",
     "Job",
     "JobReward",
 )
 
-class SalaryCondition(IntEnum):
-    """
-    Represents the salary conditions of a job.
-    """
-    NO_SALARY = 0
-    EVERY_DAYS = 1
-    EVERY_DAYS_IF_WORKING = 2
-    EVERY_WEEKS = 3
-    EVERY_WEEKS_IF_WORKING = 4
-
-class RewardType(IntEnum):
-    """
-    Represents the reward types of a job.
-    """
-    MONEY = 0
-    ITEM = 1
-    STAT = 2
 
 class Job(Model):
     class Meta:
