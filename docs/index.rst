@@ -7,6 +7,10 @@ Welcome to Taho's documentation!
 ================================
 
 .. image:: /images/taho.svg
+   :width: 200px
+   :height: 100px
+   :scale: 50 %
+   :alt: Taho
 
 Taho is an open-source Discord bot written in Python.
 
