@@ -1,12 +1,28 @@
 """
-    taho_babel
-    code copied and modified from flask_babel
-    ~~~~~~~~~~~
+The MIT License (MIT)
 
-    Implements i18n/l10n support for Tahp botlications based on Babel.
+Copyright (c) 2022-present Taho-DiscordBot
 
-    :copyright: (c) 2022-present by Baptiste (Taho).
-    :license: BSD, see LICENSE for more details.
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+This code is based on the work of the flask_babel project:
+https://pypi.org/project/Flask-Babel/
 """
 from __future__ import absolute_import, annotations
 import asyncio
