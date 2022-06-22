@@ -6,10 +6,13 @@
 Welcome to Taho's documentation!
 ================================
 
+.. image:: /images/taho.svg
+   
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+   ./database.rst
 
 
 Indices and tables
