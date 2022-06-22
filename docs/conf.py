@@ -63,7 +63,6 @@ copyright = '2022-present, Taho-DiscordBot'
 
 version = ''
 with open('../taho/__init__.py') as f:
-    raise Exception(f.read())
     version = re.search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), re.MULTILINE).group(1)
 # The full version, including alpha/beta/rc tags.
 release = version
