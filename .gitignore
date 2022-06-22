@@ -31,5 +31,5 @@ config.py
 .vscode/
 .env/
 *.mo
-*.txt
+*.test
 logs/
