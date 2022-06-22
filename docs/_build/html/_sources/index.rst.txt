@@ -7,12 +7,16 @@ Welcome to Taho's documentation!
 ================================
 
 .. image:: /images/taho.svg
+   :width: 200px
+   :height: 200px
+   :alt: Taho
+   :align: center
    
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   ./database.rst
+   database/models.rst
 
 
 Indices and tables
