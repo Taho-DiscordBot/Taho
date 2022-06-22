@@ -7,16 +7,17 @@ Welcome to Taho's documentation!
 ================================
 
 .. image:: /images/taho.svg
-   :width: 200px
-   :height: 100px
+   :width: 300px
+   :height: 300px
    :scale: 50 %
    :alt: Taho
+   :align: center
 
 Taho is an open-source Discord bot written in Python.
 
 **Features:**
 
-- Modern bot using discord.py, ``async``\/``await``, and Tortoise-ORM
+- Modern bot using discord.py, ``async``\/``await`` and Tortoise-ORM
 - Well documented and easy to understand
 
 
