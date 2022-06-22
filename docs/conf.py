@@ -17,7 +17,6 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-import logging
 import re
 
 
@@ -25,8 +24,6 @@ project = 'Taho'
 copyright = '2022, Baptiste#4040'
 author = 'Baptiste#4040'
 
-# The full version, including alpha/beta/rc tags
-release = '1.0.0.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -76,24 +73,8 @@ release = version
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
-locale_dirs = ['locale/']
-gettext_compact = False
-
-# Ignore warnings about inconsistent order and/or count of references in translated messages.
-# This makes no sense, different languages can have different word order...
-def _i18n_warning_filter(record: logging.LogRecord) -> bool:
-  return not record.msg.startswith(
-    (
-      'inconsistent references in translated message',
-      'inconsistent term references in translated message',
-    )
-  )
-
-
-_i18n_logger = logging.getLogger('sphinx')
-_i18n_logger.addFilter(_i18n_warning_filter)
 
 
 # Add any paths that contain templates here, relative to this directory.
@@ -126,7 +107,7 @@ resource_links = {
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = './images/discord_py_logo.ico'
+html_favicon = './images/taho.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
