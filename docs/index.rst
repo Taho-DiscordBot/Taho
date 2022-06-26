@@ -17,6 +17,8 @@ Welcome to Taho's documentation!
    :caption: Contents:
 
    database/models.rst
+   database/utils.rst
+   enums.rst
 
 
 Indices and tables

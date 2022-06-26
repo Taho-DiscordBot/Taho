@@ -1,0 +1,24 @@
+:root {
+    --grey-2: #ededf0;
+    --grey-4: #b1b1b3;
+    --black: #0c0c0d;
+    --codeblock-border: var(--grey-4);
+    --api-entry-background: var(--grey-2);
+    --main-big-headers-text: var(--black);
+}
+.container.operations {
+    padding: 10px;
+    border: 1px solid var(--codeblock-border);
+    margin-bottom: 20px;
+  }
+  
+  .container.operations::before {
+    content: 'Supported Operations';
+    color: var(--main-big-headers-text);
+    display: block;
+    padding-bottom: 0.5em;
+  }
+  
+  .container.operations > dl.describe > dt {
+    background-color: var(--api-entry-background);
+  }
