@@ -21,8 +21,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .enums import InfoType
-from typing import Any
+from __future__ import annotations
+from taho.enums import InfoType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Union
 
 __all__ = (
     "convert_to_type",
@@ -30,24 +34,64 @@ __all__ = (
 )
 
 
-def convert_to_type(value: Any, type_: InfoType) -> Any:
+def convert_to_type(value: str, type_: InfoType) -> Union[None, bool, int, float, str]:
+    """
+    Convert a value from the DB to a certain type.
+
+    Parameters
+    -----------
+    value: :class:`str`
+        The value to convert.
+    type_: :class:`~taho.enums.InfoType`
+        The type to convert to.
+    
+    Raises
+    -------
+    ValueError
+        If the value is not of the correct type.
+    
+    Returns
+    --------
+    Union[None, bool, int, float, str]
+        The converted value.
+    """
     if type_ == InfoType.NULL:
         return None
     converters = {
         InfoType.BOOL: bool,
         InfoType.INT: int,
-        InfoType.STRING: str,
+        InfoType.STR: str,
         InfoType.FLOAT: float
     }
     return converters[type_](value)
 
-def get_type(value: Any) -> InfoType:
+def get_type(value: Union[None, bool, int, float, str]) -> InfoType:
+    """
+    Get the :class:`~taho.enums.InfoType` of a value.
+
+    Parameters
+    -----------
+    value: Union[None, bool, int, float, str]
+        The value to get the type of.
+    
+    Raises
+    -------
+    ValueError
+        If the value does not correspond to an
+        :class:`~taho.enums.InfoType`.
+    
+    Returns
+    --------
+    :class:`~taho.enums.InfoType`
+        The :class:`~taho.enums.InfoType` that correspond
+        to the value.
+    """
     if value is None:
         return InfoType.NULL
     types = {
         bool: InfoType.BOOL,
         int: InfoType.INT,
-        str: InfoType.STRING,
+        str: InfoType.STR,
         float: InfoType.FLOAT
     }
     return types[type(value)]

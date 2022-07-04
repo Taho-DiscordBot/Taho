@@ -36,13 +36,24 @@ extensions = [
     "sphinx.ext.extlinks",
     "sphinx.ext.napoleon",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.viewcode",
     "sphinxcontrib_trio",
-
+    "sphinx_toolbox.collapse",
 ]
+
+autodoc_member_order = 'bysource'
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'discord': ('https://discordpy.readthedocs.io/en/latest/', None),
+    'tortoise': ('https://tortoise.github.io/', None),
+}
+
 
 extlinks = {
     'issue': ('https://github.com/Taho-DiscordBot/Taho/issues/%s', 'GH-'),
-    'ddocs': ('https://github.com/Rapptz/discord.py/%s', None),
+    'ddocs': ('https://discordpy.readthedocs.io/en/latest/%s', None),
+    'tdocs': ('https://tortoise.github.io/%s', None),
 }
 
 rst_prolog = """
@@ -50,6 +61,10 @@ rst_prolog = """
 .. |maybecoro| replace:: This function *could be a* |coroutine_link|_.
 .. |coroutine_link| replace:: *coroutine*
 .. _coroutine_link: https://docs.python.org/3/library/asyncio-task.html#coroutine
+.. |coro_attr| replace:: This attribute is not loaded. You have to ``await`` it.
+.. |int_enum| replace:: This is an |int_enum_link|_.
+.. |int_enum_link| replace:: *Integer enum*
+.. _int_enum_link: https://docs.python.org/3/library/enum.html#enum.IntEnum
 """
 
 # General information about the project.
@@ -113,3 +128,7 @@ html_favicon = './images/taho.ico'
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+html_css_files = [
+    'style.css',
+]

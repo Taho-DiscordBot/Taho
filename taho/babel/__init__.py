@@ -25,17 +25,11 @@ This code is based on the work of the flask_babel project:
 https://pypi.org/project/Flask-Babel/
 """
 from __future__ import absolute_import, annotations
-import asyncio
 import os
-
-from datetime import datetime
-from contextlib import contextmanager
 from typing import Dict, Tuple, Generator
-from babel import dates, numbers, support, Locale
+from babel import support, Locale
 from discord import Interaction
-from discord.ext.commands import Context
-from pytz import timezone, UTC
-from ..utils import TahoContext
+from taho.utils.context import TahoContext
 
 from .speaklater import LazyString
 current_bot = None

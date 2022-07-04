@@ -21,25 +21,33 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-import pytest
-from taho.database.models import *
-from .test_initialize_db import clusters, guilds, users, npcs
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from taho.database import Server
+from tortoise.exceptions import DoesNotExist
+import discord
 
-@pytest.fixture
-async def roles(clusters):
-    _roles = pytest.test_data["discord"]["roles"]
-    _guilds = pytest.test_data["discord"]["guilds"]
-    return [
-        await clusters[0].create_role(pytest.bot, _roles[_guilds[0]][0], RoleType.default),
-        await clusters[1].create_role(pytest.bot, _roles[_guilds[2]][0], RoleType.default),
-    ]
+if TYPE_CHECKING:
+    from typing import Optional
+    from taho.database import Cluster
 
-@pytest.mark.asyncio
-async def test_roles(roles, clusters):
-    assert len(roles) == 2
-    assert roles[0].cluster == clusters[0]
-    assert roles[1].cluster == clusters[1]
-    assert roles[0].type == RoleType.default
-    assert roles[1].type == RoleType.default
-    assert len(await roles[0].guild_roles.all()) == 2
-    assert len(await roles[1].guild_roles.all()) == 1
+
+
+__all__ = (
+    "get_db_guild",
+)
+
+async def get_db_guild(guild: discord.Guild) -> Optional[Server]:
+    """
+    Return a Server record of the Database from a discord Guild.
+    """
+    try:
+        return await Server.get(id=guild.id)
+    except DoesNotExist:
+        return None
+    
+async def get_cluster(guild: discord.Guild) -> Optional[Cluster]:
+    server = await get_db_guild(guild)
+    if server:
+        return await server.cluster
+    return None

@@ -22,6 +22,5 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from .models import *
-from .enums import *
 from .utils import *
 from .start import init_db

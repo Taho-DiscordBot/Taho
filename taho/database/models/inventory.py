@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from tortoise.models import Model
 from tortoise import fields
-from ..enums import ItemType
+from taho.enums import ItemType
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -35,9 +35,98 @@ if TYPE_CHECKING:
 
 __all__ = (
     "Inventory",
+    "Hotbar",
 )
 
 class Inventory(Model):
+    """Represents a :class:`~taho.database.models.Item` in a
+    :class:`~taho.database.models.User`'s inventory.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two inventories are equal.
+
+        .. describe:: x != y
+
+            Checks if two inventories are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the inventories's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``inventories``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: item
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Item`
+                - :attr:`related_name` ``inventories``
+        
+            Python: :class:`~taho.database.models.Item`
+        
+        .. collapse:: amount
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`default` 0
+            
+            Python: :class:`int`
+        
+        .. collapse:: durability
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`null` True
+            
+            Python: Optional[:class:`int`]
+        
+        .. collapse:: ammo
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`null` True
+            
+            Python: Optional[:class:`int`]
+        
+    Attributes
+    -----------
+    id: :class:`int`
+        The inventory's ID.
+    user: :class:`~taho.database.models.User`
+        |coro_attr|
+
+        The :class:`~taho.database.models.User` that owns the inventory.
+    item: :class:`~taho.database.models.Item`
+        |coro_attr|
+        
+        The :class:`~taho.database.models.Item` in the inventory.
+    amount: :class:`int`
+        The amount of the item in the inventory.
+    durability: Optional[:class:`int`]
+        The durability of the item in the inventory.
+    ammo: Optional[:class:`int`]
+        The ammo of the item in the inventory.
+    """
     class Meta:
         table = "inventories"
 
@@ -49,12 +138,23 @@ class Inventory(Model):
     amount = fields.IntField(default=0)
     durability = fields.IntField(null=True)
     ammo = fields.IntField(null=True)
-    hotbar = fields.IntField(null=True)
+
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+    
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+    
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
 
     @property
     def dura(self) -> Optional[int]:
         """
-        Shortcut for <Inventory>.durability
+        Optional[:class:`int`]: Shortcut for :attr:`.durability`.
         """
         return self.durability
 
@@ -65,15 +165,13 @@ class Inventory(Model):
         force_create: bool = False,
         force_update: bool = False,
     ) -> None:
-        if self.item.type == ItemType.RESOURCE:
+        if self.item.type == ItemType.resource:
             self.ammo = None
             self.durability = None
-            self.hotbar = None
-        elif self.item.type == ItemType.CONSUMABLE:
+        elif self.item.type == ItemType.consumable:
             self.durability = self.dura if (self.dura <= self.item.dura) else self.item.dura #TODO better
             self.ammo = None
-            self.hotbar = None
-        elif self.item.type == ItemType.EQUIPMENT:
+        elif self.item.type == ItemType.equipment:
             self.ammo = self.ammo if (self.ammo<=self.item.charger_size) else self.item.charger_size #TODO better       
             await super().save(
             using_db=using_db,
@@ -81,3 +179,121 @@ class Inventory(Model):
             force_create=force_create,
             force_update=force_update,
             )
+
+class Hotbar(Model):
+    """Represents a :class:`~taho.database.models.Item` in a
+    :class:`~taho.database.models.User`'s hotbar.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two hotbars are equal.
+
+        .. describe:: x != y
+
+            Checks if two hotbars are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the hotbars's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``hotbars``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: item
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Item`
+                - :attr:`related_name` ``hotbars``
+        
+            Python: :class:`~taho.database.models.Item`
+        
+        .. collapse:: slot
+
+            Tortoise: :class:`tortoise.fields.IntField`
+            
+            Python: :class:`int`
+        
+        .. collapse:: durability
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`null` True
+            
+            Python: Optional[:class:`int`]
+        
+        .. collapse:: ammo
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`null` True
+            
+            Python: Optional[:class:`int`]       
+    
+    Attributes
+    -----------
+    id: :class:`int`
+        The hotbar's ID.
+    user: :class:`~taho.database.models.User`
+        |coro_attr|
+
+        The :class:`~taho.database.models.User` that owns the hotbar.
+    item: :class:`~taho.database.models.Item`
+        |coro_attr|
+
+        The :class:`~taho.database.models.Item` in the hotbar.
+    slot: :class:`int`
+        The slot in the hotbar.
+    durability: Optional[:class:`int`]
+        The durability of the item in the hotbar.
+    ammo: Optional[:class:`int`]
+        The ammo of the item in the hotbar.
+    """
+    class Meta:
+        table = "hotbars"
+
+    id = fields.IntField(pk=True)
+
+    user = fields.ForeignKeyField("main.User", related_name="hotbars")
+    item = fields.ForeignKeyField("main.Item", related_name="hotbars")
+
+    slot = fields.IntField()
+    durability = fields.IntField(null=True)
+    ammo = fields.IntField(null=True)
+
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+    
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+    
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+
+    @property
+    def dura(self) -> Optional[int]:
+        """
+        Optional[:class:`int`]: Shortcut for :attr:`.durability`.
+        """
+        return self.durability

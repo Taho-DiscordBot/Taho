@@ -31,3 +31,4 @@ from .role import *
 from .stat import *
 from .job import *
 from .npc import *
+from .currency import *

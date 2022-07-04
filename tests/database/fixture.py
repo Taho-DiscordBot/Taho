@@ -35,15 +35,15 @@ class TestData:
 
     async def load(self) -> None:
         self.clusters = [
-            (await ServerCluster.get_or_create(name="Cluster A"))[0],
-            (await ServerCluster.get_or_create(name="Cluster B"))[0],
+            (await Cluster.get_or_create(name="Cluster A"))[0],
+            (await Cluster.get_or_create(name="Cluster B"))[0],
         ]
 
         _guilds = pytest.test_data["discord"]["guilds"]
         self.guilds =  [
-            (await Guild.get_or_create(cluster=self.clusters[0], id=_guilds[0].id))[0],
-            (await Guild.get_or_create(cluster=self.clusters[0], id=_guilds[1].id))[0],
-            (await Guild.get_or_create(cluster=self.clusters[1], id=_guilds[2].id))[0],
+            (await Server.get_or_create(cluster=self.clusters[0], id=_guilds[0].id))[0],
+            (await Server.get_or_create(cluster=self.clusters[0], id=_guilds[1].id))[0],
+            (await Server.get_or_create(cluster=self.clusters[1], id=_guilds[2].id))[0],
         ]
 
         _users = pytest.test_data["discord"]["users"]

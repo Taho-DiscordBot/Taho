@@ -22,7 +22,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 __version__ = '1.0.0.0a'
-from .babel import *
-from .database import *
 from .exceptions import *
 from .utils import *
+from .bot import *
+from . import database
+from .currency_amount import *
+from .emoji import *

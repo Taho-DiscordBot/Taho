@@ -21,25 +21,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-import pytest
-from taho.database.models import *
-from .test_initialize_db import clusters, guilds, users, npcs
+from enum import IntEnum
 
-@pytest.fixture
-async def roles(clusters):
-    _roles = pytest.test_data["discord"]["roles"]
-    _guilds = pytest.test_data["discord"]["guilds"]
-    return [
-        await clusters[0].create_role(pytest.bot, _roles[_guilds[0]][0], RoleType.default),
-        await clusters[1].create_role(pytest.bot, _roles[_guilds[2]][0], RoleType.default),
-    ]
+__all__ = (
+    "SalaryCondition",
+    "RewardType",
+)
 
-@pytest.mark.asyncio
-async def test_roles(roles, clusters):
-    assert len(roles) == 2
-    assert roles[0].cluster == clusters[0]
-    assert roles[1].cluster == clusters[1]
-    assert roles[0].type == RoleType.default
-    assert roles[1].type == RoleType.default
-    assert len(await roles[0].guild_roles.all()) == 2
-    assert len(await roles[1].guild_roles.all()) == 1
+class SalaryCondition(IntEnum):
+    """
+    Represents the salary conditions of a job.
+    """
+    no_salary = 0
+    every_day = 1
+    every_day_if_worked = 2
+    every_week = 3
+    every_week_if_worked = 4
+
+class RewardType(IntEnum):
+    """
+    Represents the reward types of a job.
+    """
+    money = 0
+    item = 1
+    stat = 2

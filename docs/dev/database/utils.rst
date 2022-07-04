@@ -6,3 +6,4 @@ Database utils
 .. autofunction:: convert_to_type
 
 .. autofunction:: get_type
+

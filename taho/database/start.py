@@ -26,7 +26,6 @@ from tortoise import Tortoise
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from discord.ext.commands import AutoShardedBot
     from sshtunnel import SSHTunnelForwarder
 
 
@@ -41,14 +40,28 @@ _models = [
     "taho.database.models.stat",
     "taho.database.models.job",
     "taho.database.models.npc",
+    "taho.database.models.currency"
     ]
 
-async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, config: dict=None, _create_db: bool=False) -> None:
-    if not config:
-        config = bot.config
+async def init_db(config: dict, ssh_tunnel: SSHTunnelForwarder=None, _create_db: bool=False) -> None:
+    """|coro|
+
+    Connect and initialize the database.
+
+    Parameters
+    ----------
+    config: :class:`dict`
+        The config dictionary, which is loaded from 
+        the config file.
+    tunnel: Optional[:class:`sshtunnel.SSHTunnelForwarder`]
+        The SSH tunnel instance if used.
+    _create_db: Optional[bool]
+        Whether to create the database.
+        Only for testing purposes.
+    """
     # If the SSH tunnel is not used, we can use the default port
     # The SSH tunnel creates a new port for the DB
-    port = tunnel.local_bind_port if tunnel else config["DB_PORT"]
+    port = ssh_tunnel.local_bind_port if ssh_tunnel else config["DB_PORT"]
     await Tortoise.init(
         config={
             "connections": {
@@ -97,4 +110,3 @@ async def init_db(bot: AutoShardedBot, tunnel: SSHTunnelForwarder, config: dict=
     #DROP TABLE IF EXISTS npc_roles CASCADE;
     #DROP TABLE IF EXISTS npc_owners CASCADE;
     #""")
-    return True

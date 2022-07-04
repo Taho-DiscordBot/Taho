@@ -59,7 +59,7 @@ async def connect_db(request):
         ssh_tunnel = None
     pytest.ssh_tunnel = ssh_tunnel
 
-    await init_db(pytest.bot, ssh_tunnel)
+    await init_db(config, ssh_tunnel=ssh_tunnel)
 
     conn = Tortoise.get_connection('default')
     await conn.execute_script("""
@@ -118,9 +118,9 @@ async def initialize_db(request):
     return
     bot = pytest.bot
 
-    clusters = await ServerCluster.bulk_create([
-        ServerCluster(name="Cluster A"),
-        ServerCluster(name="Cluster B"),
+    clusters = await Cluster.bulk_create([
+        Cluster(name="Cluster A"),
+        Cluster(name="Cluster B"),
     ],
     batch_size=2
     )
@@ -166,8 +166,8 @@ async def initialize_db(request):
 
     _roles = pytest.test_data["discord"]["roles"]
     roles = [
-        await clusters[0].create_role(bot, _roles[_guilds[0]], RoleType.DEFAULT),
-        await clusters[1].create_role(bot, _roles[_guilds[2]], RoleType.DEFAULT),
+        await clusters[0].create_role(bot, _roles[_guilds[0]], RoleType.default),
+        await clusters[1].create_role(bot, _roles[_guilds[2]], RoleType.default),
     ]
 
     npc_roles = await NPCRole.bulk_create([

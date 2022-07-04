@@ -26,37 +26,103 @@ from typing import TYPE_CHECKING
 from tortoise.models import Model
 from tortoise import fields
 from taho.exceptions import QuantityException, NPCException
-from ..enums import ItemUse, ItemType, ItemReason
+from taho.enums import ItemUse, ItemType, ItemReason
+from .npc import NPC
 
 if TYPE_CHECKING:
     from typing import Any, List
-    from .npc import NPC
     from .bank import Bank, BankAccount
     from .role import Role
-    from .inventory import Inventory
+    from .inventory import Inventory, Hotbar
     from .item import Item, ItemStat, ItemRole
     from .stat import Stat
     from .npc import NPCOwner
-    from .server import ServerCluster
-    from discord.ext.commands import AutoShardedBot
+    from .server import Cluster
+    from taho import Bot
     from discord import Member
-
-
 
 __all__ = (
     "User",
+    "UserStat",
 )
-
-
-
 
 class User(Model):
     """
-    Represents a user in the database.
-    The user have to be linked to a Cluster.
-    The user with the user_id 0 is the default user for a cluster;
-    it can be used to store data that is not linked to a specific user
-    (ex: the default bank account is linked to the user with user_id 0).
+    Represents a user of a cluster.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two users are equal.
+
+        .. describe:: x != y
+
+            Checks if two users are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the user's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: user_id
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+            Python: :class:`int`
+
+        .. collapse:: cluster
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`taho.database.models.Cluster`
+                - :attr:`related_name` ``users``
+
+            Python: :class:`taho.database.models.Cluster`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The user's ID.
+    user_id: :class:`int`
+        The user's Discord ID.
+    cluster: :class:`~taho.database.models.Cluster`
+        The cluster the user is in.
+    banks: List[:class:`~taho.database.models.Bank`]
+        |coro_attr|
+
+        The banks owned by the user.
+    accounts: List[:class:`~taho.database.models.BankAccount`]
+        |coro_attr|
+
+        The accounts owned by the user.
+    inventories: List[:class:`~taho.database.models.Inventory`]
+        |coro_attr|
+
+        The items in the user's inventory.
+    hotbars: List[:class:`~taho.database.models.Hotbar`]
+        |coro_attr|
+
+        The items in the user's hotbar.
+    npcs: List[:class:`~taho.database.models.NPCOwner`]
+        |coro_attr|
+
+        The NPCs owned by the user.
+    
+
+    .. note::
+
+        The user with the :attr:`.user_id` to 0 is the 
+        :attr:`.cluster`'s default account.
     """
     class Meta:
         table = "users"
@@ -64,16 +130,16 @@ class User(Model):
     # if you haven't done it yourself
     id = fields.IntField(pk=True)
     user_id = fields.BigIntField()
-    cluster: ServerCluster = fields.ForeignKeyField("main.ServerCluster", related_name="users")
+    cluster: Cluster = fields.ForeignKeyField("main.Cluster", related_name="users")
 
     banks: fields.ReverseRelation["Bank"] # The banks owned by the user
     accounts: fields.ReverseRelation["BankAccount"] # The accounts owned by the user
     inventories: fields.ReverseRelation["Inventory"] # The items in the user's inventory
+    hotbars: fields.ReverseRelation["Hotbar"] # The hotbars of the user
     npcs: fields.ReverseRelation["NPCOwner"] # The npcs owned by the user
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        print("user initied")
         self._is_npc = None
 
     async def is_npc(self) -> bool:
@@ -105,7 +171,7 @@ class User(Model):
             raise NPCException("The user is not an NPC")
         return await NPC.get(id=self.user_id)
 
-    async def get_discord_member(self, bot: AutoShardedBot) -> List[Member]:
+    async def get_discord_member(self, bot: Bot) -> List[Member]:
         """
         Get all Member instances of the user from the guilds of the cluster.
         Raises an exception if:
@@ -115,14 +181,14 @@ class User(Model):
             raise NPCException("The user is an NPC")
         return await self.cluster.get_discord_members(bot, self.user_id)
 
-    async def get_roles(self, bot: AutoShardedBot) -> List[Role]:
+    async def get_roles(self, bot: Bot) -> List[Role]:
         """
         Get the roles of the user.
         """
         if await self.is_npc():
             return await (await self.get_npc()).roles.all() # Get the roles of the NPC
         user_roles = []
-        cluster_roles = await self.cluster.get_roles(bot)
+        cluster_roles = await self.cluster.get_servers_roles(bot)
         member_roles = [m.roles for m in await self.get_discord_member(bot)]
         for role, roles in cluster_roles.items():
             for r in roles:
@@ -135,15 +201,15 @@ class User(Model):
         """
         Define hotbar slot for an item in the user's inventory.
         Returns True if done, False if one of the following is true:
-        - the item's type is not "EQUIPEMENT"
+        - the item's type is not "equipEMENT"
         """
-        if hotbar.type != ItemType.EQUIPMENT: # Check if the item is an equipement
+        if hotbar.type != ItemType.equipment: # Check if the item is an equipement
             return False
         async for inventory in self.inventories:
             if inventory.hotbar == slot: # Check if the slot is already occupied
                 inventory.hotbar = None
                 await inventory.save()
-                await self.item_after_use(inventory, use_type=ItemUse.UNEQUIP)
+                await self.item_after_use(inventory, use_type=ItemUse.unequip)
         if hotbar.amount > 1: # Check if the item is stacked
             # If the item is stacked, we need to create a new item
             # We split the two items :
@@ -153,7 +219,7 @@ class User(Model):
             hotbar.amount = 1
         hotbar.hotbar = slot # Set the hotbar slot and save the item
         await hotbar.save()
-        await self.item_after_use(hotbar, use_type=ItemUse.EQUIP)
+        await self.item_after_use(hotbar, use_type=ItemUse.equip)
         return True
 
     async def give_item(self, item: Inventory, amount: int=1) -> bool:
@@ -190,7 +256,7 @@ class User(Model):
             await self.take_item(inventory, amount)
         except QuantityException as e:
             raise e
-        if inventory.item.type in (ItemType.EQUIPEMENT, ItemType.CONSUMABLE):
+        if inventory.item.type in (ItemType.equipment, ItemType.consumable):
             await self.item_after_use(inventory, amount, use_type)
 
     async def item_after_use(self, inventory: Inventory, amount: int=1, use_type: int=None) -> None:
@@ -201,26 +267,26 @@ class User(Model):
 
         """
         item: Item = inventory.item
-        if use_type == ItemUse.USE:
+        if use_type == ItemUse.use:
             stats: List[ItemStat] = item.stats
             for stat in stats:
-                if stat.type == ItemReason.ITEM_USED:
+                if stat.type == ItemReason.item_used:
                     await self.add_stat(stat.stat, stat.amount * amount, stat.is_regen)
             roles: List[ItemRole] = item.roles
             for role in roles:
-                if role.type == ItemReason.ITEM_USED:
+                if role.type == ItemReason.item_used:
                     await self.add_role(role.role)
-        elif use_type == ItemUse.EQUIP:
+        elif use_type == ItemUse.equip:
             pass
             #stats: List[ItemStat] = item.stats
             #for stat in stats:
-            #    if stat.type == ItemReason.ITEM_EQUIPPED:
+            #    if stat.type == ItemReason.item_equipped:
             #        await self.add_stat(stat.stat, stat.amount * amount, stat.is_regen)
             #roles: List[ItemRole] = item.roles
             #for role in roles:
-            #    if role.type == ItemReason.ITEM_EQUIPPED:
+            #    if role.type == ItemReason.item_equipped:
             #        await self.add_role(role.role)
-        elif use_type == ItemUse.UNEQUIP:
+        elif use_type == ItemUse.unequip:
             pass
 
     async def add_stat(self, stat: Stat, amount: int=1, regen: bool=True) -> None:
@@ -236,14 +302,15 @@ class User(Model):
         """
         pass
 
-    async def add_role(self, bot: AutoShardedBot, role: Role) -> None:
+    async def add_role(self, bot: Bot, role: Role) -> None:
         """
         Add a role to the user.
         """
         if role in await self.get_roles(bot): # Check if the role is already in the user's roles
             return
         if await self.is_npc():
-            await self.get_npc().add_role(role) # Add the role to the NPC
+            npc = await self.get_npc()
+            await npc.add_role(role) # Add the role to the NPC
         else:
             discord_roles = await role.get_discord_roles(bot) # Get the discord roles to add
             # Get the discord members of the user, ordered by guild
@@ -255,7 +322,7 @@ class User(Model):
                 except:
                     pass
 
-    async def remove_role(self, bot: AutoShardedBot, role: Role) -> None:
+    async def remove_role(self, bot: Bot, role: Role) -> None:
         """
         Remove a role from the user.
         """
@@ -274,8 +341,78 @@ class User(Model):
                 except:
                     pass
 
-
 class UserStat(Model):
+    """Represents a stat a user have.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two stats are equal.
+
+        .. describe:: x != y
+
+            Checks if two stats are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the stat's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``stats``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: stat
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Stat`
+                - :attr:`related_name` ``user_stats``
+
+            Python: :class:`~taho.database.models.Stat`
+        
+        .. collapse:: amount
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+            Python: :class:`int`
+
+        .. collapse:: is_regen
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`null` ``True``
+
+            Python: Optional[:class:`bool`]
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The stat's ID.
+    user: :class:`~taho.database.models.User`
+        The user who have the stat.
+    stat: :class:`~taho.database.models.Stat`
+        The stat.
+    amount: :class:`int`
+        The amount of the stat.
+    is_regen: Optional[:class:`bool`]
+        Whether the stat is regenerable.
+    """
     class Meta:
         table = "user_stats"
 
@@ -284,5 +421,5 @@ class UserStat(Model):
     user = fields.ForeignKeyField("main.User", related_name="stats")
     stat = fields.ForeignKeyField("main.Stat", related_name="user_stats")
     amount = fields.IntField()
-    is_regen = fields.BooleanField()
-    maximum = fields.IntField()
+    is_regen = fields.BooleanField(null=True)
+    maximum = fields.IntField() #todo penser à ça

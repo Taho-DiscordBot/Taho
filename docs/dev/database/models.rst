@@ -6,9 +6,6 @@ Database models
 All the models from the database.
 
 
-Base Model
------------
-
 .. note::
 
     All these models are inherited from the Tortoise-ORM's base :tdocs:`Model <models.html>`.
@@ -19,9 +16,6 @@ Model
 .. autoclass:: tortoise.models.Model
     :members:
 
-
-Server & Cluster
------------------
 
 Cluster
 ~~~~~~~~
@@ -48,9 +42,6 @@ ServerInfo
     :exclude-members: Meta
 
 
-Financial sector
------------------
-
 Currency
 ~~~~~~~~~
 .. autoclass:: Currency()
@@ -73,17 +64,15 @@ BankAccount
 ~~~~~~~~~~~~
 .. autoclass:: BankAccount()
     :members:
+    :private-members:
     :exclude-members: Meta
 
-BankOperation
-~~~~~~~~~~~~~~
-.. autoclass:: BankOperation()
+BankingTransaction
+~~~~~~~~~~~~~~~~~~~
+.. autoclass:: BankingTransaction()
     :members:
     :exclude-members: Meta
 
-
-Jobs
------
 
 Job
 ~~~~
@@ -97,15 +86,19 @@ JobReward
     :members:
     :exclude-members: Meta
 
+JobCost
+~~~~~~~~~~
+.. autoclass:: JobCost()
+    :members:
+    :exclude-members: Meta
 
-Items
-------
 
 Item
 ~~~~~
 .. autoclass:: Item()
     :members:
-    :exclude-members: Meta
+    :exclude-members: Meta, save
+
 
 ItemStat
 ~~~~~~~~~
@@ -117,11 +110,14 @@ Inventory
 ~~~~~~~~~~
 .. autoclass:: Inventory()
     :members:
+    :exclude-members: Meta, save
+
+Hotbar
+~~~~~~~
+.. autoclass:: Hotbar()
+    :members:
     :exclude-members: Meta
 
-
-Roles
-------
 
 Role
 ~~~~~
@@ -129,8 +125,9 @@ Role
     :members:
     :exclude-members: Meta
 
-Stats
-------
+.. autoclass:: ServerRole()
+    :members:
+    :exclude-members: Meta
 
 Stat
 ~~~~~
@@ -139,17 +136,17 @@ Stat
     :exclude-members: Meta
 
 
-Users
-------
-
 User
 ~~~~~
 .. autoclass:: User()
     :members:
     :exclude-members: Meta
 
-NPCs
------
+UserStat
+~~~~~~~~~
+.. autoclass:: UserStat()
+    :members:
+    :exclude-members: Meta
 
 NPC
 ~~~~

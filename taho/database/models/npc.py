@@ -39,44 +39,157 @@ __all__ = (
 )
 
 class NPC(Model):
+    """Represents a NPC.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two NPCs are equal.
+
+        .. describe:: x != y
+
+            Checks if two NPCs are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the npc's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: cluster
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Cluster`
+                - :attr:`related_name` ``npcs``
+            
+            Python: :class:`~taho.database.models.Cluster`
+        
+        .. collapse:: name
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+            
+            Python: :class:`str`
+        
+        .. collapse:: avatar
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: description
+
+            Tortoise: :class:`tortoise.fields.TextField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+    Attributes
+    -----------
+    id: :class:`int`
+        The NPC's ID.
+    cluster: :class:`~taho.database.models.Cluster`
+        The cluster the NPC belongs to.
+    name: :class:`str`
+        The NPC's name.
+    avatar: Optional[:class:`str`]  
+        The NPC's avatar (url).
+    description: Optional[:class:`str`]
+        The NPC's description.
+    roles: List[:class:`~taho.database.models.NPCRole`]
+        |coro_attr|
+
+        The roles the NPC has.
+    users: List[:class:`~taho.database.models.NPCOwner`]
+        |coro_attr|
+
+        The users who own the NPC.
+    """
     class Meta:
         table = "npcs"
 
     id = fields.IntField(pk=True)
-    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="npcs")
+    cluster = fields.ForeignKeyField("main.Cluster", related_name="npcs")
     name = fields.CharField(max_length=255)
     avatar = fields.CharField(max_length=255, null=True)
+    description = fields.TextField(null=True)
 
     users: fields.ReverseRelation["NPCOwner"]
     roles: fields.ReverseRelation["NPCRole"]
 
-    async def add_role(self, role: Role) -> None:
-        """
-        Add a role to the NPC.
-        """
-        await NPCRole.get_or_create(npc=self, role=role)
+    async def add_roles(self, *roles: List[Role]) -> None:
+        """|coro|
 
-    async def remove_role(self, role: Role) -> None:
-        """
-        Remove a role from the NPC.
-        """
-        await NPCRole.filter(npc=self, role=role).delete()
+        Add roles to the NPC.
 
-    async def get_db_user(self) -> User:
+        Parameters
+        -----------
+        roles: List[:class:`~taho.database.models.Role`]
+            The roles to add.
         """
-        Get the User that represents the NPC.
+        await NPCRole.filter(npc=self, role__in=roles).delete()
+        await NPCRole.bulk_create([NPCRole(npc=self, role=r) for r in roles])
+
+    async def remove_roles(self, *roles: List[Role]) -> None:
+        """|coro|
+
+        Remove roles from the NPC.
+
+        Parameters
+        -----------
+        roles: List[:class:`~taho.database.models.Role`]
+            The roles to remove.
+        """
+        await NPCRole.filter(npc=self, role__in=roles).delete()
+
+    async def get_user(self) -> User:
+        """|coro|
+        
+        Get the :class:`~taho.database.models.User` that 
+        represents the NPC.
+
+        Returns
+        --------
+        :class:`~taho.database.models.User`
+            The user.
         """
         from .user import User # Avoid circular import
         return (await User.get_or_create(user_id=self.id, cluster=self.cluster))[0]
 
-    async def get_users(self) -> List[User]:
-        """
-        Get all the users who own the NPC as a <User> instance.
-        This is different from <.users> because <.users> returns <NPCOwner>
+    async def get_users(self) -> List[NPCOwner]:
+        """|coro|
+
+        Get all the users who own the NPC.
+
+        Returns
+        --------
+        List[:class:`~taho.database.models.NPCOwner`]
+            The users.
+        
+
+        .. note::
+
+            :class:`~taho.database.models.NPCOwner` is different from
+            :class:`~taho.database.models.User`.
+
         """
         return [await u.user async for u in self.users]
         
-
 @post_save(NPC)
 async def on_npc_save(_, instance: NPC, created: bool, *args, **kwargs) -> None:
     if created:
@@ -84,6 +197,90 @@ async def on_npc_save(_, instance: NPC, created: bool, *args, **kwargs) -> None:
         await User.get_or_create(user_id=instance.id, cluster=instance.cluster)
 
 class NPCOwner(Model):
+    """Represents an owner of a NPC.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two owners are equal.
+
+        .. describe:: x != y
+
+            Checks if two owners are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the owner's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: npc
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.NPC`
+                - :attr:`related_name` ``users``
+            
+            Python: :class:`~taho.database.models.NPC`
+        
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``npcs``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: original_owner
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` ``False``
+            
+            Python: :class:`bool`
+        
+        .. collapse:: pattern
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: is_selected
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` ``False``
+            
+            Python: :class:`bool`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The owner's ID.
+    npc: :class:`~taho.database.models.NPC`
+        The NPC that the owner owns.
+    user: :class:`~taho.database.models.User`
+        The user that owns the NPC.
+    original_owner: :class:`bool`
+        Whether the user is the original owner of the NPC.
+    pattern: Optional[:class:`str`]
+        The pattern used to send RP messages in a RP channel.
+    is_selected: :class:`bool`
+        Whether the user has selected the NPC.
+    """
     class Meta:
         table = "npc_owners"
 
@@ -95,11 +292,88 @@ class NPCOwner(Model):
     pattern = fields.CharField(max_length=255, null=True)
     is_selected = fields.BooleanField(default=False)
 
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+    
+    def __ne__(self, other: object) -> bool:
+        return not super().__eq__(other)
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+
 class NPCRole(Model):
+    """Represents a role of a NPC.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two roles are equal.
+
+        .. describe:: x != y
+
+            Checks if two roles are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the role's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: npc
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.NPC`
+                - :attr:`related_name` ``roles``
+            
+            Python: :class:`~taho.database.models.NPC`
+        
+        .. collapse:: role
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Role`
+                - :attr:`related_name` ``npcs``
+            
+            Python: :class:`~taho.database.models.Role`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The role's ID.
+    npc: :class:`~taho.database.models.NPC`
+        The NPC that the role belongs to.
+    role: :class:`~taho.database.models.Role`
+        The role that the NPC belongs to.
+    """
     class Meta:
         table = "npc_roles"
 
     id = fields.IntField(pk=True)
 
-    npc = fields.ForeignKeyField("main.NPC", related_name="npc_roles")
+    npc = fields.ForeignKeyField("main.NPC", related_name="roles")
     role = fields.ForeignKeyField("main.Role", related_name="npc_roles")
+
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+    
+    def __ne__(self, other: object) -> bool:
+        return not super().__eq__(other)
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

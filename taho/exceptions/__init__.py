@@ -24,15 +24,22 @@ DEALINGS IN THE SOFTWARE.
 
 __all__ = (
     "TahoException",
+    "AlreadyExists",
     "QuantityException",
     "NPCException",
     "RoleException",
-    "Unknown",
+    "DoesNotExist",
 )
 
 class TahoException(Exception):
     """
     Raised when an error occurs in the Taho framework.
+    """
+    pass
+
+class AlreadyExists(TahoException):
+    """
+    Raised when an object already exists.
     """
     pass
 
@@ -58,9 +65,8 @@ class RoleException(TahoException):
     """
     pass
 
-class Unknown(TahoException):
+class DoesNotExist(TahoException):
     """
-    Raised when you are trying to get something
-    that doesn't exist.
+    Raised when an object does not exist.
     """
     pass

@@ -25,12 +25,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from tortoise.models import Model
 from tortoise import fields
+from tortoise import exceptions as t_exceptions
 from ..utils import convert_to_type, get_type
+from taho.enums import InfoType
 
 if TYPE_CHECKING:
-    from discord.ext.commands import AutoShardedBot
     from typing import Any, Optional, Union
-    from discord import Member, Role as DRole, Guild
+    import discord
+    from taho import Bot
 
 
 __all__ = (
@@ -38,78 +40,265 @@ __all__ = (
     "ServerInfo",
 )
 
-
-
-
-
-
 class Server(Model):
+    """
+    Represents a Server.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two servers are equal.
+
+        .. describe:: x != y
+
+            Checks if two servers are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the server's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: cluster
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Cluster`
+                - :attr:`related_name` ``servers``
+            
+            Python: :class:`~taho.database.models.Cluster`       
+    
+    Attributes
+    -----------
+    id: :class:`int`
+        The server's ID.
+    cluster: :class:`~taho.database.models.Cluster`
+        The cluster the server is in.
+    infos: List[:class:`.ServerInfo`]
+        |coro_attr|
+
+        The server's info.
+    
+
+    .. note::
+
+        When you create a server, please set the ID as that of 
+        the attached :class:`discord.Guild`.
+
+        Example:
+
+            My guild (ID: 123456789) ::
+
+                server = Server.create(id=123456789)
+
+    """
     class Meta:
         table = "servers"
 
     id = fields.BigIntField(pk=True)
-    cluster = fields.ForeignKeyField("main.ServerCluster", related_name="servers")
+    cluster = fields.ForeignKeyField("main.Cluster", related_name="servers")
 
     infos: fields.ReverseRelation["ServerInfo"]
 
     async def get_info(self, key: str) -> Optional[Union[str, int, float, None]]:
-        """
-        Gets the value of a key in the cluster's info.
+        """|coro|
 
-        Raises KeyError if the key does not exist.
+        Returns the value of a key in the server's info.
+
+        Parameters
+        -----------
+        key: :class:`str`
+            The key of the info.
+        
+        Raises
+        -------
+        KeyError
+            If the key does not exist.
+        
+        Returns
+        --------
+        Union[``None``, :class:`bool`, :class:`int`, :class:`float`, :class:`str`]
+            The value of the key. 
+
+
+        .. note::
+
+            If the key is not found in server's info,
+            then the function search in cluster's ones.       
         """
-        async for info in self.infos:
-            if info.key == key:
-                return info.py_value
-        return await self.cluster.get_info(key)
+        try:
+            info = await ServerInfo.get(server=self, key=key)
+            return info.py_value
+        except t_exceptions.DoesNotExist:
+            return await (await self.cluster).get_info(key)
     
     async def set_info(self, key: str, value: Optional[Union[str, int, float, None]]) -> None:
-        """
-        Sets the value of a key in the cluster's info.
-        If the value is None, the info is deleted.
+        """|coro|
 
-        Raises KeyError if the key does not exist (only for deletion).
+        Sets the value of a key in the server's info.
+
+        Parameters
+        -----------
+        key: :class:`str`
+            The key of the info.
+        value: Union[``None``, :class:`bool`, :class:`int`, :class:`float`, :class:`str`]
+            The value of the key.
         """
-        if value is None:
-            try:
-                await self.infos.filter(key=key).delete()
-            except:
-                raise KeyError(f"No info with key {key}")
-        async for info in self.infos:
-            if info.key == key:
-                info.value = value
-                info.type = get_type(value)
-                await info.save()
-                return
-        await ServerInfo.create(
-            server=self,
+        # If the info already exists, update it.
+        await ServerInfo.update_or_create(
+            server=self, 
             key=key,
-            value=value,
-            type=get_type(value)
+            type=get_type(value),
+            value=str(value)
         )
 
-    async def get_guild(self, bot: AutoShardedBot) -> Guild:
-        """
-        Get the discord.Guild object for this server.
+    async def get_guild(self, bot: Bot) -> Optional[discord.Guild]:
+        """|coro|
+
+        Get the :class:`discord.Guild` object of the server.
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        
+        Returns
+        --------
+        Optional[class:`discord.Guild`]
+            The guild object, if found.
         """
         guild = bot.get_guild(self.id)
         if guild and not guild.chunked:
             await guild.chunk()
         return guild
     
-    async def get_member(self, bot: AutoShardedBot, user_id: int) -> Optional[Member]:
-        """
-        Returns a discord.Member object for the user.
+    async def get_member(self, bot: Bot, user_id: int) -> Optional[discord.Member]:
+        """|coro|
+
+        Get a :class:`discord.Member` from the server's guild.
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        user_id: :class:`int`
+            The user's ID.
+        
+        Returns
+        --------
+        Optional[:class:`discord.Member`]
+            The member object, if found.
         """
         return (await self.get_guild(bot)).get_member(user_id)
     
-    async def get_role(self, bot: AutoShardedBot, role_id: int) -> Optional[DRole]:
-        """
-        Returns a discord.Role object for the role.
+    async def get_role(self, bot: Bot, role_id: int) -> Optional[discord.Role]:
+        """|coro|
+
+        Get a :class:`discord.Role` from the server's guild.
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        role_id: :class:`int`
+            The role's ID.
+        
+        Returns
+        --------
+        Optional[:class:`discord.Role`]
+            The role object, if found.
         """
         return (await self.get_guild(bot)).get_role(role_id)
 
 class ServerInfo(Model):
+    """
+    Represents a server's info.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two info are equal.
+            The two :attr:`.py_value` are compared.
+        
+        .. describe:: x != y
+
+            Checks if two info are different.
+            The two :attr:`.py_value` are compared.
+        
+        .. describe:: hash(x)
+
+            Returns the info's hash.
+        
+        .. describe:: str(x)
+
+            Returns the info as a string.
+    
+    .. container:: fields
+
+        .. collapse:: id
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+            
+            Python: :class:`int`
+        
+        .. collapse:: server
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`.Server`
+                - :attr:`related_name` ``infos``
+            
+            Python: :class:`.Server`
+        
+        .. collapse:: key
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+            
+            Python: :class:`str`
+        
+        .. collapse:: type
+
+            Tortoise: :class:`tortoise.fields.IntEnumField`
+
+                - :attr:`enum` :class:`~taho.enums.InfoType`
+            
+            Python: :class:`~taho.enums.InfoType`
+        
+        .. collapse:: value
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+            
+            Python: :class:`str`
+        
+    Attributes
+    -----------
+    server: :class:`.Server`
+        The server the info belongs to.
+    key: :class:`str`
+        The key of the info.
+    type: :class:`~taho.enums.InfoType`
+        The type of the info.
+    value: :class:`str`
+        The value of the info.
+    py_value: Union[``None``, :class:`bool`, :class:`int`, :class:`float`, :class:`str`]
+        The value of the info in Python's type.
+    """
     class Meta:
         table = "server_infos"
 
@@ -117,15 +306,26 @@ class ServerInfo(Model):
 
     server = fields.ForeignKeyField("main.Server", related_name="infos")
     key = fields.CharField(max_length=255)
-    type = fields.CharField(max_length=255)
+    type = fields.IntEnumField(InfoType)
     value = fields.CharField(max_length=255)
 
-    def __str__(self):
-        return f"{self.key} : {self.value} ({self.type})"
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, ServerInfo):
+            return self.py_value == other.py_value
+        return other == self.py_value
+    
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+    
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+
+    def __str__(self) -> str:
+        return self.value
     
     @property
-    def py_value(self) -> Any:
-        """
-        Get the value in Python format.
-        """
+    def py_value(self) -> Union[None, bool, int, float, str]:
         return convert_to_type(self.value, self.type)

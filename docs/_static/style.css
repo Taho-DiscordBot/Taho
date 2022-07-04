@@ -22,3 +22,20 @@
   .container.operations > dl.describe > dt {
     background-color: var(--api-entry-background);
   }
+
+  .container.fields {
+    padding: 10px;
+    border: 1px solid var(--codeblock-border);
+    margin-bottom: 20px;
+  }
+  
+  .container.fields::before {
+    content: 'Database fields';
+    color: var(--main-big-headers-text);
+    display: block;
+    padding-bottom: 0.5em;
+  }
+  
+  .container.fields > dl.describe > dt {
+    background-color: var(--api-entry-background);
+  }

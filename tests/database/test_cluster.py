@@ -32,7 +32,7 @@ async def test_clusters(db_data):
 
 @pytest.mark.asyncio
 async def test_cluster_info(db_data):
-    clusters: List[ServerCluster] = db_data.clusters
+    clusters: List[Cluster] = db_data.clusters
     await clusters[0].set_info("test1", "test")
     await clusters[0].set_info("test2", None)
     await clusters[0].set_info("test3", True)
