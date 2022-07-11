@@ -34,6 +34,7 @@ _models = [
     "taho.database.models.channel",
     "taho.database.models.class_",
     "taho.database.models.cluster",
+    "taho.database.models.craft",
     "taho.database.models.currency",
     "taho.database.models.inventory",
     "taho.database.models.item",

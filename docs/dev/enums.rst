@@ -302,3 +302,21 @@ ShortcutType
     .. attribute:: currency
     
         This shortcut goes to a :class:`~taho.database.models.Currency`.
+
+CraftAccessType
+~~~~~~~~~~~~~~~~
+
+.. class:: CraftAccessType
+
+    |int_enum|
+
+    The type of entity which have (or not) access 
+    to a :class:`~taho.database.models.Craft`.
+
+    .. attribute:: user
+    
+        The access is for a user.
+    
+    .. attribute:: role
+    
+        The access is for a role.
