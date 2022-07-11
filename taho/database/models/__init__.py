@@ -34,3 +34,4 @@ from .npc import *
 from .currency import *
 from .class_ import *
 from .shortcut import *
+from .channel import *

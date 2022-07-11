@@ -22,21 +22,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from tortoise.models import Model
-from tortoise import fields
-from tortoise.signals import post_save
-
-if TYPE_CHECKING:
-    from typing import List
-    from .user import User
-    from .role import Role
 
 __all__ = (
-    "NPC",
-    "NPCOwner",
-    "NPCRole",
-    "NPCMessage",
+    "ServerChannel",
 )
 
 class ServerChannel(Model):
@@ -121,7 +110,7 @@ class ServerChannel(Model):
 
     .. note:: 
 
-        When a channel is created, the same :attr:`.type` is 
+        When a channel is created, the same :attr:`.ServerChannel.type` is 
         associated with all its threads
 
     """
