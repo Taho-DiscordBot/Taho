@@ -35,7 +35,8 @@ if TYPE_CHECKING:
 __all__ = (
     "NPC",
     "NPCOwner",
-    "NPCRole"
+    "NPCRole",
+    "NPCMessage",
 )
 
 class NPC(Model):
@@ -119,6 +120,10 @@ class NPC(Model):
         |coro_attr|
 
         The users who own the NPC.
+    messages: List[:class:`~taho.database.models.NPCMessage`]
+        |coro_attr|
+
+        The messages sent by the NPC.
     """
     class Meta:
         table = "npcs"
@@ -131,6 +136,7 @@ class NPC(Model):
 
     users: fields.ReverseRelation["NPCOwner"]
     roles: fields.ReverseRelation["NPCRole"]
+    messages: fields.ReverseRelation["NPCMessage"]
 
     async def add_roles(self, *roles: List[Role]) -> None:
         """|coro|
@@ -365,6 +371,162 @@ class NPCRole(Model):
 
     npc = fields.ForeignKeyField("main.NPC", related_name="roles")
     role = fields.ForeignKeyField("main.Role", related_name="npc_roles")
+
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+    
+    def __ne__(self, other: object) -> bool:
+        return not super().__eq__(other)
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+
+class NPCMessage(Model):
+    """Represents a message sent by a NPC.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two messages are equal.
+
+        .. describe:: x != y
+
+            Checks if two messages are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the message's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: npc
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.NPC`
+                - :attr:`related_name` ``messages``
+            
+            Python: :class:`~taho.database.models.NPC`
+        
+        .. collapse:: channel
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Channel`
+                - :attr:`related_name` ``npc_messages``
+            
+            Python: :class:`~taho.database.models.Channel`
+        
+        .. collapse:: message_id
+
+            Tortoise: :class:`tortoise.fields.BigIntField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`int`]
+        
+        .. collapse:: message_type
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: message_content
+
+            Tortoise: :class:`tortoise.fields.TextField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: message_timestamp
+
+            Tortoise: :class:`tortoise.fields.BigIntField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`int`]
+        
+        .. collapse:: message_sender
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``npc_messages``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: message_sender_name
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: message_sender_role
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Role`
+                - :attr:`related_name` ``npc_messages``
+            
+            Python: :class:`~taho.database.models.Role`
+        
+        .. collapse:: message_sender_role_name
+
+            Tortoise: :class:`tortoise.fields
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: timestamp
+
+            Tortoise: :class:`tortoise.fields.DatetimeField`
+
+                - :attr:`auto_now_add` ``True``
+            
+            Python: :class:`datetime.datetime`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The message's ID.
+    npc: :class:`~taho.database.models.NPC`
+        The NPC that sent the message.
+    channel: :class:`~taho.database.models.Channel`
+        The channel that the message was sent in.
+    message: Optional[:class:`str`]
+        The message that was sent.
+    timestamp: :class:`datetime.datetime`
+        The timestamp of the message.
+    """
+    class Meta:
+        table = "npc_messages"
+
+    id = fields.IntField(pk=True)
+
+    npc = fields.ForeignKeyField("main.NPC", related_name="messages")
+    channel = fields.ForeignKeyField("main.ServerChannel", related_name="npc_messages")
+    message = fields.TextField(null=True)
+    timestamp = fields.DatetimeField(auto_now_add=True)
 
     def __repr__(self) -> str:
         return super().__repr__()
