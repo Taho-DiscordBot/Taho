@@ -2,3 +2,5 @@ sphinx
 sphinx_rtd_theme
 sphinxcontrib_trio
 sphinx_toolbox
+discord
+tortoise-orm
