@@ -155,7 +155,7 @@ class Shortcut(Model):
             :class:`~taho.database.models.Stat`, 
             :class:`~taho.database.models.Currency`
             ]
-            THe shortcut's item, stat, or currency.
+            The shortcut's item, stat, or currency.
         """
         converters = {
             ShortcutType.item: self.item,
