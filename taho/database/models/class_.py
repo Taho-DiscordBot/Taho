@@ -212,6 +212,9 @@ class ClassStat(Model):
     value: :class:`int`
         The amount of stat added by the class.
     """
+    class Meta:
+        table = "class_stats"
+
     id: int = fields.IntField(pk=True)
     class_: Class = fields.ForeignKeyField("main.Class", related_name="stats")
     stat: str = fields.ForeignKeyField("main.Stat", related_name="classes")
