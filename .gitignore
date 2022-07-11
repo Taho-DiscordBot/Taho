@@ -34,3 +34,4 @@ config.py
 *.test
 logs/
 docs/_build/
+*.todo
