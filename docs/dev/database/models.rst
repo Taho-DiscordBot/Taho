@@ -102,6 +102,12 @@ JobDone
     :members:
     :exclude-members: Meta
 
+Shortcut
+~~~~~~~~~
+.. autoclass:: Shortcut()
+    :members:
+    :exclude-members: Meta
+
 Item
 ~~~~~
 .. autoclass:: Item()

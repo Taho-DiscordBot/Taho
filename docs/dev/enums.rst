@@ -281,3 +281,24 @@ RPEffect
     .. attribute:: ability
 
         The stat is the ability of the user.
+
+ShortcutType
+~~~~~~~~~~~~~~
+
+.. class:: ShortcutType
+
+    |int_enum|
+
+    The type of a :class:`~taho.database.models.Shortcut`.
+
+    .. attribute:: item
+    
+        This shortcut goes to an :class:`~taho.database.models.Item`.
+    
+    .. attribute:: stat
+    
+        This shortcut goes to a :class:`~taho.database.models.Stat`.
+    
+    .. attribute:: currency
+    
+        This shortcut goes to a :class:`~taho.database.models.Currency`.
