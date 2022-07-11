@@ -122,6 +122,9 @@ class Currency(Model):
             Please avoid setting the rate to 0, 
             as this will cause a division by zero.
     """
+    class Meta:
+        table = "currencies"
+    
     id = fields.IntField(pk=True)
 
     cluster = fields.ForeignKeyField("main.Cluster", related_name="currencies")
