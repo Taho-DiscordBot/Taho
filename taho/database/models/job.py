@@ -21,9 +21,17 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+from __future__ import annotations
 from tortoise.models import Model
+from typing import TYPE_CHECKING
 from tortoise import fields
-from taho.enums import SalaryCondition, RewardType
+from taho.enums import SalaryCondition
+
+if TYPE_CHECKING:
+    from .item import Item
+    from .stat import Stat
+    from .currency import Currency
+    from typing import Union
 
 __all__ = (
     "Job",
@@ -149,6 +157,18 @@ class Job(Model):
     rewards: fields.ReverseRelation["JobReward"]
     costs: fields.ReverseRelation["JobCost"]
 
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+
 class JobReward(Model):
     """Represents a reward for a job.
 
@@ -185,35 +205,15 @@ class JobReward(Model):
             
             Python: :class:`~taho.database.models.Job`
         
-        .. collapse:: type
-
-            Tortoise: :class:`tortoise.fields.IntEnumField`
-
-                - :attr:`enum` :class:`~taho.enums.RewardType`
-                - :attr:`default` :attr:`RewardType.money`
-            
-            Python: :class:`~taho.enums.RewardType`
-        
-        .. collapse:: item
+        . collapse:: shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Item`
+                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
                 - :attr:`related_name` ``job_rewards``
-                - :attr:`null` True
             
-            Python: Optional[:class:`~taho.database.models.Item`]
-        
-        .. collapse:: stat
+            Python: :class:`~taho.database.models.Shortcut`
 
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Stat`
-                - :attr:`related_name` ``job_rewards``
-                - :attr:`null` True
-            
-            Python: Optional[:class:`~taho.database.models.Stat`]
-        
         .. collapse:: give_regeneration
 
             Tortoise: :class:`tortoise.fields.BooleanField`
@@ -222,16 +222,6 @@ class JobReward(Model):
             
             Python: Optional[:class:`bool`]
         
-        .. collapse:: currency
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Currency`
-                - :attr:`related_name` ``job_rewards``
-                - :attr:`null` True
-            
-            Python: Optional[:class:`~taho.database.models.Currency`]
-            
         .. collapse:: chance
 
             Tortoise: :class:`tortoise.fields.DecimalField`
@@ -259,18 +249,11 @@ class JobReward(Model):
         The reward's ID.
     job: :class:`~taho.database.models.Job`
         The job linked to the reward.
-    type: :class:`~taho.enums.RewardType`
-        The type of the reward.
-    item: Optional[:class:`~taho.database.models.Item`]
-        If the reward's type is :attr:`RewardType.item`, this is the item rewarded.
-    stat: Optional[:class:`~taho.database.models.Stat`]
-        If the reward's type is :attr:`RewardType.stat`, this is the stat rewarded.
+    shortcut: :class:`~taho.database.models.Shortcut`
+        A shortcut to the reward (item, stat, ...).
     give_regeneration: Optional[:class:`bool`]
         If the reward's type is :attr:`RewardType.stat`, then a regenerable point
         will be rewarded.
-    currency: Optional[:class:`~taho.database.models.Currency`]
-        If the reward's type is :attr:`RewardType.money`, this is the currency in
-        which the money is rewarded.
     chance: :class:`float`
         The chance of the reward.
         It is a percentage (0.0 to 1.0).
@@ -291,14 +274,39 @@ class JobReward(Model):
     id = fields.IntField(pk=True)
 
     job = fields.ForeignKeyField("main.Job", related_name="rewards")
-    type = fields.IntEnumField(RewardType, default=RewardType.money)
-    item = fields.ForeignKeyField("main.Item", related_name="job_rewards", null=True)
-    stat = fields.ForeignKeyField("main.Stat", related_name="job_rewards", null=True)
+    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="job_costs", null=True)
     give_regeneration = fields.BooleanField(null=True)
-    currency = fields.ForeignKeyField("main.Currency", related_name="job_rewards", null=True)
     chance = fields.DecimalField(max_digits=3, decimal_places=2)
     amount_min = fields.IntField()
     amount_max = fields.IntField()
+
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+    
+    async def get_reward(self) -> Union[Item, Stat, Currency]:
+        """|coro|
+
+        Get the real reward from the :attr:`.shortcut`
+
+        Returns
+        --------
+        Union[
+            :class:`~taho.database.models.Item`, 
+            :class:`~taho.database.models.Stat`, 
+            :class:`~taho.database.models.Currency`
+            ]
+            The shortcut's item, stat, or currency.
+        """
+        return await self.shortcut.get()
 
 class JobCost(Model):
     """Represents a cost for a job.
@@ -336,24 +344,14 @@ class JobCost(Model):
             
             Python: :class:`~taho.database.models.Job`
         
-        .. collapse:: type
-
-            Tortoise: :class:`tortoise.fields.IntEnumField`
-
-                - :attr:`enum` :class:`~taho.enums.RewardType`
-                - :attr:`default` :attr:`RewardType.money`
-            
-            Python: :class:`~taho.enums.RewardType`
-        
-        .. collapse:: item
+        .. collapse:: shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Item`
+                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
                 - :attr:`related_name` ``job_rewards``
-                - :attr:`null` True
             
-            Python: Optional[:class:`~taho.database.models.Item`]
+            Python: :class:`~taho.database.models.Shortcut`
         
         .. collapse:: use_durabilty
 
@@ -363,16 +361,6 @@ class JobCost(Model):
             
             Python: Optional[:class:`bool`]
         
-        .. collapse:: stat
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Stat`
-                - :attr:`related_name` ``job_rewards``
-                - :attr:`null` True
-            
-            Python: Optional[:class:`~taho.database.models.Stat`]
-        
         .. collapse:: use_regeneration
 
             Tortoise: :class:`tortoise.fields.BooleanField`
@@ -381,16 +369,6 @@ class JobCost(Model):
             
             Python: Optional[:class:`bool`]
         
-        .. collapse:: currency
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Currency`
-                - :attr:`related_name` ``job_rewards``
-                - :attr:`null` True
-            
-            Python: Optional[:class:`~taho.database.models.Currency`]
-    
         .. collapse:: chance
 
             Tortoise: :class:`tortoise.fields.DecimalField`
@@ -418,21 +396,14 @@ class JobCost(Model):
         The cost's ID.
     job: :class:`~taho.database.models.Job`
         The job linked to the cost.
-    type: :class:`~taho.enums.RewardType`
-        The type of the cost.
-    item: Optional[:class:`~taho.database.models.Item`]
-        If the cost's type is :attr:`RewardType.item`, this is the item removed.
+    shortcut: :class:`~taho.database.models.Shortcut`
+        A shortcut to the cost (item, stat, ...).
     use_durabilty: Optional[:class:`bool`]
         If the cost's type is :attr:`RewardType.item`, then durability will be
         removed to the item.
-    stat: Optional[:class:`~taho.database.models.Stat`]
-        If the cost's type is :attr:`RewardType.stat`, this is the stat removed.
     use_regeneration: Optional[:class:`bool`]
         If the cost's type is :attr:`RewardType.stat`, then a regenerable point
         will be removed.
-    currency: Optional[:class:`~taho.database.models.Currency`]
-        If the cost's type is :attr:`RewardType.money`, this is the currency in
-        which the money is removed.
     chance: :class:`float`
         The chance of the cost.
         It is a percentage (0.0 to 1.0).
@@ -453,15 +424,40 @@ class JobCost(Model):
     id = fields.IntField(pk=True)
 
     job = fields.ForeignKeyField("main.Job", related_name="costs")
-    type = fields.IntEnumField(RewardType, default=RewardType.money)
-    item = fields.ForeignKeyField("main.Item", related_name="job_costs", null=True)
+    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="job_costs", null=True)
     use_durability = fields.BooleanField(null=True)
-    stat = fields.ForeignKeyField("main.Stat", related_name="job_costs", null=True)
     use_regeneration = fields.BooleanField(null=True)
-    currency = fields.ForeignKeyField("main.Currency", related_name="job_costs", null=True)
     chance = fields.DecimalField(max_digits=3, decimal_places=2)
     amount_min = fields.IntField()
     amount_max = fields.IntField()
+
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())
+    
+    async def get_cost(self) -> Union[Item, Stat, Currency]:
+        """|coro|
+
+        Get the real cost from the :attr:`.shortcut`
+
+        Returns
+        --------
+        Union[
+            :class:`~taho.database.models.Item`, 
+            :class:`~taho.database.models.Stat`, 
+            :class:`~taho.database.models.Currency`
+            ]
+            The shortcut's item, stat, or currency.
+        """
+        return await self.shortcut.get()
 
 class JobDone(Model):
     """Represents a job execution by a user.
