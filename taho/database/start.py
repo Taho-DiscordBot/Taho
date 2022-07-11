@@ -30,17 +30,19 @@ if TYPE_CHECKING:
 
 
 _models = [
-    "taho.database.models.user",
-    "taho.database.models.cluster",
-    "taho.database.models.server",
     "taho.database.models.bank",
-    "taho.database.models.item",
+    "taho.database.models.channel",
+    "taho.database.models.class",
+    "taho.database.models.cluster",
+    "taho.database.models.currency",
     "taho.database.models.inventory",
-    "taho.database.models.role",
-    "taho.database.models.stat",
+    "taho.database.models.item",
     "taho.database.models.job",
     "taho.database.models.npc",
-    "taho.database.models.currency"
+    "taho.database.models.role",
+    "taho.database.models.server",
+    "taho.database.models.stat",
+    "taho.database.models.user",
     ]
 
 async def init_db(config: dict, ssh_tunnel: SSHTunnelForwarder=None, _create_db: bool=False) -> None:

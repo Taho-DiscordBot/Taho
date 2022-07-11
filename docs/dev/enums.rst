@@ -37,6 +37,23 @@ InfoType
     
         The info is a :class:`str` value.
 
+ChannelType
+~~~~~~~~~~~~
+
+.. class:: ChannelType
+
+    |int_enum|
+
+    The type of a :class:`~taho.database.models.ServerChannel`.
+
+    .. attribute:: roleplay
+    
+        The channel is a roleplay channel.
+    
+    .. attribute:: other
+        
+        The channel has no special type.
+
 
 ItemType
 ~~~~~~~~~
