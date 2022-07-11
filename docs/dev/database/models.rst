@@ -197,3 +197,33 @@ NPCMessage
 .. autoclass:: NPCMessage()
     :members:
     :exclude-members: Meta
+
+Craft
+~~~~~~
+.. autoclass:: Craft()
+    :members:
+    :exclude-members: Meta
+
+CraftCost
+~~~~~~~~~~
+.. autoclass:: CraftCost()
+    :members:
+    :exclude-members: Meta
+
+CraftReward
+~~~~~~~~~~~~
+.. autoclass:: CraftReward()
+    :members:
+    :exclude-members: Meta
+
+CraftAccess
+~~~~~~~~~~~~
+.. autoclass:: CraftAccess()
+    :members:
+    :exclude-members: Meta
+
+CraftDone
+~~~~~~~~~~
+.. autoclass:: CraftDone()
+    :members:
+    :exclude-members: Meta
