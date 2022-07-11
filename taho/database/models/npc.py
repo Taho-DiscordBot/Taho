@@ -491,7 +491,7 @@ class NPCMessage(Model):
         
         .. collapse:: message_sender_role_name
 
-            Tortoise: :class:`tortoise.fields
+            Tortoise: :class:`tortoise.fields`
 
                 - :attr:`null` ``True``
             
