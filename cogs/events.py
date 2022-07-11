@@ -23,7 +23,8 @@ DEALINGS IN THE SOFTWARE.
 """
 from discord.ext import commands
 import discord
-from taho.database.models import Guild
+from taho.database.models import Server, Cluster
+from taho.exceptions import DoesNotExist
 from tortoise.exceptions import IntegrityError
 
 class Events(commands.Cog):
@@ -34,9 +35,13 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_join(self, guild:discord.Guild):
         try:
-            await Guild.create(id=guild.id)
-        except IntegrityError:
-            pass
-
+            await Cluster.from_guild(self.bot, guild)
+        except DoesNotExist:
+            try:
+                cluster = await Cluster.create()
+                await Server.create(cluster=cluster, id=guild.id)
+            except IntegrityError:
+                pass
+    
 async def setup(bot):
     await bot.add_cog(Events(bot))
