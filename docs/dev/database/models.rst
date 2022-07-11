@@ -41,6 +41,11 @@ ServerInfo
     :members:
     :exclude-members: Meta
 
+ServerChannel
+~~~~~~~~~~~~~~
+.. autoclass:: ServerChannel()
+    :members:
+    :exclude-members: Meta
 
 Currency
 ~~~~~~~~~
@@ -72,7 +77,6 @@ BankingTransaction
 .. autoclass:: BankingTransaction()
     :members:
     :exclude-members: Meta
-
 
 Job
 ~~~~
@@ -135,6 +139,17 @@ Stat
     :members:
     :exclude-members: Meta
 
+Class
+~~~~~~
+.. autoclass:: Class()
+    :members:
+    :exclude-members: Meta
+
+ClassStat
+~~~~~~~~~~
+.. autoclass:: ClassStat()
+    :members:
+    :exclude-members: Meta
 
 User
 ~~~~~
@@ -163,5 +178,11 @@ NPCOwner
 NPCRole
 ~~~~~~~~
 .. autoclass:: NPCRole()
+    :members:
+    :exclude-members: Meta
+
+NPCMessage
+~~~~~~~~~~~
+.. autoclass:: NPCMessage()
     :members:
     :exclude-members: Meta
