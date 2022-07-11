@@ -29,6 +29,7 @@ __all__ = (
     "Job",
     "JobReward",
     "JobCost",
+    "JobDone"
 )
 
 class Job(Model):
@@ -461,3 +462,76 @@ class JobCost(Model):
     chance = fields.DecimalField(max_digits=3, decimal_places=2)
     amount_min = fields.IntField()
     amount_max = fields.IntField()
+
+class JobDone(Model):
+    """Represents a job execution by a user.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two jobs are equal.
+
+        .. describe:: x != y
+
+            Checks if two jobs are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the job's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+            
+        .. collapse:: job
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Job`
+                - :attr:`related_name` ``done``
+            
+            Python: :class:`~taho.database.models.Job`
+        
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``job_done``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: done_at
+
+            Tortoise: :class:`tortoise.fields.DateTimeField`
+
+                - :attr:`auto_now_add` ``True``
+            
+            Python: :class:`datetime.datetime`
+        
+    Attributes
+    -----------
+    id: :class:`int`
+        The job's ID.
+    job: :class:`~taho.database.models.Job`
+        The job done.
+    user: :class:`~taho.database.models.User`
+        The user who did the job.
+    done_at: :class:`datetime.datetime`
+        When the job was done.
+    """
+    class Meta:
+        table = "job_done"
+    
+    id = fields.IntField(pk=True)
+
+    job = fields.ForeignKeyField("main.Job", related_name="job_done")
+    user = fields.ForeignKeyField("main.User", related_name="job_done")
+    done_at = fields.DatetimeField(auto_now_add=True)

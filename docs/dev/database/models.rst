@@ -96,6 +96,11 @@ JobCost
     :members:
     :exclude-members: Meta
 
+JobDone
+~~~~~~~~
+.. autoclass:: JobDone()
+    :members:
+    :exclude-members: Meta
 
 Item
 ~~~~~
