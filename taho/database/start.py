@@ -32,7 +32,7 @@ if TYPE_CHECKING:
 _models = [
     "taho.database.models.bank",
     "taho.database.models.channel",
-    "taho.database.models.class",
+    "taho.database.models.class_",
     "taho.database.models.cluster",
     "taho.database.models.currency",
     "taho.database.models.inventory",

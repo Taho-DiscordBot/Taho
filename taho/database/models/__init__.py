@@ -32,3 +32,5 @@ from .stat import *
 from .job import *
 from .npc import *
 from .currency import *
+from .class_ import *
+from .shortcut import *
