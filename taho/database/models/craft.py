@@ -39,7 +39,7 @@ __all__ = (
     "CraftCost",
     "CraftReward",
     "CraftAccess",
-    "CraftDone",
+    "CraftHistory",
 )
 
 class Craft(Model):
@@ -399,7 +399,7 @@ class CraftCost(Model):
         """
         return await self.shortcut.get()
 
-class CraftDone(Model):
+class CraftHistory(Model):
     """Represents a craft done by a user.
 
     .. container:: operations
@@ -440,7 +440,7 @@ class CraftDone(Model):
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.User`
-                - :attr:`related_name` ``craft_done``
+                - :attr:`related_name` ``craft_history``
             
             Python: :class:`~taho.database.models.User`
         
@@ -464,12 +464,12 @@ class CraftDone(Model):
         When the craft was done.
     """
     class Meta:
-        table = "craft_done"
+        table = "craft_history"
     
     id = fields.IntField(pk=True)
 
-    craft = fields.ForeignKeyField("main.Craft", related_name="craft_done")
-    user = fields.ForeignKeyField("main.User", related_name="craft_done")
+    craft = fields.ForeignKeyField("main.Craft", related_name="craft_history")
+    user = fields.ForeignKeyField("main.User", related_name="craft_history")
     done_at = fields.DatetimeField(auto_now_add=True)
 
 class CraftAccess(Model):

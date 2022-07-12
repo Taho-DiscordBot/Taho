@@ -102,9 +102,9 @@ JobCost
     :members:
     :exclude-members: Meta
 
-JobDone
+JobHistory
 ~~~~~~~~
-.. autoclass:: JobDone()
+.. autoclass:: JobHistory()
     :members:
     :exclude-members: Meta
 
@@ -228,9 +228,9 @@ CraftAccess
     :members:
     :exclude-members: Meta
 
-CraftDone
+CraftHistory
 ~~~~~~~~~~
-.. autoclass:: CraftDone()
+.. autoclass:: CraftHistory()
     :members:
     :exclude-members: Meta
 

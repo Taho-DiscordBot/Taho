@@ -32,7 +32,7 @@ __all__ = (
     "Job",
     "JobReward",
     "JobCost",
-    "JobDone"
+    "JobHistory"
 )
 
 class Job(Model):
@@ -464,7 +464,7 @@ class JobCost(Model):
         """
         return await self.shortcut.get()
 
-class JobDone(Model):
+class JobHistory(Model):
     """Represents a job execution by a user.
 
     .. container:: operations
@@ -505,7 +505,7 @@ class JobDone(Model):
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.User`
-                - :attr:`related_name` ``job_done``
+                - :attr:`related_name` ``job_history``
             
             Python: :class:`~taho.database.models.User`
         
@@ -529,10 +529,10 @@ class JobDone(Model):
         When the job was done.
     """
     class Meta:
-        table = "job_done"
+        table = "job_history"
     
     id = fields.IntField(pk=True)
 
-    job = fields.ForeignKeyField("main.Job", related_name="job_done")
-    user = fields.ForeignKeyField("main.User", related_name="job_done")
+    job = fields.ForeignKeyField("main.Job", related_name="job_history")
+    user = fields.ForeignKeyField("main.User", related_name="job_history")
     done_at = fields.DatetimeField(auto_now_add=True)
