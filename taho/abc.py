@@ -21,11 +21,21 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-__version__ = '1.0.0.0a'
-from .exceptions import *
-from .utils import *
-from .bot import *
-from . import database
-from .currency_amount import *
-from .emoji import *
-from . import abc
+
+class Shortcutable:
+    """An ABC that brings together all the models that can be pointed 
+    by a :class:`~taho.database.models.Shortcut`.
+
+    Using a shortcut can be very useful if you want to create a Model 
+    with a Field pointing to several ForeignKeys (this system can be 
+    likened to a Polymorphic relationship).
+
+    The following classes implement this ABC:
+
+    - :class:`~taho.database.models.Item`
+    - :class:`~taho.database.models.Stat`
+    - :class:`~taho.database.models.Currency`
+    - :class:`~taho.database.models.User`
+    - :class:`~taho.database.models.Role`
+    - :class:`~taho.database.models.User`
+    """
