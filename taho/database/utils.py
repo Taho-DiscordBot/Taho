@@ -37,7 +37,7 @@ __all__ = (
 )
 
 
-def convert_to_type(value: str, type_: InfoType) -> Union[None, bool, int, float, str]:
+def convert_to_type(value: str, type: InfoType) -> Union[None, bool, int, float, str]:
     """
     Convert a value from the DB to a certain type.
 
@@ -45,7 +45,7 @@ def convert_to_type(value: str, type_: InfoType) -> Union[None, bool, int, float
     -----------
     value: :class:`str`
         The value to convert.
-    type_: :class:`~taho.enums.InfoType`
+    type: :class:`~taho.enums.InfoType`
         The type to convert to.
     
     Raises
@@ -58,7 +58,7 @@ def convert_to_type(value: str, type_: InfoType) -> Union[None, bool, int, float
     Union[None, bool, int, float, str]
         The converted value.
     """
-    if type_ == InfoType.NULL:
+    if type == InfoType.NULL:
         return None
     converters = {
         InfoType.BOOL: bool,
@@ -66,7 +66,7 @@ def convert_to_type(value: str, type_: InfoType) -> Union[None, bool, int, float
         InfoType.STR: str,
         InfoType.FLOAT: float
     }
-    return converters[type_](value)
+    return converters[type](value)
 
 def get_type(value: Union[None, bool, int, float, str]) -> InfoType:
     """
