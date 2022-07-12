@@ -1,7 +1,18 @@
+.. currentmodule:: taho.database
+
+.. |shortcutable| replace:: This model can be pointed by a :class:`.Shortcut`. See :ref:`Shortcuts <shortcut>` for more information.
+
+Database
+=========
+
+All the documentation about Taho's Database.
+Taho uses Tortoise-ORM.
+
+
 .. currentmodule:: taho.database.models
 
-Database models
-===========================
+Models
+-------
 
 All the models from the database.
 
@@ -10,11 +21,6 @@ All the models from the database.
 
     All these models are inherited from the Tortoise-ORM's base :tdocs:`Model <models.html>`.
     So you can use all the methods from the base model.
-
-Model
-~~~~~~
-.. autoclass:: tortoise.models.Model
-    :members:
 
 
 Cluster
@@ -227,3 +233,22 @@ CraftDone
 .. autoclass:: CraftDone()
     :members:
     :exclude-members: Meta
+
+
+.. currentmodule:: taho.database.utils
+
+Utils
+------
+
+convert_to_type
+~~~~~~~~~~~~~~~~
+.. autofunction:: convert_to_type
+
+get_type
+~~~~~~~~~
+.. autofunction:: get_type
+
+create_shortcut
+~~~~~~~~~~~~~~~~
+.. autofunction:: create_shortcut
+

@@ -1,8 +1,25 @@
+
+Taho Global
+===============
+
+THe following section outlines the module Taho.
+This doesn't include taho's submodules (database, babel...).
+
+.. currentmodule:: taho.abc
+
+ABC
+----
+
+Shortcutable
+~~~~~~~~~~~~
+
+.. autoclass:: Shortcutable()
+    :members:
+
 .. currentmodule:: taho.enums
 
 Enums
-===========================
-
+------
 
 InfoType
 ~~~~~~~~~
@@ -40,7 +57,7 @@ InfoType
 ChannelType
 ~~~~~~~~~~~~
 
-.. class:: ChannelType
+.. class:: taho.enums.ChannelType
 
     |int_enum|
 
@@ -58,7 +75,7 @@ ChannelType
 ItemType
 ~~~~~~~~~
 
-.. class:: ItemType
+.. class:: taho.enums.ItemType
 
     |int_enum|
 
@@ -79,7 +96,7 @@ ItemType
 ItemReason
 ~~~~~~~~~~~
 
-.. class:: ItemReason
+.. class:: taho.enums.ItemReason
 
     |int_enum|
 
@@ -104,7 +121,7 @@ ItemReason
 ItemUse
 ~~~~~~~~
 
-.. class:: ItemUse
+.. class:: taho.enums.ItemUse
 
     |int_enum|
 
@@ -130,7 +147,7 @@ ItemUse
 SalaryCondition
 ~~~~~~~~~~~~~~~~
 
-.. class:: SalaryCondition
+.. class:: taho.enums.SalaryCondition
 
     |int_enum|
 
@@ -162,7 +179,7 @@ SalaryCondition
 RewardType
 ~~~~~~~~~~~
 
-.. class:: RewardType
+.. class:: taho.enums.RewardType
 
     |int_enum|
 
@@ -185,7 +202,7 @@ RewardType
 RoleType
 ~~~~~~~~~
 
-.. class:: RoleType
+.. class:: taho.enums.RoleType
 
     |int_enum|
 
@@ -211,7 +228,7 @@ RoleType
 RegenerationType
 ~~~~~~~~~~~~~~~~~
 
-.. class:: RegenerationType
+.. class:: taho.enums.RegenerationType
 
     |int_enum|
 
@@ -244,7 +261,7 @@ RegenerationType
 RPEffect
 ~~~~~~~~~
 
-.. class:: RPEffect
+.. class:: taho.enums.RPEffect
 
     |int_enum|
 
@@ -285,7 +302,7 @@ RPEffect
 ShortcutType
 ~~~~~~~~~~~~~~
 
-.. class:: ShortcutType
+.. class:: taho.enums.ShortcutType
 
     |int_enum|
 
@@ -306,7 +323,7 @@ ShortcutType
 CraftAccessType
 ~~~~~~~~~~~~~~~~
 
-.. class:: CraftAccessType
+.. class:: taho.enums.CraftAccessType
 
     |int_enum|
 
@@ -320,3 +337,5 @@ CraftAccessType
     .. attribute:: role
     
         The access is for a role.
+
+

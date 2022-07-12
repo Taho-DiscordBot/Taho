@@ -27,9 +27,7 @@ All the documentation about Taho's code to help us develop the bot.
 .. toctree::
    :maxdepth: 2
 
-   dev/database/models
-   dev/database/utils
-   dev/enums
+   dev/index
    
 Use the bot
 ------------
