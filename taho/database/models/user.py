@@ -48,7 +48,8 @@ __all__ = (
 )
 
 class User(Model, Shortcutable):
-    """
+    """|shortcutable|
+    
     Represents a user of a cluster.
 
     .. container:: operations

@@ -39,7 +39,9 @@ __all__ = (
 )
 
 class Item(Model, Shortcutable):
-    """Represents an item.
+    """|shortcutable|
+    
+    Represents an item.
 
     .. container:: operations
 

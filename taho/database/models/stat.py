@@ -36,7 +36,9 @@ __all__ = (
 )
 
 class Stat(Model, Shortcutable):
-    """Represents a Statistic.
+    """|shortcutable|
+    
+    Represents a Statistic.
 
     .. container:: operations
 

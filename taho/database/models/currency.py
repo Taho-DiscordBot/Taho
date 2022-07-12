@@ -32,7 +32,8 @@ __all__ = (
 )
 
 class Currency(Model, Shortcutable):
-    """
+    """|shortcutable|
+    
     Represents a currency.
 
     .. container:: operations

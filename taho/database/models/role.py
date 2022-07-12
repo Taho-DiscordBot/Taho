@@ -38,7 +38,8 @@ __all__ = (
 )
 
 class Role(Model, Shortcutable):
-    """
+    """|shortcutable|
+    
     Represents a RP Role of a :class:`~taho.database.models.Cluster`.
 
     .. container:: operations
