@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 from tortoise.models import Model
 from tortoise import fields
 from taho.enums import RPEffect, RegenerationType
+from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
     from taho import Emoji, Bot
@@ -34,7 +35,7 @@ __all__ = (
     "Stat",
 )
 
-class Stat(Model):
+class Stat(Model, Shortcutable):
     """Represents a Statistic.
 
     .. container:: operations

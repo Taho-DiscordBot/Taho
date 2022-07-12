@@ -28,6 +28,7 @@ from tortoise import fields
 from taho.exceptions import QuantityException, NPCException
 from taho.enums import ItemUse, ItemType, ItemReason
 from .npc import NPC
+from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
     from typing import Any, List
@@ -46,7 +47,7 @@ __all__ = (
     "UserStat",
 )
 
-class User(Model):
+class User(Model, Shortcutable):
     """
     Represents a user of a cluster.
 

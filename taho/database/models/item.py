@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 from tortoise.models import Model
 from tortoise import fields
 from taho.enums import ItemType, ItemReason
+from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
     from typing import Any, Iterable, Optional
@@ -37,7 +38,7 @@ __all__ = (
     "ItemRole",
 )
 
-class Item(Model):
+class Item(Model, Shortcutable):
     """Represents an item.
 
     .. container:: operations

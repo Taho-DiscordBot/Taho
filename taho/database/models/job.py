@@ -26,12 +26,7 @@ from tortoise.models import Model
 from typing import TYPE_CHECKING
 from tortoise import fields
 from taho.enums import SalaryCondition
-
-if TYPE_CHECKING:
-    from .item import Item
-    from .stat import Stat
-    from .currency import Currency
-    from typing import Union
+from taho.abc import Shortcutable
 
 __all__ = (
     "Job",
@@ -267,6 +262,15 @@ class JobReward(Model):
 
         For a fix amount of the reward, set :attr:`amount_min` and :attr:`amount_max`
         to the same value.
+    
+
+    .. warning::
+
+        In this model, the :attr:`.JobReward.shortcut` can
+        only point to :
+        - :class:`~taho.database.models.Item`
+        - :class:`~taho.database.models.Stat`
+        - :class:`~taho.database.models.Currency`
     """
     class Meta:
         table = "job_rewards"
@@ -292,14 +296,14 @@ class JobReward(Model):
     def __hash__(self) -> int:
         return hash(self.__repr__())
     
-    async def get_reward(self) -> Union[Item, Stat, Currency]:
+    async def get_reward(self) -> Shortcutable:
         """|coro|
 
-        Get the real reward from the :attr:`.shortcut`
+        Get the real reward from the :attr:`.JobReward.shortcut`
 
         Returns
         --------
-        Union[:class:`~taho.database.models.Item`, :class:`~taho.database.models.Stat`, :class:`~taho.database.models.Currency`]
+        :class:`~taho.abc.Shortcutable`
             The shortcut's item, stat, or currency.
         """
         return await self.shortcut.get()
@@ -413,6 +417,15 @@ class JobCost(Model):
 
         For a fix amount of the cost, set :attr:`amount_min` and :attr:`amount_max`
         to the same value.
+    
+
+    .. warning::
+
+        In this model, the :attr:`.JobCost.shortcut` can
+        only point to :
+        - :class:`~taho.database.models.Item`
+        - :class:`~taho.database.models.Stat`
+        - :class:`~taho.database.models.Currency`
     """
     class Meta:
         table = "job_costs"
@@ -439,14 +452,14 @@ class JobCost(Model):
     def __hash__(self) -> int:
         return hash(self.__repr__())
     
-    async def get_cost(self) -> Union[Item, Stat, Currency]:
+    async def get_cost(self) -> Shortcutable:
         """|coro|
 
-        Get the real cost from the :attr:`.shortcut`
+        Get the real cost from the :attr:`.JobCost.shortcut`
 
         Returns
         --------
-        Union[:class:`~taho.database.models.Item`, :class:`~taho.database.models.Stat`, :class:`~taho.database.models.Currency`]
+        :class:`~taho.abc.Shortcutable`
             The shortcut's item, stat, or currency.
         """
         return await self.shortcut.get()
