@@ -35,3 +35,4 @@ from .currency import *
 from .class_ import *
 from .shortcut import *
 from .channel import *
+from .craft import *

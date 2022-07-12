@@ -25,7 +25,8 @@ from __future__ import annotations
 from tortoise.models import Model
 from typing import TYPE_CHECKING
 from tortoise import fields
-from taho.enums import CraftAccessType
+from taho.enums import CraftAccessType, shortcut
+from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
     from .item import Item
@@ -38,7 +39,7 @@ __all__ = (
     "CraftCost",
     "CraftReward",
     "CraftAccess",
-    "CraftDone"
+    "CraftDone",
 )
 
 class Craft(Model):
@@ -235,6 +236,15 @@ class CraftReward(Model):
         will be rewarded.
     amount: :class:`int`
         The amount rewarded.
+    
+
+    .. warning::
+
+        In this model, the :attr:`.CraftReward.shortcut` can
+        only point to :
+        - :class:`~taho.database.models.Item`
+        - :class:`~taho.database.models.Stat`
+        - :class:`~taho.database.models.Currency`
     """
     class Meta:
         table = "craft_rewards"
@@ -258,14 +268,14 @@ class CraftReward(Model):
     def __hash__(self) -> int:
         return hash(self.__repr__())
     
-    async def get_reward(self) -> Union[Item, Stat, Currency]:
+    async def get_reward(self) -> Shortcutable:
         """|coro|
 
-        Get the real reward from the :attr:`.shortcut`
+        Get the real reward from the :attr:`.CraftReward.shortcut`
 
         Returns
         --------
-        Union[:class:`~taho.database.models.Item`, :class:`~taho.database.models.Stat`, :class:`~taho.database.models.Currency]
+        :class:`~taho.abc.Shortcutable`
             The shortcut's item, stat, or currency.
         """
         return await self.shortcut.get()
@@ -377,14 +387,14 @@ class CraftCost(Model):
     def __hash__(self) -> int:
         return hash(self.__repr__())
     
-    async def get_cost(self) -> Union[Item, Stat, Currency]:
+    async def get_cost(self) -> Shortcutable:
         """|coro|
 
-        Get the real cost from the :attr:`.shortcut`
+        Get the real cost from the :attr:`.CraftCost.shortcut`
 
         Returns
         --------
-        Union[:class:`~taho.database.models.Item`, :class:`~taho.database.models.Stat`, :class:`~taho.database.models.Currency`]
+        :class:`~taho.abs.Shortcutable`
             The shortcut's item, stat, or currency.
         """
         return await self.shortcut.get()
@@ -504,33 +514,14 @@ class CraftAccess(Model):
 
             Python: :class:`bool`
         
-        .. collapse:: type
-
-            Tortoise: :class:`tortoise.fields.IntEnumField`
-
-                - :attr:`enum` :class:`~taho.database.enums.CraftAccessType`
-            
-            Python: :class:`~taho.database.enums.CraftAccessType`
-        
-        .. collapse:: user
+        .. collapse:: shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
                 - :attr:`related_name` ``craft_accesses``
-                - :attr:`null` ``True``
             
-            Python: Optional[:class:`~taho.database.models.User`]
-        
-        .. collapse:: role
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Role`
-                - :attr:`related_name` ``craft_accesses``
-                - :attr:`null` ``True``
-            
-            Python: Optional[:class:`~taho.database.models.Role`]
+            Python: :class:`~taho.database.models.Shortcut`
         
     Attributes
     -----------
@@ -540,12 +531,18 @@ class CraftAccess(Model):
         The craft linked to this access.
     have_access: :class:`bool`
         Whether the user/role has access to the craft.
-    type: :class:`~taho.database.enums.CraftAccessType`
-        The type of entity which have (or not) access.
-    user: Optional[:class:`~taho.database.models.User`]
-        The user who have access.
-    role: Optional[:class:`~taho.database.models.Role`]
-        The role who have access.
+    shortcut: :class:`~taho.database.models.Shortcut`
+        The shortcut to the :class:`~taho.database.models.User`
+        or :class:`~taho.database.models.Role` who has access 
+        to the craft.
+
+
+    .. warning::
+
+        In this model, the :attr:`.CraftAccess.shortcut` can
+        only point to :
+        - :class:`~taho.database.models.User`
+        - :class:`~taho.database.models.Role`
     """
     class Meta:
         table = "craft_access"
@@ -554,6 +551,4 @@ class CraftAccess(Model):
 
     craft = fields.ForeignKeyField("main.Craft", related_name="accesses")
     have_access = fields.BooleanField()
-    type = fields.IntEnumField(CraftAccessType)
-    user = fields.ForeignKeyField("main.User", related_name="craft_accesses", null=True)
-    role = fields.ForeignKeyField("main.Role", related_name="craft_accesses", null=True)
+    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="craft_accesses")
