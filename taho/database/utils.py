@@ -22,15 +22,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from taho.enums import InfoType
+from taho.enums import InfoType, ShortcutType
 from typing import TYPE_CHECKING
+from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
     from typing import Union
+    from .models import Shortcut
 
 __all__ = (
     "convert_to_type",
-    "get_type"
+    "get_type",
+    "create_shortcut",
 )
 
 
@@ -95,3 +98,42 @@ def get_type(value: Union[None, bool, int, float, str]) -> InfoType:
         float: InfoType.FLOAT
     }
     return types[type(value)]
+
+async def create_shortcut(model: Shortcutable) -> Shortcut:
+    """|coro|
+
+    Creates a shortcut for the given model.
+
+    Parameters
+    -----------
+    model: :class:`~taho.abc.Shortcutable`
+        The model to create a shortcut for.
+    
+    Returns
+    --------
+    :class:`.Shortcut`
+        The created shortcut.    
+    """
+    from .models import (
+        Item,
+        Stat,
+        Currency,
+        User,
+        Role,
+        Shortcut,
+    )
+    converters = {
+        Item: [ShortcutType.item, "item"],
+        Stat: [ShortcutType.stat, "stat"],
+        Currency: [ShortcutType.currency, "currency"],
+        User: [ShortcutType.user, "user"],
+        Role: [ShortcutType.role, "role"],
+    }
+    data = converters[type(model)]
+    shortcut = await Shortcut.get_or_create(
+        **{
+            "type": data[0],
+            data[1]: model,
+        }
+    )
+    return shortcut[0]
