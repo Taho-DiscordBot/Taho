@@ -30,7 +30,7 @@ from ..utils import convert_to_type, get_type
 from taho.enums import InfoType
 
 if TYPE_CHECKING:
-    from typing import Any, Optional, Union
+    from typing import Optional, Union
     import discord
     from taho import Bot
 
