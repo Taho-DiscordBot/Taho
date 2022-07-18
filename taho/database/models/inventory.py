@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from taho.enums import ItemType
 from typing import TYPE_CHECKING
@@ -38,7 +38,7 @@ __all__ = (
     "Hotbar",
 )
 
-class Inventory(Model):
+class Inventory(BaseModel):
     """Represents a :class:`~taho.database.models.Item` in a
     :class:`~taho.database.models.User`'s inventory.
 
@@ -139,17 +139,7 @@ class Inventory(Model):
     durability = fields.IntField(null=True)
     ammo = fields.IntField(null=True)
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+
 
     @property
     def dura(self) -> Optional[int]:
@@ -180,7 +170,7 @@ class Inventory(Model):
             force_update=force_update,
             )
 
-class Hotbar(Model):
+class Hotbar(BaseModel):
     """Represents a :class:`~taho.database.models.Item` in a
     :class:`~taho.database.models.User`'s hotbar.
 
@@ -279,17 +269,7 @@ class Hotbar(Model):
     durability = fields.IntField(null=True)
     ammo = fields.IntField(null=True)
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+
 
     @property
     def dura(self) -> Optional[int]:

@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from taho.enums import RPEffect, RegenerationType
 from taho.abc import Shortcutable
@@ -35,7 +35,7 @@ __all__ = (
     "Stat",
 )
 
-class Stat(Model, Shortcutable):
+class Stat(BaseModel, Shortcutable):
     """|shortcutable|
     
     Represents a Statistic.
@@ -156,17 +156,7 @@ class Stat(Model, Shortcutable):
     regeneration = fields.IntEnumField(RegenerationType, default=RegenerationType.no_regeneration)
     duration = fields.IntField(null=True)
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
 
     def get_emoji(self, bot: Bot) -> Emoji:
         """

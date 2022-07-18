@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 
 if TYPE_CHECKING:
@@ -36,7 +36,7 @@ __all__ = (
     "ClassStat",
 )
 
-class Class(Model):
+class Class(BaseModel):
     """Represents a class for a user.
 
     .. container:: operations
@@ -137,20 +137,10 @@ class Class(Model):
     def __str__(self) -> str:
         return self.name
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not super().__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+
     
 
-class ClassStat(Model):
+class ClassStat(BaseModel):
     """Represents a stat of a class.
 
     .. container:: operations
@@ -220,14 +210,3 @@ class ClassStat(Model):
     stat: str = fields.ForeignKeyField("main.Stat", related_name="classes")
     value: int = fields.IntField()
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not super().__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())

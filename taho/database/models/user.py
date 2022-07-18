@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from taho.exceptions import QuantityException, NPCException
 from taho.enums import ItemUse, ItemType, ItemReason
@@ -343,7 +343,7 @@ class User(Model, Shortcutable):
                 except:
                     pass
 
-class UserStat(Model):
+class UserStat(BaseModel):
     """Represents a stat a user have.
 
     .. container:: operations

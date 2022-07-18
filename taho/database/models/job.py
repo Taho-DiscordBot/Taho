@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from tortoise.models import Model
+from .base import BaseModel
 from typing import TYPE_CHECKING
 from tortoise import fields
 from taho.enums import SalaryCondition
@@ -35,7 +35,7 @@ __all__ = (
     "JobHistory"
 )
 
-class Job(Model):
+class Job(BaseModel):
     """Represents a job.
 
     .. container:: operations
@@ -152,19 +152,9 @@ class Job(Model):
     rewards: fields.ReverseRelation["JobReward"]
     costs: fields.ReverseRelation["JobCost"]
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-
-class JobReward(Model):
+class JobReward(BaseModel):
     """Represents a reward for a job.
 
     .. container:: operations
@@ -284,17 +274,7 @@ class JobReward(Model):
     amount_min = fields.IntField()
     amount_max = fields.IntField()
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
     
     async def get_reward(self) -> Shortcutable:
         """|coro|
@@ -308,7 +288,7 @@ class JobReward(Model):
         """
         return await self.shortcut.get()
 
-class JobCost(Model):
+class JobCost(BaseModel):
     """Represents a cost for a job.
 
     .. container:: operations
@@ -440,17 +420,7 @@ class JobCost(Model):
     amount_min = fields.IntField()
     amount_max = fields.IntField()
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
     
     async def get_cost(self) -> Shortcutable:
         """|coro|
@@ -464,7 +434,7 @@ class JobCost(Model):
         """
         return await self.shortcut.get()
 
-class JobHistory(Model):
+class JobHistory(BaseModel):
     """Represents a job execution by a user.
 
     .. container:: operations

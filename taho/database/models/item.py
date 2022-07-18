@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from taho.enums import ItemType, ItemReason
 from taho.abc import Shortcutable
@@ -38,7 +38,7 @@ __all__ = (
     "ItemRole",
 )
 
-class Item(Model, Shortcutable):
+class Item(BaseModel, Shortcutable):
     """|shortcutable|
     
     Represents an item.
@@ -196,17 +196,7 @@ class Item(Model, Shortcutable):
     stats: fields.ReverseRelation["ItemStat"]
     roles: fields.ReverseRelation["ItemRole"]
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+
     
     def __str__(self) -> str:
         return self.name
@@ -262,7 +252,7 @@ class Item(Model, Shortcutable):
             force_update=force_update
             )
 
-class ItemStat(Model):
+class ItemStat(BaseModel):
     """Represents an item stat.
 
     .. container:: operations
@@ -360,7 +350,7 @@ class ItemStat(Model):
     type = fields.IntEnumField(ItemReason, default=ItemReason.item_in_inventory)
     is_regen = fields.BooleanField(default=True)
 
-class ItemRole(Model):
+class ItemRole(BaseModel):
     """Represents an item role.
 
     .. container:: operations

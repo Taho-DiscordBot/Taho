@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from taho.abc import Shortcutable
 
@@ -31,7 +31,7 @@ __all__ = (
     "Currency",
 )
 
-class Currency(Model, Shortcutable):
+class Currency(BaseModel, Shortcutable):
     """|shortcutable|
     
     Represents a currency.
@@ -135,18 +135,6 @@ class Currency(Model, Shortcutable):
     code = fields.CharField(max_length=255, null=True)
     rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-    
     def __str__(self) -> str:
         return self.name
     

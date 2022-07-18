@@ -22,13 +22,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from tortoise.models import Model
+from .base import BaseModel
+from tortoise import fields
+from taho.enums import ChannelType
 
 __all__ = (
     "ServerChannel",
 )
 
-class ServerChannel(Model):
+class ServerChannel(BaseModel):
     """
     Represents a channel of a Server.
 
@@ -65,19 +67,13 @@ class ServerChannel(Model):
 
             Python: :class:`~taho.database.models.Server`
         
-        .. collapse:: channel_id
-
-            Tortoise: :class:`tortoise.fields.BigIntField`
-
-            Python: :class:`int`
-        
         .. collapse:: webhook_url
 
             Tortoise: :class:`tortoise.fields.TextField`
 
                 - :attr:`null` ``True``
 
-            Python: :class:`str`
+            Python: Optional[:class:`str`]
         
         .. collapse:: type
 
@@ -94,6 +90,10 @@ class ServerChannel(Model):
         The channel's ID.
     server: :class:`~taho.database.models.Server`
         The server the channel belongs to.
+    webhook_url: Optional[:class:`str`]
+        The channel's webhook URL.
+    type: :class:`~taho.enums.ChannelType`
+        The channel's type.
     
 
     .. note::
@@ -112,8 +112,12 @@ class ServerChannel(Model):
 
         When a channel is created, the same :attr:`.ServerChannel.type` is 
         associated with all its threads
-
     """
 
     class Meta:
-        table = "rp_channels"
+        table = "server_channels"
+    
+    id = fields.BigIntField(pk=True)
+    server = fields.ForeignKeyField("main.Server", related_name="rp_channels")
+    webhook_url = fields.TextField(null=True)
+    type = fields.IntEnumField(ChannelType, default=ChannelType.other)

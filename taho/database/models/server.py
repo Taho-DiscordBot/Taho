@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from tortoise import exceptions as t_exceptions
 from ..utils import convert_to_type, get_type
@@ -40,7 +40,7 @@ __all__ = (
     "ServerInfo",
 )
 
-class Server(Model):
+class Server(BaseModel):
     """
     Represents a Server.
 
@@ -219,7 +219,7 @@ class Server(Model):
         """
         return (await self.get_guild(bot)).get_role(role_id)
 
-class ServerInfo(Model):
+class ServerInfo(BaseModel):
     """
     Represents a server's info.
 
@@ -314,15 +314,6 @@ class ServerInfo(Model):
             return self.py_value == other.py_value
         return other == self.py_value
     
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-
     def __str__(self) -> str:
         return self.value
     

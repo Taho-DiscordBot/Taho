@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from tortoise import exceptions as t_exceptions
 from .role import ServerRole, Role
@@ -52,7 +52,7 @@ __all__ = (
     "ClusterInfo",
 )
 
-class Cluster(Model):
+class Cluster(BaseModel):
     """Represents a cluster.
 
     .. container:: operations
@@ -141,17 +141,7 @@ class Cluster(Model):
     items: fields.ReverseRelation["Item"]
     roles: fields.ReverseRelation["Role"]
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+
 
     async def __aiter__(self) -> AsyncGenerator[Server]:
         async for server in self.servers:
@@ -405,7 +395,7 @@ class Cluster(Model):
         return await server.cluster
 
 
-class ClusterInfo(Model):
+class ClusterInfo(BaseModel):
     """
     Represents a cluster's info.
 
@@ -500,15 +490,6 @@ class ClusterInfo(Model):
             return self.py_value == other.py_value
         return other == self.py_value
     
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-
     def __str__(self) -> str:
         return self.value
     

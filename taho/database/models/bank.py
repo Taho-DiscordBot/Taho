@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import uuid
 import tortoise
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from tortoise.signals import post_save
 from taho.exceptions import AlreadyExists, DoesNotExist
@@ -47,7 +47,7 @@ __all__ = (
     "BankingTransaction",
 )
 
-class Bank(Model):
+class Bank(BaseModel):
     """Represents a bank.
 
     .. container:: operations
@@ -142,18 +142,6 @@ class Bank(Model):
 
     infos: fields.ReverseRelation["BankInfo"]
     accounts: fields.ReverseRelation["BankAccount"]
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
     
     def __str__(self) -> str:
         return self.name
@@ -359,7 +347,7 @@ async def bank_post_save(_, instance: Bank, created: bool, *args, **kwargs) -> N
         except AlreadyExists:
             pass
 
-class BankInfo(Model):
+class BankInfo(BaseModel):
     """
     Represents an info about a bank.
 
@@ -447,18 +435,6 @@ class BankInfo(Model):
         if isinstance(other, BankInfo):
             return self.py_value == other.py_value
         return other == self.py_value
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-
-    def __str__(self) -> str:
-        return self.value
 
     @property
     def py_value(self) -> Union[None, bool, int, float, str]:
@@ -531,7 +507,7 @@ async def create_transaction_operation(
     else:
         await BankingTransaction.bulk_create(transactions)
 
-class BankAccount(Model):
+class BankAccount(BaseModel):
     """
     Represents an account in a bank.
 
@@ -632,15 +608,6 @@ class BankAccount(Model):
 
     transactions: fields.ReverseRelation["BankingTransaction"]
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-    
     def get_balance(self) -> CurrencyAmount:
         """
 
@@ -717,7 +684,7 @@ class BankAccount(Model):
         await create_transaction_operation(self, to, amount, description)
 
 
-class BankingTransaction(Model):
+class BankingTransaction(BaseModel):
     """
     Represents a transaction from a :class:`.BankAccount`.
 
@@ -833,17 +800,7 @@ class BankingTransaction(Model):
     date = fields.DatetimeField(auto_now_add=True)
     description = fields.CharField(max_length=255, null=True)
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-    
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+
 
     async def get_similar(self) -> List[BankingTransaction]:
         """|coro|

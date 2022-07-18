@@ -22,7 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from tortoise.models import Model
+from .base import BaseModel
 from typing import TYPE_CHECKING
 from tortoise import fields
 from taho.enums import CraftAccessType, shortcut
@@ -42,7 +42,7 @@ __all__ = (
     "CraftHistory",
 )
 
-class Craft(Model):
+class Craft(BaseModel):
     """Represents a craft.
 
     .. container:: operations
@@ -152,19 +152,9 @@ class Craft(Model):
     rewards: fields.ReverseRelation["CraftReward"]
     costs: fields.ReverseRelation["CraftCost"]
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
-
-class CraftReward(Model):
+class CraftReward(BaseModel):
     """Represents a reward for a craft.
 
     .. container:: operations
@@ -256,17 +246,7 @@ class CraftReward(Model):
     give_regeneration = fields.BooleanField(null=True)
     amount = fields.IntField()
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
     
     async def get_reward(self) -> Shortcutable:
         """|coro|
@@ -280,7 +260,7 @@ class CraftReward(Model):
         """
         return await self.shortcut.get()
 
-class CraftCost(Model):
+class CraftCost(BaseModel):
     """Represents a cost for a craft.
 
     .. container:: operations
@@ -375,17 +355,7 @@ class CraftCost(Model):
     use_regeneration = fields.BooleanField(null=True)
     amount = fields.IntField()
 
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
 
-    def __ne__(self, other: object) -> bool:
-        return not self.__eq__(other)
-
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
     
     async def get_cost(self) -> Shortcutable:
         """|coro|
@@ -399,7 +369,7 @@ class CraftCost(Model):
         """
         return await self.shortcut.get()
 
-class CraftHistory(Model):
+class CraftHistory(BaseModel):
     """Represents a craft done by a user.
 
     .. container:: operations
@@ -472,7 +442,7 @@ class CraftHistory(Model):
     user = fields.ForeignKeyField("main.User", related_name="craft_history")
     done_at = fields.DatetimeField(auto_now_add=True)
 
-class CraftAccess(Model):
+class CraftAccess(BaseModel):
     """Represents an access to a craft.
 
     .. container:: operations

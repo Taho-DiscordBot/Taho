@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from tortoise.signals import post_save
 
@@ -39,7 +39,7 @@ __all__ = (
     "NPCMessage",
 )
 
-class NPC(Model):
+class NPC(BaseModel):
     """Represents a NPC.
 
     .. container:: operations
@@ -202,7 +202,7 @@ async def on_npc_save(_, instance: NPC, created: bool, *args, **kwargs) -> None:
         from .user import User # circular import
         await User.get_or_create(user_id=instance.id, cluster=instance.cluster)
 
-class NPCOwner(Model):
+class NPCOwner(BaseModel):
     """Represents an owner of a NPC.
 
     .. container:: operations
@@ -298,19 +298,9 @@ class NPCOwner(Model):
     pattern = fields.CharField(max_length=255, null=True)
     is_selected = fields.BooleanField(default=False)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not super().__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
 
-class NPCRole(Model):
+
+class NPCRole(BaseModel):
     """Represents a role of a NPC.
 
     .. container:: operations
@@ -372,19 +362,9 @@ class NPCRole(Model):
     npc = fields.ForeignKeyField("main.NPC", related_name="roles")
     role = fields.ForeignKeyField("main.Role", related_name="npc_roles")
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not super().__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
 
-class NPCMessage(Model):
+
+class NPCMessage(BaseModel):
     """Represents a message sent by a NPC.
 
     .. container:: operations
@@ -528,14 +508,4 @@ class NPCMessage(Model):
     message = fields.TextField(null=True)
     timestamp = fields.DatetimeField(auto_now_add=True)
 
-    def __repr__(self) -> str:
-        return super().__repr__()
-    
-    def __eq__(self, other: object) -> bool:
-        return super().__eq__(other)
-    
-    def __ne__(self, other: object) -> bool:
-        return not super().__eq__(other)
-    
-    def __hash__(self) -> int:
-        return hash(self.__repr__())
+

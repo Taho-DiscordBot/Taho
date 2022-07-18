@@ -21,19 +21,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .base import *
-from .user import *
-from .server import *
-from .cluster import *
-from .bank import *
-from .item import *
-from .inventory import *
-from .role import *
-from .stat import *
-from .job import *
-from .npc import *
-from .currency import *
-from .class_ import *
-from .shortcut import *
-from .channel import *
-from .craft import *
+from __future__ import annotations
+from tortoise.models import Model
+
+__all__ = (
+    "BaseModel",
+)
+
+class BaseModel(Model):
+    class Meta:
+        abstract = True
+    
+    def __eq__(self, other: object) -> bool:
+        return super().__eq__(other)
+    
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
+    
+    def __repr__(self) -> str:
+        return super().__repr__()
+    
+    def __hash__(self) -> int:
+        return hash(self.__repr__())

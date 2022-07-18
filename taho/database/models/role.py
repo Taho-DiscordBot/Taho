@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from taho.enums import RoleType
-from tortoise.models import Model
+from .base import BaseModel
 from tortoise import fields
 from typing import TYPE_CHECKING, AsyncGenerator
 from taho.abc import Shortcutable
@@ -37,7 +37,7 @@ __all__ = (
     "ServerRole"
 )
 
-class Role(Model, Shortcutable):
+class Role(BaseModel, Shortcutable):
     """|shortcutable|
     
     Represents a RP Role of a :class:`~taho.database.models.Cluster`.
@@ -128,7 +128,7 @@ class Role(Model, Shortcutable):
             # Get the role from the Server object
             yield await s_role.server.get_role(bot, s_role.discord_role_id)
 
-class ServerRole(Model):
+class ServerRole(BaseModel):
     """
     Represents a RP role in a :class:`~taho.database.models.Server`.
 
