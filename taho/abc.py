@@ -23,21 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 class Shortcutable:
-    """An ABC that brings together all the models that can be pointed 
-    by a :class:`~taho.database.models.Shortcut`.
-
-    Using a shortcut can be very useful if you want to create a Model 
-    with a Field pointing to several ForeignKeys (this system can be 
-    likened to a Polymorphic relationship).
-
-    The following classes implement this ABC:
-
-    - :class:`~taho.database.models.Item`
-    - :class:`~taho.database.models.Stat`
-    - :class:`~taho.database.models.Currency`
-    - :class:`~taho.database.models.User`
-    - :class:`~taho.database.models.Role`
-    - :class:`~taho.database.models.User`
+    """A base class for shortcutables.
     """
 
 class StuffShortcutable(Shortcutable):
