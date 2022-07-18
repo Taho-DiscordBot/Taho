@@ -24,14 +24,14 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from .base import BaseModel
 from tortoise import fields
-from taho.abc import Shortcutable
+from taho.abc import StuffShortcutable
 
 
 __all__ = (
     "Currency",
 )
 
-class Currency(BaseModel, Shortcutable):
+class Currency(BaseModel, StuffShortcutable):
     """|shortcutable|
     
     Represents a currency.
