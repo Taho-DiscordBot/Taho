@@ -39,3 +39,40 @@ class Shortcutable:
     - :class:`~taho.database.models.Role`
     - :class:`~taho.database.models.User`
     """
+
+class StuffShortcutable(Shortcutable):
+    """An ABC that brings together all the models that can be pointed 
+    by a :class:`~taho.database.models.StuffShortcut`.
+
+    See :ref:`Shortcuts <shortcut>` for more information.
+
+    The following classes implement this ABC:
+
+    - :class:`~taho.database.models.Item`
+    - :class:`~taho.database.models.Stat`
+    - :class:`~taho.database.models.Currency`
+    - :class:`~taho.database.models.Role`
+    """
+
+class OwnerShortcutable:
+    """An ABC that brings together all the models that can be pointed 
+    by a :class:`~taho.database.models.OwnerShortcut`.
+
+    See :ref:`Shortcuts <shortcut>` for more information.
+
+    The following classes implement this ABC:
+
+    - :class:`~taho.database.models.User`
+    """
+
+class AccessShortcutable(Shortcutable):
+    """An ABC that brings together all the models that can be pointed 
+    by a :class:`~taho.database.models.AccessShortcut`.
+
+    See :ref:`Shortcuts <shortcut>` for more information.
+
+    The following classes implement this ABC:
+
+    - :class:`~taho.database.models.User`
+    - :class:`~taho.database.models.Role`
+    """

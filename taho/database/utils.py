@@ -99,7 +99,7 @@ def get_type(value: Union[None, bool, int, float, str]) -> InfoType:
     }
     return types[type(value)]
 
-async def create_shortcut(model: Shortcutable) -> Shortcut:
+async def create_shortcut(model: Shortcutable) -> Shortcut: #todo update
     """|coro|
 
     Creates a shortcut for the given model.

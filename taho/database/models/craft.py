@@ -25,14 +25,9 @@ from __future__ import annotations
 from .base import BaseModel
 from typing import TYPE_CHECKING
 from tortoise import fields
-from taho.enums import CraftAccessType, shortcut
-from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
-    from .item import Item
-    from .stat import Stat
-    from .currency import Currency
-    from typing import Union
+    from taho.abc import StuffShortcutable
 
 __all__ = (
     "Craft",
@@ -190,14 +185,14 @@ class CraftReward(BaseModel):
             
             Python: :class:`~taho.database.models.Craft`
         
-        .. collapse:: shortcut
+        .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
                 - :attr:`related_name` ``craft_rewards``
             
-            Python: :class:`~taho.database.models.Shortcut`
+            Python: :class:`~taho.database.models.StuffShortcut`
 
         .. collapse:: give_regeneration
 
@@ -219,8 +214,8 @@ class CraftReward(BaseModel):
         The reward's ID.
     craft: :class:`~taho.database.models.Craft`
         The craft linked to the reward.
-    shortcut: :class:`~taho.database.models.Shortcut`
-        A shortcut to the reward (item, stat, ...).
+    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
+        A shortcut to the reward (item, stat or currency).
     give_regeneration: Optional[:class:`bool`]
         If the reward is a :class:`~taho.database.models.Stat`, then a regenerable point
         will be rewarded.
@@ -228,13 +223,13 @@ class CraftReward(BaseModel):
         The amount rewarded.
     
 
-    .. warning::
+    .. note::
 
-        In this model, the :attr:`.CraftReward.shortcut` can
-        only point to :
-        - :class:`~taho.database.models.Item`
-        - :class:`~taho.database.models.Stat`
-        - :class:`~taho.database.models.Currency`
+        In this model, the :attr:`.CraftReward.stuff_shortcut` is
+        an :class:`~taho.database.models.StuffShortcut` that
+        point to a :class:`~taho.abc.StuffShortcutable` model.
+
+        See :ref:`Shortcuts <shortcut>` for more information.
     """
     class Meta:
         table = "craft_rewards"
@@ -242,23 +237,21 @@ class CraftReward(BaseModel):
     id = fields.IntField(pk=True)
 
     craft = fields.ForeignKeyField("main.Craft", related_name="rewards")
-    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="craft_rewards", null=True)
+    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
     give_regeneration = fields.BooleanField(null=True)
     amount = fields.IntField()
-
-
     
-    async def get_reward(self) -> Shortcutable:
+    async def get_reward(self) -> StuffShortcutable:
         """|coro|
 
-        Get the real reward from the :attr:`.CraftReward.shortcut`
+        Get the real reward from the :attr:`.CraftReward.stuff_shortcut`.
 
         Returns
         --------
-        :class:`~taho.abc.Shortcutable`
+        :class:`~taho.abc.StuffShortcutable`
             The shortcut's item, stat, or currency.
         """
-        return await self.shortcut.get()
+        return await self.stuff_shortcut
 
 class CraftCost(BaseModel):
     """Represents a cost for a craft.
@@ -296,14 +289,14 @@ class CraftCost(BaseModel):
             
             Python: :class:`~taho.database.models.Craft`
         
-        .. collapse:: shortcut
+        .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
                 - :attr:`related_name` ``craft_costs``
             
-            Python: :class:`~taho.database.models.Shortcut`
+            Python: :class:`~taho.database.models.StuffShortcut`
         
         .. collapse:: use_durabilty
 
@@ -333,7 +326,7 @@ class CraftCost(BaseModel):
         The cost's ID.
     craft: :class:`~taho.database.models.Craft`
         The craft linked to the cost.
-    shortcut: :class:`~taho.database.models.Shortcut`
+    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
         A shortcut to the cost (item, stat, ...).
     use_durabilty: Optional[:class:`bool`]
         If the cost is a :class:`~taho.database.models.Item`, then durability will be
@@ -343,6 +336,15 @@ class CraftCost(BaseModel):
         will be removed.
     amount: :class:`int`
         The amount costed.
+    
+
+    .. note::
+
+        In this model, the :attr:`.CraftCost.stuff_shortcut` is
+        an :class:`~taho.database.models.StuffShortcut` that
+        point to a :class:`~taho.abc.StuffShortcutable` model.
+
+        See :ref:`Shortcuts <shortcut>` for more information.
     """
     class Meta:
         table = "craft_costs"
@@ -350,24 +352,22 @@ class CraftCost(BaseModel):
     id = fields.IntField(pk=True)
 
     craft = fields.ForeignKeyField("main.Craft", related_name="costs")
-    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="craft_costs", null=True)
+    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
     use_durability = fields.BooleanField(null=True)
     use_regeneration = fields.BooleanField(null=True)
     amount = fields.IntField()
-
-
     
-    async def get_cost(self) -> Shortcutable:
+    async def get_cost(self) -> StuffShortcutable:
         """|coro|
 
-        Get the real cost from the :attr:`.CraftCost.shortcut`
+        Get the real cost from the :attr:`.CraftCost.stuff_shortcut`
 
         Returns
         --------
-        :class:`~taho.abs.Shortcutable`
+        :class:`~taho.abc.StuffShortcutable`
             The shortcut's item, stat, or currency.
         """
-        return await self.shortcut.get()
+        return await self.stuff_shortcut
 
 class CraftHistory(BaseModel):
     """Represents a craft done by a user.
@@ -484,14 +484,14 @@ class CraftAccess(BaseModel):
 
             Python: :class:`bool`
         
-        .. collapse:: shortcut
+        .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
                 - :attr:`related_name` ``craft_accesses``
             
-            Python: :class:`~taho.database.models.Shortcut`
+            Python: :class:`~taho.database.models.StuffShortcut`
         
     Attributes
     -----------
@@ -501,18 +501,19 @@ class CraftAccess(BaseModel):
         The craft linked to this access.
     have_access: :class:`bool`
         Whether the user/role has access to the craft.
-    shortcut: :class:`~taho.database.models.Shortcut`
+    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
         The shortcut to the :class:`~taho.database.models.User`
         or :class:`~taho.database.models.Role` who has access 
         to the craft.
 
 
-    .. warning::
+    .. note::
 
-        In this model, the :attr:`.CraftAccess.shortcut` can
-        only point to :
-        - :class:`~taho.database.models.User`
-        - :class:`~taho.database.models.Role`
+        In this model, the :attr:`.CraftAccess.stuff_shortcut` is
+        an :class:`~taho.database.models.AccessShortcut` that
+        point to a :class:`~taho.abc.AccessShortcutable` model.
+
+        See :ref:`Shortcuts <shortcut>` for more information.
     """
     class Meta:
         table = "craft_access"
@@ -521,4 +522,4 @@ class CraftAccess(BaseModel):
 
     craft = fields.ForeignKeyField("main.Craft", related_name="accesses")
     have_access = fields.BooleanField()
-    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="craft_accesses")
+    stuff_shortcut = fields.ForeignKeyField("main.AccessShortcut")

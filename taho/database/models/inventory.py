@@ -66,11 +66,11 @@ class Inventory(BaseModel):
 
             Python: :class:`int`
         
-        .. collapse:: shortcut
+        .. collapse:: owner_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
+                - :attr:`related_model` :class:`~taho.database.models.OwnerShortcut`
                 - :attr:`related_name` ``inventories``
             
             Python: :class:`~taho.database.models.User`
@@ -112,10 +112,8 @@ class Inventory(BaseModel):
     -----------
     id: :class:`int`
         The inventory's ID.
-    shortcut: :class:`~taho.database.models.Shortcut`
-        |coro_attr|
-
-        The :class:`~taho.database.models.Shortcut` that owns the inventory.
+    owner_shortcut: :class:`~taho.database.models.OwnerShortcut`
+        A shortcut to the owner (user, ...) of this.
     item: :class:`~taho.database.models.Item`
         |coro_attr|
         
@@ -132,7 +130,7 @@ class Inventory(BaseModel):
 
     id = fields.IntField(pk=True)
 
-    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="inventories")
+    owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut")
     item = fields.ForeignKeyField("main.Item", related_name="inventories")
 
     amount = fields.IntField(default=0)

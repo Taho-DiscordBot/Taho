@@ -477,6 +477,8 @@ class UserPermission(BaseModel):
     permissions: :class:`int`
         The int representation of the permission.
     """
+    class Meta:
+        table = "user_permissions"
 
     user = fields.OneToOneField("main.User", pk=True, related_name="permission")
     permission = fields.BigIntField(default=0)

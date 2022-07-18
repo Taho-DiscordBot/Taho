@@ -190,14 +190,13 @@ class JobReward(BaseModel):
             
             Python: :class:`~taho.database.models.Job`
         
-        .. collapse:: shortcut
+        .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
-                - :attr:`related_name` ``job_rewards``
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
             
-            Python: :class:`~taho.database.models.Shortcut`
+            Python: :class:`~taho.database.models.StuffShortcut`
 
         .. collapse:: give_regeneration
 
@@ -234,7 +233,7 @@ class JobReward(BaseModel):
         The reward's ID.
     job: :class:`~taho.database.models.Job`
         The job linked to the reward.
-    shortcut: :class:`~taho.database.models.Shortcut`
+    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
         A shortcut to the reward (item, stat, ...).
     give_regeneration: Optional[:class:`bool`]
         If the reward is a :class:`~taho.database.models.Stat`, then a regenerable point
@@ -256,7 +255,7 @@ class JobReward(BaseModel):
 
     .. warning::
 
-        In this model, the :attr:`.JobReward.shortcut` can
+        In this model, the :attr:`.JobReward.stuff_shortcut` can
         only point to :
         - :class:`~taho.database.models.Item`
         - :class:`~taho.database.models.Stat`
@@ -268,7 +267,7 @@ class JobReward(BaseModel):
     id = fields.IntField(pk=True)
 
     job = fields.ForeignKeyField("main.Job", related_name="rewards")
-    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="job_rewards", null=True)
+    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
     give_regeneration = fields.BooleanField(null=True)
     chance = fields.DecimalField(max_digits=3, decimal_places=2)
     amount_min = fields.IntField()
@@ -279,14 +278,14 @@ class JobReward(BaseModel):
     async def get_reward(self) -> Shortcutable:
         """|coro|
 
-        Get the real reward from the :attr:`.JobReward.shortcut`
+        Get the real reward from the :attr:`.JobReward.stuff_shortcut`
 
         Returns
         --------
-        :class:`~taho.abc.Shortcutable`
+        :class:`~taho.abc.StuffShortcutable`
             The shortcut's item, stat, or currency.
         """
-        return await self.shortcut.get()
+        return await self.stuff_shortcut.get()
 
 class JobCost(BaseModel):
     """Represents a cost for a job.
@@ -324,14 +323,13 @@ class JobCost(BaseModel):
             
             Python: :class:`~taho.database.models.Job`
         
-        .. collapse:: shortcut
+        .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Shortcut`
-                - :attr:`related_name` ``job_costs``
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
             
-            Python: :class:`~taho.database.models.Shortcut`
+            Python: :class:`~taho.database.models.StuffShortcut`
         
         .. collapse:: use_durabilty
 
@@ -376,7 +374,7 @@ class JobCost(BaseModel):
         The cost's ID.
     job: :class:`~taho.database.models.Job`
         The job linked to the cost.
-    shortcut: :class:`~taho.database.models.Shortcut`
+    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
         A shortcut to the cost (item, stat, ...).
     use_durabilty: Optional[:class:`bool`]
         If the cost is a :class:`~taho.database.models.Item`, then durability will be
@@ -401,7 +399,7 @@ class JobCost(BaseModel):
 
     .. warning::
 
-        In this model, the :attr:`.JobCost.shortcut` can
+        In this model, the :attr:`.JobCost.stuff_shortcut` can
         only point to :
         - :class:`~taho.database.models.Item`
         - :class:`~taho.database.models.Stat`
@@ -413,7 +411,7 @@ class JobCost(BaseModel):
     id = fields.IntField(pk=True)
 
     job = fields.ForeignKeyField("main.Job", related_name="costs")
-    shortcut = fields.ForeignKeyField("main.Shortcut", related_name="job_costs", null=True)
+    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
     use_durability = fields.BooleanField(null=True)
     use_regeneration = fields.BooleanField(null=True)
     chance = fields.DecimalField(max_digits=3, decimal_places=2)
@@ -425,14 +423,14 @@ class JobCost(BaseModel):
     async def get_cost(self) -> Shortcutable:
         """|coro|
 
-        Get the real cost from the :attr:`.JobCost.shortcut`
+        Get the real cost from the :attr:`.JobCost.stuff_shortcut`
 
         Returns
         --------
-        :class:`~taho.abc.Shortcutable`
+        :class:`~taho.abc.StuffShortcutable`
             The shortcut's item, stat, or currency.
         """
-        return await self.shortcut.get()
+        return await self.stuff_shortcut.get()
 
 class JobHistory(BaseModel):
     """Represents a job execution by a user.

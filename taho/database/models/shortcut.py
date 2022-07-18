@@ -23,158 +23,133 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
+
 from .base import BaseModel
 from tortoise import fields
 from taho.enums import ShortcutType
 
 if TYPE_CHECKING:
-    from taho.abc import Shortcutable
+    from taho.abc import (
+        Shortcutable, 
+        StuffShortcutable, 
+        OwnerShortcutable,
+        AccessShortcutable
+    )
 
 __all__ = (
     "Shortcut",
+    "OwnerShortcut",
+    "StuffShortcut",
+    "AccessShortcut",
 )
 
 class Shortcut(BaseModel):
-    """Represents a shortcut to:
-    - :class:`~taho.database.models.Item`
-    - :class:`~taho.database.models.Stat`
-    - :class:`~taho.database.models.Currency`
-    - :class:`~taho.database.models.User`
-    - :class:`~taho.database.models.Role`
 
-    .. container:: operations
-
-        .. describe:: x == y
-
-            Checks if two shortcuts are equal.
-
-        .. describe:: x != y
-
-            Checks if two shortcuts are not equal.
-        
-        .. describe:: hash(x)
-
-            Returns the shortcut's hash.
-        
-    .. container:: fields
-
-        .. collapse:: id
-            
-            Tortoise: :class:`tortoise.fields.IntField`
-
-                - :attr:`pk` True
-
-            Python: :class:`int`
-        
-        .. collapse:: type
-            
-            Tortoise: :class:`tortoise.fields.IntEnumField`
-
-                - :attr:`enum` :class:`~taho.enums.ShortcutType`
-
-            Python: :class:`~taho.enums.ShortcutType`
-        
-        .. collapse:: item
-            
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Item`
-                - :attr:`related_name` ``shortcuts``
-                - :attr:`null` ``True``
-            
-            Python: Optional[:class:`~taho.database.models.Item`]
-        
-        .. collapse:: stat
-            
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Stat`
-                - :attr:`related_name` ``shortcuts``
-                - :attr:`null` ``True``
-            
-            Python: Optional[:class:`~taho.database.models.Stat`]
-        
-        .. collapse:: currency
-            
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Currency`
-                - :attr:`related_name` ``shortcuts``
-                - :attr:`null` ``True``
-            
-            Python: Optional[:class:`~taho.database.models.Currency`]
-        
-        .. collapse:: user
-            
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.User`
-                - :attr:`related_name` ``shortcuts``
-                - :attr:`null` ``True``
-            
-            Python: Optional[:class:`~taho.database.models.User`]
-        
-        .. collapse:: role
-            
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Role`
-                - :attr:`related_name` ``shortcuts``
-                - :attr:`null` ``True``
-            
-            Python: Optional[:class:`~taho.database.models.Role`]
-
-    Attributes
-    -----------
-    id: :class:`int`
-        The shortcut's ID.
-    type: :class:`~taho.enums.ShortcutType`
-        The shortcut's type.
-    item: Optional[:class:`~taho.database.models.Item`]
-        If the :attr:`.type` is :attr:`~taho.enums.ShortcutType.item`,
-        this is the item.
-    stat: Optional[:class:`~taho.database.models.Stat`]
-        If the :attr:`.type` is :attr:`~taho.enums.ShortcutType.stat`,
-        this is the stat.
-    currency: Optional[:class:`~taho.database.models.Currency`]
-        If the :attr:`.type` is :attr:`~taho.enums.ShortcutType.currency`,
-        this is the currency.   
-    user: Optional[:class:`~taho.database.models.User`]
-        If the :attr:`.type` is :attr:`~taho.enums.ShortcutType.user`,
-        this is the user.
-    role: Optional[:class:`~taho.database.models.Role`]
-        If the :attr:`.type` is :attr:`~taho.enums.ShortcutType.role`,
-        this is the role.
-    """
     class Meta:
-        table = "shortcuts"
+        abstract = True
     
     id = fields.IntField(pk=True)
-    type = fields.IntEnumField(ShortcutType, default=ShortcutType.item)
-    item = fields.ForeignKeyField("main.Item", related_name="shortcuts", null=True)
-    stat = fields.ForeignKeyField("main.Stat", related_name="shortcuts", null=True)
-    currency = fields.ForeignKeyField("main.Currency", related_name="shortcuts", null=True)
-    user = fields.ForeignKeyField("main.User", related_name="shortcuts", null=True)
-    role = fields.ForeignKeyField("main.Role", related_name="shortcuts", null=True)
-
-
-
+    type = fields.IntEnumField(ShortcutType)
     
+    converters = {}
+
+    def __await__(self):
+        return self.get().__await__()
+
     async def get(self) -> Shortcutable:
         """|coro|
 
-        Returns the shortcut's item, stat, or currency.
+        Returns the shortcut's model.
 
         Returns
         --------
         :class:`~taho.abc.Shortcutable`
-            The shortcut's item, stat, or currency.
+            The shortcut's model.
         """
-        converters = {
-            ShortcutType.item: self.item,
-            ShortcutType.stat: self.stat,
-            ShortcutType.currency: self.currency,
-            ShortcutType.user: self.user,
-            ShortcutType.role: self.role,
-        }
-        return converters[self.type] #todo check if |coro_attr|
+        attr = self.converters[self.type]
+        return getattr(self, attr)
+
+class OwnerShortcut(Shortcut):
+    """Represents a shortcut to a
+    :class:`~taho.abc.OwnerShortcutable` model. 
+    
+    See :ref:`Shortcuts <shortcut>` for more information.
+    """
+    class Meta:
+        table = "shortcuts_owner"
+
+    user = fields.ForeignKeyField("main.User")
+
+    converters = {
+        ShortcutType.user: "user",
+    }
+
+    async def get(self) -> OwnerShortcutable:
+        """|coro|
+
+        Returns the shortcut's model.
+
+        Returns
+        --------
+        :class:`~taho.abc.OwnerShortcutable`
+            The shortcut's model.
+        """
+        return await super().get()
+
+class StuffShortcut(Shortcut):
+    """Represents a shortcut to a
+    :class:`~taho.abc.StuffShortcutable` model. 
+    
+    See :ref:`Shortcuts <shortcut>` for more information.
+    """
+
+    item = fields.ForeignKeyField("main.Item")
+    stat = fields.ForeignKeyField("main.Stat")
+    role = fields.ForeignKeyField("main.Role")
+    currency = fields.ForeignKeyField("main.Currency")
+
+    converters = {
+        ShortcutType.item: "item",
+        ShortcutType.stat: "stat",
+        ShortcutType.role: "role",
+        ShortcutType.currency: "currency",
+    }
+
+    async def get(self) -> StuffShortcutable:
+        """|coro|
+
+        Returns the shortcut's model.
+
+        Returns
+        --------
+        :class:`~taho.abc.StuffShortcutable`
+            The shortcut's model.
+        """
+        return await super().get()
+
+class AccessShortcut(Shortcut):
+    """Represents a shortcut to a
+    :class:`~taho.abc.AccessShortcutable` model. 
+    
+    See :ref:`Shortcuts <shortcut>` for more information.
+    """
+
+    user = fields.ForeignKeyField("main.User")
+    role = fields.ForeignKeyField("main.Role")
+
+    converters = {
+        ShortcutType.user: "user",
+        ShortcutType.role: "role",
+    }
+
+    async def get(self) -> AccessShortcutable:
+        """|coro|
+
+        Returns the shortcut's model.
+
+        Returns
+        --------
+        :class:`~taho.abc.AccessShortcutable`
+            The shortcut's model.
+        """
+        return await super().get()

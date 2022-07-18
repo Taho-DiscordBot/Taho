@@ -31,3 +31,5 @@ class ShortcutType(IntEnum):
     item = 0
     stat = 1
     currency = 2
+    role = 3
+    user = 4
