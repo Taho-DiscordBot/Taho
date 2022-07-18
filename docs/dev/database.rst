@@ -103,7 +103,7 @@ JobCost
     :exclude-members: Meta
 
 JobHistory
-~~~~~~~~
+~~~~~~~~~~~
 .. autoclass:: JobHistory()
     :members:
     :exclude-members: Meta
@@ -180,6 +180,12 @@ UserStat
     :members:
     :exclude-members: Meta
 
+UserPermission
+~~~~~~~~~~~~~~~
+.. autoclass:: UserPermission()
+    :members:
+    :exclude-members: Meta
+
 NPC
 ~~~~
 .. autoclass:: NPC()
@@ -229,7 +235,7 @@ CraftAccess
     :exclude-members: Meta
 
 CraftHistory
-~~~~~~~~~~
+~~~~~~~~~~~~~
 .. autoclass:: CraftHistory()
     :members:
     :exclude-members: Meta

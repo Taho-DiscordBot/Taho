@@ -45,9 +45,10 @@ if TYPE_CHECKING:
 __all__ = (
     "User",
     "UserStat",
+    "UserPermission",
 )
 
-class User(Model, Shortcutable):
+class User(BaseModel, Shortcutable):
     """|shortcutable|
     
     Represents a user of a cluster.
@@ -119,6 +120,10 @@ class User(Model, Shortcutable):
         |coro_attr|
 
         The NPCs owned by the user.
+    permissions: :class:`~taho.database.models.UserPermission`
+        |coro_attr|
+
+        The permissions of the user.
     
 
     .. note::
@@ -136,9 +141,11 @@ class User(Model, Shortcutable):
 
     banks: fields.ReverseRelation["Bank"] # The banks owned by the user
     accounts: fields.ReverseRelation["BankAccount"] # The accounts owned by the user
-    inventories: fields.ReverseRelation["Inventory"] # The items in the user's inventory
+    #TODO: adapt with shortcut
+    #inventories: fields.ReverseRelation["Inventory"] # The items in the user's inventory
     hotbars: fields.ReverseRelation["Hotbar"] # The hotbars of the user
     npcs: fields.ReverseRelation["NPCOwner"] # The npcs owned by the user
+    permissions: fields.OneToOneRelation["UserPermission"] # The permissions of the user
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -425,3 +432,51 @@ class UserStat(BaseModel):
     amount = fields.IntField()
     is_regen = fields.BooleanField(null=True)
     maximum = fields.IntField() #todo penser à ça
+
+class UserPermission(BaseModel):
+    """Represents a RP Permission of a :class:`~taho.database.models.User`.
+    
+    .. container:: operations
+    
+        .. describe:: x == y
+
+            Checks if two permissions are equal.
+        
+        .. describe:: x != y
+        
+            Checks if two permissions are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the permission's hash.
+        
+    .. container:: fields
+
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.OneToOneField`
+
+                - :attr:`pk` ``True``
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``'permission'``
+            
+            Python: :class:`int`
+        
+        .. collapse:: permission
+
+            Tortoise: :class:`tortoise.fields.BigIntField`
+
+                - :attr:`default` ``0``
+        
+            Python: :class:`int`
+    
+    Attributes
+    -----------
+    user: :class:`~taho.database.models.User`
+        The user on which the permission is set.
+    permissions: :class:`int`
+        The int representation of the permission.
+    """
+
+    user = fields.OneToOneField("main.User", pk=True, related_name="permission")
+    permission = fields.BigIntField(default=0)
