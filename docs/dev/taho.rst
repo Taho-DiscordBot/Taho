@@ -11,9 +11,27 @@ ABC
 ----
 
 Shortcutable
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 .. autoclass:: Shortcutable()
+    :members:
+
+StuffShortcutable
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: StuffShortcutable()
+    :members:
+
+OwnerShortcutable
+~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: OwnerShortcutable()
+    :members:
+
+AccessShortcutable
+~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: AccessShortcutable()
     :members:
 
 .. currentmodule:: taho.enums
