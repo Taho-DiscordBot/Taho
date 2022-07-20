@@ -112,6 +112,15 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
         |coro_attr|
 
         The permissions of the user.
+    roles: List[:class:`~taho.database.models.UserRole`]
+        |coro_attr|
+
+        The roles of the user.
+    infos: List[:class:`~taho.database.models.UserInfo`]
+        |coro_attr|
+
+        The infos of the user (displayed as a list 
+        in user's profile).
     
 
     .. note::
@@ -131,6 +140,9 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
     hotbars: fields.ReverseRelation["Hotbar"] # The hotbars of the user
     npcs: fields.ReverseRelation["NPCOwner"] # The npcs owned by the user
     permissions: fields.OneToOneRelation["UserPermission"] # The permissions of the user
+    roles: fields.ReverseRelation["UserRole"] # The roles of the user
+    infos: fields.ReverseRelation["UserInfo"] # The infos about the user (displayed
+    # as a list in user's profile)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -537,3 +549,63 @@ class UserRole(BaseModel):
     user = fields.ForeignKeyField("main.User", related_name="roles")
     role = fields.ForeignKeyField("main.Role")
     added_by = fields.IntEnumField(RoleAddedBy)
+
+
+class UserInfo(BaseModel):
+    """Represents a user's info.
+    
+    .. container:: operations
+    
+        .. describe:: x == y
+
+            Checks if two infos are equal.
+        
+        .. describe:: x != y
+        
+            Checks if two infos are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the info's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+            
+            Python: :class:`int`
+
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``infos``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: value
+
+            Tortoise: :class:`tortoise.fields.TextField`
+
+            Python: :class:`str`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The info's ID.
+    user: :class:`~taho.database.models.User`
+        The user on which the info is set.
+    value: :class:`str`
+        The value of the info.
+    """
+    class Meta:
+        table = "user_infos"
+
+    id = fields.IntField(pk=True)
+
+    user = fields.ForeignKeyField("main.User", related_name="infos")
+    value = fields.TextField()
