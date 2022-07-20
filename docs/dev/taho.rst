@@ -365,6 +365,18 @@ ShortcutType
     .. attribute:: currency
     
         This shortcut goes to a :class:`~taho.database.models.Currency`.
+    
+    .. attribute:: role
+
+        This shortcut goes to a :class:`~taho.database.models.Role`.
+    
+    .. attribute:: user
+
+        This shortcut goes to a :class:`~taho.database.models.User`.
+    
+    .. attribute:: inventory
+
+        This shortcut goes to a :class:`~taho.database.models.Inventory`.
 
 CraftAccessType
 ~~~~~~~~~~~~~~~~
