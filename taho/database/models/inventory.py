@@ -72,8 +72,9 @@ class Inventory(BaseModel):
 
                 - :attr:`related_model` :class:`~taho.database.models.OwnerShortcut`
                 - :attr:`related_name` ``inventories``
+                - :attr:`null` ``True``
             
-            Python: :class:`~taho.database.models.User`
+            Python: Optional[:class:`~taho.database.models.OwnerShortcut`]
         
         .. collapse:: item
 
@@ -112,8 +113,10 @@ class Inventory(BaseModel):
     -----------
     id: :class:`int`
         The inventory's ID.
-    owner_shortcut: :class:`~taho.database.models.OwnerShortcut`
+    owner_shortcut: Optional[:class:`~taho.database.models.OwnerShortcut`]
         A shortcut to the owner (user, ...) of this.
+        Set to ``None`` if the inventory is not owned by a user
+        (used for shops sales).
     item: :class:`~taho.database.models.Item`
         |coro_attr|
         
