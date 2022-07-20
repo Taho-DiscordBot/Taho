@@ -99,14 +99,14 @@ class Bank(BaseModel):
 
             Python: optional[:class:`str`]
         
-        .. collapse:: user
+        .. collapse:: owner_shortcut
         
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.User`
-                - :attr:`related_name` ``banks``
+                - :attr:`related_model` :class:`~taho.database.models.OwnerShortcut`
+                - :attr:`null` ``True``
 
-            Python: :class:`~taho.database.models.User`
+            Python: Optional[:class:`~taho.database.models.OwnerShortcut`]
         
         .. collapse:: cluster
 
@@ -125,8 +125,10 @@ class Bank(BaseModel):
         The bank's name.
     emoji: Optional[:class:`str`]
         The bank's emoji.
-    user: :class:`~taho.database.User`
-        The bank's owner, the user who created the bank.
+    owner_shortcut: Optional[:class:`~taho.database.OwnerShortcut`]
+        The bank's owner (user, ...).
+        If ``None``, the bank is owned by the bot
+        (cash bank).
     cluster: :class:`~taho.database.models.Cluster`
         The cluster where the bank is.
     """
@@ -136,7 +138,7 @@ class Bank(BaseModel):
     id = fields.IntField(pk=True)
     
     cluster = fields.ForeignKeyField("main.Cluster", related_name="banks")
-    user = fields.ForeignKeyField("main.User", related_name="banks")
+    owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut", null=True)
     name = fields.CharField(max_length=255)
     emoji = fields.CharField(max_length=255, null=True)
 
@@ -168,8 +170,6 @@ class Bank(BaseModel):
         from taho.utils import Emoji
         return Emoji(bot, self.emoji)
         
-
-
     async def get_info(self, key: str) -> Union[str, int, float, None]:
         """|coro|
 
@@ -544,33 +544,22 @@ class BankAccount(BaseModel):
             
             Python: :class:`.Bank`
         
-        .. collapse:: user
+        .. collapse:: owner_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.User`
-                - :attr:`related_name` ``accounts``
+                - :attr:`related_model` :class:`~taho.database.models.OwnerShortcut`
+                - :attr:`null` ``True``
             
-            Python: :class:`~taho.database.models.User`
-        
-        .. collapse:: currency
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Currency`
-                - :attr:`related_name` ``accounts``
-            
-            Python: :class:`~taho.database.models.Currency`
+            Python: Optional[:class:`~taho.database.models.OwnerShortcut`]
         
         .. collapse:: balance
 
-            Tortoise: :class:`tortoise.models.fields.DecimalField`
+            Tortoise: :class:`tortoise.models.fields.ForeignKeyField`
 
-                - :attr:`max_digits` 32
-                - :attr:`decimal_places` 2
-                - :attr:`default` 0
+                - :attr:`related_model` :class:`~taho.database.models.CurrencyAmount`
             
-            Python: :class:`float`
+            Python: :class:`~taho.database.models.CurrencyAmount`
         
         .. collapse:: is_default
 
@@ -584,13 +573,12 @@ class BankAccount(BaseModel):
     ----------
     bank: :class:`.Bank`
         The bank the account belongs to.
-    user: :class:`~taho.database.models.User`
-        The user the account belongs to.
-        If None, the account is the bank's default account.
-    balance: :class:`float`
-        The balance of the account.
-    currency: :class:`~taho.database.models.Currency`
-        The currency of the money stored on account.
+    owner_shortcut: Optional[:class:`~taho.database.models.OwnerShortcut`]
+        The shortcut to the owner of the account (user, ...).
+        If ``None``, the account is the bank's default account.
+    balance: :class:`~taho.database.models.CurrencyAmount`
+        The balance of the account in a specific
+        :class:`~taho.database.models.Currency`.
     is_default: :class:`bool`
         Whether the account is the default account of the user.
         This account will receive salaries, interests, etc.
@@ -601,26 +589,12 @@ class BankAccount(BaseModel):
     id = fields.IntField(pk=True)
 
     bank = fields.ForeignKeyField("main.Bank", related_name="accounts")
-    user = fields.ForeignKeyField("main.User", related_name="accounts", null=True)
-    balance = fields.DecimalField(max_digits=32, decimal_places=2, default=0)
-    currency = fields.ForeignKeyField("main.Currency", related_name="accounts")
+    owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut", null=True)
+    balance = fields.OneToOneField("main.CurrencyAmount")
     is_default = fields.BooleanField(default=False)
 
     transactions: fields.ReverseRelation["BankingTransaction"]
 
-    def get_balance(self) -> CurrencyAmount:
-        """
-
-        Returns the balance of the account.
-
-        Returns
-        -------
-        :class:`~taho.CurrencyAmount`
-            The balance of the account.
-        
-        """
-        return CurrencyAmount(self.balance, self.currency)
-    
     async def credit(self, amount: CurrencyAmount) -> None:
         """|coro|
 
@@ -652,8 +626,7 @@ class BankAccount(BaseModel):
             currencies.
             Please use :meth:`.credit` instead.
         """
-        self.balance += amount
-        await self.save()
+        await self.balance.credit(amount)
     
     async def transfer(self, to: BankAccount, amount: CurrencyAmount, description: str=None) -> None:
         """|coro|
@@ -723,22 +696,12 @@ class BankingTransaction(BaseModel):
         
         .. collapse:: amount
 
-            Tortoise: :class:`tortoise.models.fields.DecimalField`
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`max_digits` 32
-                - :attr:`decimal_places` 2
+                - :attr:`related_model` :class:`~taho.database.models.CurrencyAmount`
             
-            Python: :class:`float`
-        
-        .. collapse:: currency
+            Python: :class:`~taho.database.models.CurrencyAmount`
 
-            Tortoise: :class:`tortoise.models.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Currency`
-                - :attr:`related_name` '``transactions``
-            
-            Python: :class:`~taho.database.models.Currency`
-        
         .. collapse:: ref
 
             Tortoise: :class:`tortoise.models.fields.UUIDField`
@@ -770,10 +733,9 @@ class BankingTransaction(BaseModel):
         The transaction's ID.
     account: :class:`.BankAccount`
         The account on which the transaction is done.
-    amount: :class:`float`
-        The amount of the transaction.
-    currency: :class:`~taho.database.models.Currency`
-        The currency of the transaction.
+    amount: :class:`~taho.databse.models.CurrencyAmount`
+        The amount of the transaction in a specific
+        :class:`~taho.database.models.Currency`.
     ref: Optional[:class:`uuid.UUID`]
         An UUID allowing to link two transactions resulting 
         from the same action.
@@ -794,13 +756,10 @@ class BankingTransaction(BaseModel):
     id = fields.IntField(pk=True)
 
     account: BankAccount = fields.ForeignKeyField("main.BankAccount", related_name="transactions")
-    amount = fields.DecimalField(max_digits=32, decimal_places=2)
-    currency = fields.ForeignKeyField("main.Currency", related_name="transactions")
+    amount = fields.ForeignKeyField("main.CurrencyAmount")
     ref = fields.UUIDField(null=True)
     date = fields.DatetimeField(auto_now_add=True)
     description = fields.CharField(max_length=255, null=True)
-
-
 
     async def get_similar(self) -> List[BankingTransaction]:
         """|coro|
