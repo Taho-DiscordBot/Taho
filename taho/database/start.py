@@ -45,6 +45,7 @@ _models = [
     "taho.database.models.shop",
     "taho.database.models.shortcut",
     "taho.database.models.stat",
+    "taho.database.models.trade",
     "taho.database.models.user",
     ]
 

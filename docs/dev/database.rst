@@ -265,6 +265,24 @@ Sale
     :members:
     :exclude-members: Meta
 
+Trade
+~~~~~~
+.. autoclass:: Trade()
+    :members:
+    :exclude-members: Meta
+
+TradePartie
+~~~~~~~~~~~~
+.. autoclass:: TradePartie()
+    :members:
+    :exclude-members: Meta
+
+TradeStuff
+~~~~~~~~~~~
+.. autoclass:: TradeStuff()
+    :members:
+    :exclude-members: Meta
+
 
 .. currentmodule:: taho.database.utils
 

@@ -38,3 +38,4 @@ from .shortcut import *
 from .channel import *
 from .craft import *
 from .shop import *
+from .trade import *
