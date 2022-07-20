@@ -134,13 +134,11 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self._is_npc = None
 
     async def is_npc(self) -> bool:
         """
         Check if the user is an NPC.
         """
-        print("is_npc?")
         if not hasattr(self, "_is_npc") or self._is_npc is None:
             self._is_npc = await NPC.exists(id=self.user_id)
         return self._is_npc
