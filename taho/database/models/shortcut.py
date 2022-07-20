@@ -102,6 +102,8 @@ class StuffShortcut(Shortcut):
     
     See :ref:`Shortcuts <shortcut>` for more information.
     """
+    class Meta:
+        table = "shortcuts_stuff"
 
     item = fields.ForeignKeyField("main.Item")
     stat = fields.ForeignKeyField("main.Stat")
@@ -135,6 +137,8 @@ class AccessShortcut(Shortcut):
     
     See :ref:`Shortcuts <shortcut>` for more information.
     """
+    class Meta:
+        table = "shortcuts_access"
 
     user = fields.ForeignKeyField("main.User")
     role = fields.ForeignKeyField("main.Role")
