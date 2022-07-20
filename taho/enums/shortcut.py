@@ -34,3 +34,4 @@ class ShortcutType(IntEnum):
     role = 3
     user = 4
     inventory = 5
+    currency_amount = 6
