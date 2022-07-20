@@ -26,6 +26,7 @@ from .base import BaseModel
 from tortoise import fields
 from taho.enums import ItemType
 from typing import TYPE_CHECKING
+from taho.abc import StuffShortcutable, TradeStuffShortcutable
 
 if TYPE_CHECKING:
     from typing import Iterable, Optional
@@ -38,8 +39,10 @@ __all__ = (
     "Hotbar",
 )
 
-class Inventory(BaseModel):
-    """Represents a :class:`~taho.database.models.Item` in a
+class Inventory(BaseModel, StuffShortcutable, TradeStuffShortcutable):
+    """|shortcutable|
+    
+    Represents a :class:`~taho.database.models.Item` in a
     :class:`~taho.database.models.User`'s inventory.
 
     .. container:: operations

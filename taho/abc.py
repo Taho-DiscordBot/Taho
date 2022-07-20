@@ -63,3 +63,14 @@ class AccessShortcutable(Shortcutable):
     - :class:`~taho.database.models.User`
     - :class:`~taho.database.models.Role`
     """
+
+class TradeStuffShortcutable(Shortcutable):
+    """An ABC that brings together all the models that can be pointed 
+    by a :class:`~taho.database.models.TradeStuffShortcut`.
+
+    See :ref:`Shortcuts <shortcut>` for more information.
+
+    The following classes implement this ABC:
+
+    - :class:`~taho.database.models.Inventory`
+    """

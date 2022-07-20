@@ -33,7 +33,8 @@ if TYPE_CHECKING:
         Shortcutable, 
         StuffShortcutable, 
         OwnerShortcutable,
-        AccessShortcutable
+        AccessShortcutable,
+        TradeStuffShortcutable
     )
 
 __all__ = (
@@ -156,6 +157,34 @@ class AccessShortcut(Shortcut):
         Returns
         --------
         :class:`~taho.abc.AccessShortcutable`
+            The shortcut's model.
+        """
+        return await super().get()
+
+class TradeStuffShortcut(Shortcut):
+    """Represents a shortcut to a
+    :class:`~taho.abc.TradeStuffShortcutable` model. 
+    
+    See :ref:`Shortcuts <shortcut>` for more information.
+    """
+    class Meta:
+        table = "shortcuts_trade_stuff"
+
+    inventory = fields.ForeignKeyField("main.Inventory")
+    currency_amount = fields.ForeignKeyField("main.CurrencyAmount")
+
+    converters = {
+        ShortcutType.inventory: "inventory",
+    }
+
+    async def get(self) -> TradeStuffShortcutable:
+        """|coro|
+
+        Returns the shortcut's model.
+
+        Returns
+        --------
+        :class:`~taho.abc.TradeStuffShortcutable`
             The shortcut's model.
         """
         return await super().get()

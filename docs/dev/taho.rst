@@ -34,6 +34,12 @@ AccessShortcutable
 .. autoclass:: AccessShortcutable()
     :members:
 
+TradeStuffShortcutable
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autoclass:: TradeStuffShortcutable()
+    :members:
+
 .. currentmodule:: taho.enums
 
 Enums

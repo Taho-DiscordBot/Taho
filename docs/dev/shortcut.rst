@@ -38,3 +38,11 @@ AccessShortcut
     Used to define access to something.
     It points to everythings that can have access 
     to a system, things that receive permissions.
+
+TradeStuffShortcut
+-------------------
+
+    A shortcut to :class:`~taho.abc.TradeStuffShortcutable`
+    models.
+    Used to define traded stuff (in a 
+    :class:`~taho.database.models.Trade`).
