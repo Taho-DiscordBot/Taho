@@ -59,6 +59,13 @@ Currency
     :members:
     :exclude-members: Meta
 
+CurrencyAmount
+~~~~~~~~~~~~~~~
+.. autoclass:: CurrencyAmount()
+    :members:
+    :inherited-members:
+    :exclude-members: Meta
+
 Bank
 ~~~~~
 .. autoclass:: Bank()
@@ -177,6 +184,18 @@ UserStat
 UserPermission
 ~~~~~~~~~~~~~~~
 .. autoclass:: UserPermission()
+    :members:
+    :exclude-members: Meta
+
+UserInfo
+~~~~~~~~~
+.. autoclass:: UserInfo()
+    :members:
+    :exclude-members: Meta
+
+UserRole
+~~~~~~~~~
+.. autoclass:: UserRole()
     :members:
     :exclude-members: Meta
 
