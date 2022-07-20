@@ -416,7 +416,7 @@ class CraftHistory(BaseModel):
         
         .. collapse:: done_at
 
-            Tortoise: :class:`tortoise.fields.DateTimeField`
+            Tortoise: :class:`tortoise.fields.DatetimeField`
 
                 - :attr:`auto_now_add` ``True``
             
