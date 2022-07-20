@@ -36,7 +36,7 @@ __all__ = (
 )
 
 class Trade(BaseModel):
-    """Represents a .
+    """Represents a trade between two entities (users, ...).
 
     .. container:: operations
 
