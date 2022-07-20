@@ -107,12 +107,14 @@ class StuffShortcut(Shortcut):
     stat = fields.ForeignKeyField("main.Stat")
     role = fields.ForeignKeyField("main.Role")
     currency = fields.ForeignKeyField("main.Currency")
+    inventory = fields.ForeignKeyField("main.Inventory")
 
     converters = {
         ShortcutType.item: "item",
         ShortcutType.stat: "stat",
         ShortcutType.role: "role",
         ShortcutType.currency: "currency",
+        ShortcutType.inventory: "inventory",
     }
 
     async def get(self) -> StuffShortcutable:
