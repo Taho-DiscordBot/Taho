@@ -24,11 +24,13 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from .base import BaseModel
 from tortoise import fields
-from taho.abc import StuffShortcutable
+from taho.abc import StuffShortcutable, TradeStuffShortcutable
+from taho.currency_amount import CurrencyAmount as _CurrencyAmount
 
 
 __all__ = (
     "Currency",
+    "CurrencyAmount",
 )
 
 class Currency(BaseModel, StuffShortcutable):
@@ -165,3 +167,78 @@ class Currency(BaseModel, StuffShortcutable):
         return amount * (self.rate / currency.rate)
     
 
+class CurrencyAmount(BaseModel, StuffShortcutable, TradeStuffShortcutable, _CurrencyAmount):
+    """|shortcutable|
+    
+    Represents an amount of a currency.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two amounts are equal.
+        
+        .. describe:: x != y
+
+            Checks if two amounts are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the hash of a amount.
+        
+    .. container:: fields
+
+        .. collapse:: id
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: amount
+
+            Tortoise: :class:`tortoise.fields.DecimalField`
+
+                - :attr:`max_digits` 32
+                - :attr:`decimal_places` 2
+            
+            Python: :class:`float`
+        
+        .. collapse:: currency
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`.Currency`
+
+            Python: :class:`.Currency`
+    
+    Attributes
+    ----------
+    id: :class:`int`
+        The currency amount's ID (DB primary key).
+    amount: :class:`float`
+        The amount.
+    currency: :class:`.Currency`
+        The currency in which the amount is.
+    """
+    class Meta:
+        table = "currency_amounts"
+    
+    id = fields.IntField(pk=True)
+
+    amount = fields.DecimalField(max_digits=32, decimal_places=2)
+    currency = fields.ForeignKeyField("main.Currency")
+
+    async def credit(self, amount: float) -> None:
+        """|coro|
+        
+        Adds an amount to the currency amount.
+        
+        Parameters
+        ----------
+        amount: :class:`float`
+            The amount to add.
+        """
+        await super().credit(amount)
+        await self.save()

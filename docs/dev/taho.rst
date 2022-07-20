@@ -383,6 +383,10 @@ ShortcutType
     .. attribute:: inventory
 
         This shortcut goes to a :class:`~taho.database.models.Inventory`.
+    
+    .. attribute:: currency_amount
+
+        This shortcut goes to a :class:`~taho.database.models.CurrencyAmount`.
 
 CraftAccessType
 ~~~~~~~~~~~~~~~~
