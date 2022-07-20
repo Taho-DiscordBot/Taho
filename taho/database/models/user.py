@@ -100,18 +100,6 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
         The user's Discord ID.
     cluster: :class:`~taho.database.models.Cluster`
         The cluster the user is in.
-    banks: List[:class:`~taho.database.models.Bank`]
-        |coro_attr|
-
-        The banks owned by the user.
-    accounts: List[:class:`~taho.database.models.BankAccount`]
-        |coro_attr|
-
-        The accounts owned by the user.
-    inventories: List[:class:`~taho.database.models.Inventory`]
-        |coro_attr|
-
-        The items in the user's inventory.
     hotbars: List[:class:`~taho.database.models.Hotbar`]
         |coro_attr|
 
@@ -136,13 +124,10 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
     # Defining `id` field is optional, it will be defined automatically
     # if you haven't done it yourself
     id = fields.IntField(pk=True)
+    
     user_id = fields.BigIntField()
     cluster: Cluster = fields.ForeignKeyField("main.Cluster", related_name="users")
 
-    banks: fields.ReverseRelation["Bank"] # The banks owned by the user
-    accounts: fields.ReverseRelation["BankAccount"] # The accounts owned by the user
-    #TODO: adapt with shortcut
-    #inventories: fields.ReverseRelation["Inventory"] # The items in the user's inventory
     hotbars: fields.ReverseRelation["Hotbar"] # The hotbars of the user
     npcs: fields.ReverseRelation["NPCOwner"] # The npcs owned by the user
     permissions: fields.OneToOneRelation["UserPermission"] # The permissions of the user
