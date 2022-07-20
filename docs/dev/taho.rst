@@ -396,4 +396,23 @@ CraftAccessType
     
         The access is for a role.
 
+ShopType
+~~~~~~~~~
 
+.. class:: taho.enums.ShopType
+
+    |int_enum|
+
+    The type of a :class:`~taho.database.models.Shop`.
+
+    .. attribute:: user
+    
+        The shop is a personnal shop of a :class:`~taho.database.models.User`.
+    
+    .. attribute:: admin
+    
+        The shop is created by a Server admin (the shop can have unlimited amounts).
+    
+    .. attribute:: shared
+    
+        The shop is shared between all users.

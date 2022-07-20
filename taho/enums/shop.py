@@ -21,20 +21,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .base import *
-from .user import *
-from .server import *
-from .cluster import *
-from .bank import *
-from .item import *
-from .inventory import *
-from .role import *
-from .stat import *
-from .job import *
-from .npc import *
-from .currency import *
-from .class_ import *
-from .shortcut import *
-from .channel import *
-from .craft import *
-from .shop import *
+from enum import IntEnum
+
+__all__ = (
+    "ShopType",
+)
+
+class ShopType(IntEnum):
+    user = 0
+    admin = 1
+    shared = 2

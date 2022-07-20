@@ -29,3 +29,4 @@ from .role import *
 from .stat import *
 from .shortcut import *
 from .craft import *
+from .shop import *

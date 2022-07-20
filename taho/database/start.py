@@ -42,6 +42,7 @@ _models = [
     "taho.database.models.npc",
     "taho.database.models.role",
     "taho.database.models.server",
+    "taho.database.models.shop",
     "taho.database.models.shortcut",
     "taho.database.models.stat",
     "taho.database.models.user",

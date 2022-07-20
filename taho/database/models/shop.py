@@ -22,12 +22,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
+
+from taho.currency_amount import CurrencyAmount
 from .base import BaseModel
 from tortoise import fields
 from typing import TYPE_CHECKING
+from taho.enums import ShopType
 
 if TYPE_CHECKING:
-    pass
+    from typing import Any
 
 __all__ = (
     "Shop",
@@ -74,6 +77,14 @@ class Shop(BaseModel):
             
             Python: :class:`taho.database.models.Cluster`
         
+        .. collapse:: owner_shortcut
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.OwnerShortcut`
+            
+            Python: :class:`~taho.database.models.OwnerShortcut`
+        
         .. collapse:: short_id
 
             Tortoise: :class:`tortoise.fields.IntField`
@@ -81,6 +92,14 @@ class Shop(BaseModel):
                 - :attr:`unique` ``True``
             
             Python: :class:`int`
+        
+        .. collapse:: type
+
+            Tortoise: :class:`tortoise.fields.IntEnumField`
+
+                - :attr:`enum` :class:`~taho.enums.ShopType`
+
+            Python: :class:`~taho.enums.ShopType`
         
         .. collapse:: name
 
@@ -112,23 +131,173 @@ class Shop(BaseModel):
         The shop's ID.
     cluster: :class:`taho.database.models.Cluster`
         The cluster the shop is in.
+    owner_shortcut: :class:`taho.database.models.OwnerShortcut`
+        The entity who owns the shop.
     short_id: :class:`int`
         The shop's short ID.
+    type: :class:`taho.enums.ShopType`
+        The shop's type.
     name: :class:`str`
         The shop's name.
     description: Optional[:class:`str`]
         The shop's description.
     icon_url: Optional[:class:`str`]
         The shop's icon URL.
+    sales: List[:class:`.Sale`]
+        |coro_attr|
+
+        The shop's sales.
+    
+
+    .. note::
+
+        In this model, the :attr:`.Shop.owner_shortcut` is
+        an :class:`~taho.database.models.OwnerShortcut` that
+        point to a :class:`~taho.abc.OwnerShortcutable` model.
+
+        See :ref:`Shortcuts <shortcut>` for more information.
     """
+    class Meta:
+        table = "shops"
+
     id = fields.IntField(pk=True)
 
     cluster = fields.ForeignKeyField("main.Cluster", related_name="shops")
-    #owner ?
+    owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut")
     short_id = fields.IntField(unique=True)
+    type = fields.IntEnumField(ShopType)
     name = fields.CharField(max_length=32)
     description = fields.TextField(null=True)
     icon_url = fields.TextField(null=True)
 
+    sales: fields.ReverseRelation["Sale"]
+
 class Sale(BaseModel):
-    pass
+    """Represents something from sale in a shop.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two sales are equal.
+
+        .. describe:: x != y
+
+            Checks if two sales are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the sale's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: shop
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Shop`
+                - :attr:`related_name` ``sales``
+            
+            Python: :class:`taho.database.models.Shop`
+        
+        .. collapse:: stuff_shortcut
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
+
+            Python: :class:`~taho.database.models.StuffShortcut`
+        
+        .. collapse:: currency
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Currency`
+            
+            Python: :class:`~taho.database.models.Currency`
+
+        .. collapse:: price
+
+            Tortoise: :class:`tortoise.fields.DecimalField`
+
+                - :attr:`max_digits` ``10``
+                - :attr:`precision` ``2``
+            
+            Python: :class:`float`
+        
+        .. collapse:: amount 
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+            Python: :class:`int`
+        
+        .. collapse:: description
+
+            Tortoise: :class:`tortoise.fields.TextField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: end_time
+
+            Tortoise: :class:`tortoise.fields.DatetimeField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`datetime.datetime`]
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The sale's ID.
+    shop: :class:`taho.database.models.Shop`
+        The shop the sale is in.
+    stuff_shortcut: :class:`taho.database.models.StuffShortcut`
+        The stuff the sale is for.
+    currency: :class:`taho.database.models.Currency`
+        The currency the sale's price is in.
+    price: :class:`float`
+        The sale's price.
+    amount: Optional[:class:`int`]
+        The amount of stuff the sale is for.
+    description: Optional[:class:`str`]
+        The sale's description.
+    end_time: Optional[:class:`datetime.datetime`]
+        The sale's end time.
+    currency_price: :class:`~taho.CurrencyAmount`
+        The sale's price in the sale's currency.
+        Useful for converting currencies.
+    """
+    class Meta:
+        table = "shop_sales"
+    
+    id = fields.IntField(pk=True)
+
+    shop = fields.ForeignKeyField("main.Shop", related_name="sales")
+    owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut")
+    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
+    currency = fields.ForeignKeyField("main.Currency")
+    price = fields.DecimalField(max_digits=10, decimal_places=2)
+    amount = fields.IntField()
+    description = fields.TextField(null=True)
+    end_time = fields.DatetimeField(null=True)
+
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._currency_price: CurrencyAmount = None
+
+
+    @property
+    def currency_price(self) -> CurrencyAmount:
+        if not self._currency_price:
+            self._currency_price = CurrencyAmount(self.price, self.currency)
+        return self._currency_price

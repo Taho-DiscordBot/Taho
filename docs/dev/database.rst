@@ -234,6 +234,18 @@ CraftHistory
     :members:
     :exclude-members: Meta
 
+Shop 
+~~~~~
+.. autoclass:: Shop()
+    :members:
+    :exclude-members: Meta
+
+Sale
+~~~~~
+.. autoclass:: Sale()
+    :members:
+    :exclude-members: Meta
+
 
 .. currentmodule:: taho.database.utils
 
