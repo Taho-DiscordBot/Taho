@@ -243,6 +243,34 @@ RoleType
         The role is not linked to any system
         of the bot, but it is still a rp role.
 
+RoleAddedBy
+~~~~~~~~~~~~
+
+.. class:: taho.enums.RoleAddedBy
+    
+        |int_enum|
+    
+        By what a :class:`~taho.database.models.UserRole`
+        was added to a :class:`~taho.database.models.User`.
+    
+        .. attribute:: admin
+        
+            The role was added intentionally by a Discord
+            admin or with a command.
+        
+        .. attribute:: item
+        
+            The role was added due to the presence
+            of an item in the inventory.
+        
+        .. attribute:: shop
+            
+            The role was added because of a shop purchase.
+
+        .. attribute:: other
+        
+            The role is added by an unknown source. 
+
 RegenerationType
 ~~~~~~~~~~~~~~~~~
 

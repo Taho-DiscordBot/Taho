@@ -25,10 +25,17 @@ from enum import IntEnum
 
 __all__ = (
     "RoleType",
+    "RoleAddedBy",
 )
 
 class RoleType(IntEnum):
     default = 0
     job = 1
     class_ = 2
+    other = 3
+
+class RoleAddedBy(IntEnum):
+    admin = 0
+    item = 1
+    shop = 2
     other = 3

@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from taho.exceptions import QuantityException, NPCException
-from taho.enums import ItemUse, ItemType, ItemReason
+from taho.enums import ItemUse, ItemType, ItemReason, RoleAddedBy
 from .npc import NPC
 from taho.abc import AccessShortcutable, OwnerShortcutable
 
@@ -482,3 +482,75 @@ class UserPermission(BaseModel):
 
     user = fields.OneToOneField("main.User", pk=True, related_name="permission")
     permission = fields.BigIntField(default=0)
+
+class UserRole(BaseModel):
+    """Represents a role of a :class:`~taho.database.models.User`.
+    
+    .. container:: operations
+    
+        .. describe:: x == y
+
+            Checks if two roles are equal.
+        
+        .. describe:: x != y
+        
+            Checks if two roles are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the role's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+            
+            Python: :class:`int`
+
+        .. collapse:: user
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.User`
+                - :attr:`related_name` ``roles``
+            
+            Python: :class:`~taho.database.models.User`
+        
+        .. collapse:: role
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Role`
+            
+            Python: :class:`~taho.database.models.Role`
+
+        .. collapse:: added_by
+
+            Tortoise: :class:`tortoise.fields.IntEnumField`
+
+                - :attr:`enum_type` :class:`~taho.enums.RoleAddedBy`
+            
+            Python: :class:`~taho.enums.RoleAddedBy`
+
+    Attributes
+    -----------
+    id: :class:`int`
+        The role's ID.
+    user: :class:`~taho.database.models.User`
+        The user on which the role is set.
+    role: :class:`~taho.database.models.Role`
+        The role.
+    added_by: :class:`~taho.enums.RoleAddedBy`
+        The way the role was added.
+    """
+    class Meta:
+        table = "user_roles"
+
+    id = fields.IntField(pk=True)
+
+    user = fields.ForeignKeyField("main.User", related_name="roles")
+    role = fields.ForeignKeyField("main.Role")
+    added_by = fields.IntEnumField(RoleAddedBy)
