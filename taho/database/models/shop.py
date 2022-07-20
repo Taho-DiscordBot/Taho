@@ -216,22 +216,13 @@ class Sale(BaseModel):
 
             Python: :class:`~taho.database.models.StuffShortcut`
         
-        .. collapse:: currency
+        .. collapse:: price
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Currency`
+                - :attr:`related_model` :class:`~taho.database.models.CurrencyAmount`
             
-            Python: :class:`~taho.database.models.Currency`
-
-        .. collapse:: price
-
-            Tortoise: :class:`tortoise.fields.DecimalField`
-
-                - :attr:`max_digits` ``10``
-                - :attr:`precision` ``2``
-            
-            Python: :class:`float`
+            Python: :class:`~taho.database.models.CurrencyAmount`
         
         .. collapse:: amount 
 
@@ -263,10 +254,9 @@ class Sale(BaseModel):
         The shop the sale is in.
     stuff_shortcut: :class:`taho.database.models.StuffShortcut`
         The stuff the sale is for.
-    currency: :class:`taho.database.models.Currency`
-        The currency the sale's price is in.
-    price: :class:`float`
-        The sale's price.
+    price: :class:`taho.database.models.CurrencyAmount`
+        The sale's price in a specific
+        :class:`~taho.database.models.Currency`.
     amount: Optional[:class:`int`]
         The amount of stuff the sale is for.
     description: Optional[:class:`str`]
@@ -285,19 +275,10 @@ class Sale(BaseModel):
     shop = fields.ForeignKeyField("main.Shop", related_name="sales")
     owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut")
     stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
-    currency = fields.ForeignKeyField("main.Currency")
-    price = fields.DecimalField(max_digits=10, decimal_places=2)
+    price = fields.ForeignKeyField("main.CurrencyAmount")
     amount = fields.IntField()
     description = fields.TextField(null=True)
     end_time = fields.DatetimeField(null=True)
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self._currency_price: CurrencyAmount = None
-
-
-    @property
-    def currency_price(self) -> CurrencyAmount:
-        if not self._currency_price:
-            self._currency_price = CurrencyAmount(self.price, self.currency)
-        return self._currency_price
