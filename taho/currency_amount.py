@@ -128,12 +128,27 @@ class CurrencyAmount:
         """
         if currency == self.currency: # no conversion needed
             return self.amount
+        if not hasattr(self, "_conversions"):
+            self._conversions = {} # prevent case where this class is parent of
+            # the CurrencyAmount model (in which self.__init__ is not called)
         if currency not in self._conversions: # no conversion yet
             # convert from the current currency to the given currency
             # and store the result in the conversions dict
             self._conversions[currency] = await self.currency.convert(currency, self.amount)
         return self._conversions[currency] # return the converted amount
     
+    async def credit(self, amount: float) -> None:
+        """
+
+        Add the given amount to the currency amount.
+
+        Parameters
+        -----------
+        amount: float
+            The amount to add.
+        """
+        self.amount += amount
+
     def clone(self, opposite: bool=False) -> CurrencyAmount:
         """
 
