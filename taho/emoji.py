@@ -25,6 +25,7 @@ from __future__ import annotations
 from ctypes import Union
 from typing import TYPE_CHECKING
 import unicodedata
+import discord
 
 if TYPE_CHECKING:
     from typing import Optional, Any, Dict
@@ -115,7 +116,7 @@ class Emoji:
         """:class:`bool`: Checks if this is a custom emoji."""
         return self.id is not None
     
-    def _init_emoji(self, emoji: Any, bot: AutoShardedBot) -> None:
+    def _init_emoji(self, bot: AutoShardedBot, emoji: Any) -> None:
         """
         Get data from the emoji and set the attributes.
 
