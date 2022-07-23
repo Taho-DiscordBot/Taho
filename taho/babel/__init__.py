@@ -23,17 +23,24 @@ DEALINGS IN THE SOFTWARE.
 
 This code is based on the work of the flask_babel project:
 https://pypi.org/project/Flask-Babel/
+And the Py18n project:
+https://pypi.org/project/Py18n/
 """
-from __future__ import absolute_import, annotations
+from __future__ import annotations
+import contextvars
 import os
-from typing import Dict, Tuple, Generator
+from typing import TYPE_CHECKING
 from babel import support, Locale
-from discord import Interaction
-from taho.utils.context import TahoContext
 
 from .speaklater import LazyString
-current_bot = None
+
+if TYPE_CHECKING:
+    from typing import Dict, Tuple, Generator
+    from taho.utils import TahoContext
+    from taho import Bot
+
 domain = "messages"
+
 class Domain(object):
     """Localization domain. By default will use look for tranlations in Flask
     botlication directory and "messages" domain - all message catalogs should
@@ -56,10 +63,10 @@ class Domain(object):
         for locale in self.babel.list_translations():
             self.get_translations(locale=locale)
     
-    def get_translations(self, locale:Locale=None, ctx=None) -> support.Translations:
+    def get_translations(self, locale:Locale=None) -> support.Translations:
         cache = self.get_translations_cache()
         if not locale:
-            locale = ctx.babel_locale
+            locale = self.babel.get_current_locale()
         try:
             return cache[str(locale), domain]
         except KeyError:
@@ -81,7 +88,7 @@ class Domain(object):
             cache[str(locale), self.domain] = translations
             return translations
     
-    def gettext(self, locale:Locale, string:str, **variables):
+    def gettext(self, string:str, **variables):
         """Translates a string with the current locale and passes in the
         given keyword arguments as mboting to a string formatting string.
 
@@ -90,11 +97,11 @@ class Domain(object):
             gettext(u'Hello World!')
             gettext(u'Hello %(name)s!', name='World')
         """
-        t = self.get_translations(locale=locale)
+        t = self.get_translations()
         s = t.ugettext(string)
         return s if not variables else s % variables
 
-    def ngettext(self, locale:Locale, singular:str, plural:str, num:int, **variables):
+    def ngettext(self, singular:str, plural:str, num:int, **variables):
         """Translates a string with the current locale and passes in the
         given keyword arguments as mboting to a string formatting string.
         The `num` parameter is used to dispatch between singular and various
@@ -107,30 +114,30 @@ class Domain(object):
             ngettext(u'%(num)d botle', u'%(num)d botles', num=len(botles))
         """
         variables.setdefault('num', num)
-        t = self.get_translations(locale=locale)
+        t = self.get_translations()
         s = t.ungettext(singular, plural, num)
         return s if not variables else s % variables
 
-    def pgettext(self, locale:Locale, context, string:str, **variables):
+    def pgettext(self, context, string:str, **variables):
         """Like :func:`gettext` but with a context.
 
         .. versionadded:: 0.7
         """
-        t = self.get_translations(locale=locale)
+        t = self.get_translations()
         s = t.upgettext(context, string)
         return s if not variables else s % variables
 
-    def npgettext(self, locale:Locale, context, singular:str, plural:str, num:int, **variables):
+    def npgettext(self, context, singular:str, plural:str, num:int, **variables):
         """Like :func:`ngettext` but with a context.
 
         .. versionadded:: 0.7
         """
         variables.setdefault('num', num)
-        t = self.get_translations(locale=locale)
+        t = self.get_translations()
         s = t.unpgettext(context, singular, plural, num)
         return s if not variables else s % variables
 
-    def lazy_gettext(self, locale:Locale, string:str, **variables):
+    def lazy_gettext(self, string:str, **variables):
         """Like :func:`gettext` but the string returned is lazy which means
         it will be translated when it is used as an actual string.
 
@@ -142,9 +149,9 @@ class Domain(object):
             def index():
                 return unicode(hello)
         """
-        return LazyString(self.gettext, locale, string, **variables)
+        return LazyString(self.gettext, string, **variables)
 
-    def lazy_ngettext(self, locale:Locale, singular:str, plural:str, num:int, **variables):
+    def lazy_ngettext(self, singular:str, plural:str, num:int, **variables):
         """Like :func:`ngettext` but the string returned is lazy which means
         it will be translated when it is used as an actual string.
 
@@ -156,18 +163,19 @@ class Domain(object):
             def index():
                 return unicode(botles)
         """
-        return LazyString(self.ngettext, locale, singular, plural, num, **variables)
+        return LazyString(self.ngettext, singular, plural, num, **variables)
 
-    def lazy_pgettext(self, locale:Locale, context, string:str, **variables):
+    def lazy_pgettext(self, context, string:str, **variables):
         """Like :func:`pgettext` but the string returned is lazy which means
         it will be translated when it is used as an actual string.
 
         .. versionadded:: 0.7
         """
-        return LazyString(self.pgettext, locale, context, string, **variables)
+        return LazyString(self.pgettext, context, string, **variables)
+
 
 class Babel(object):
-    def __init__(self, bot) -> None:
+    def __init__(self, bot: Bot, default_locale: str="en") -> None:
         self.cache = {}
         self.bot = bot
         bot.babel = self
@@ -176,6 +184,40 @@ class Babel(object):
             domain=domain,
             _babel=self
             )
+        
+        self.default_locale = Locale.parse(default_locale, sep="-")
+
+        self._current_locale = contextvars.ContextVar("_current_locale", default=self.default_locale)
+
+        async def pre(ctx: TahoContext):
+            self.set_current_locale(await ctx.babel_locale())
+        
+        self.bot.before_invoke(pre)
+        Babel.default_instance = self
+    
+
+    def set_current_locale(self, locale: Locale) -> None:
+        """
+        Set the current locale for the current context.
+
+        Parameters
+        -----------
+        locale: :class:`babel.Locale`
+            The locale to use.
+        """
+        self._current_locale.set(locale)
+    
+    def get_current_locale(self) -> Locale:
+        """
+        Get the current locale for the current context.
+
+        Returns
+        --------
+        :class:`babel.Locale`
+            The current locale.
+        """
+        return self._current_locale.get()
+
     
     @property
     def translation_directories(self) -> Generator[str]:
@@ -225,14 +267,13 @@ class Babel(object):
     
     def get_domain(self) -> Domain:
         return self.domain
-    
-    
-
-def get_domain(ctx) -> Domain:
-    return ctx.bot.babel.get_domain()
 
 
-async def gettext(string, ctx, **variables):
+def get_domain() -> Domain:
+    return Babel.default_instance.get_domain()
+
+
+def gettext(string, **variables):
     """Translates a string with the current locale and passes in the
     given keyword arguments as mboting to a string formatting string.
 
@@ -241,13 +282,10 @@ async def gettext(string, ctx, **variables):
         gettext(u'Hello World!')
         gettext(u'Hello %(name)s!', name='World')
     """
-    if isinstance(ctx, Interaction):
-        ctx = await TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).gettext(locale, string, **variables)
+    return get_domain().gettext(string, **variables)
 _ = gettext
 
-def ngettext(singular, plural, num, ctx, **variables):
+def ngettext(singular, plural, num, **variables):
     """Translates a string with the current locale and passes in the
     given keyword arguments as mboting to a string formatting string.
     The `num` parameter is used to dispatch between singular and various
@@ -259,35 +297,26 @@ def ngettext(singular, plural, num, ctx, **variables):
 
         ngettext(u'%(num)d botle', u'%(num)d botles', num=len(botles))
     """
-    if isinstance(ctx, Interaction):
-        ctx = TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).ngettext(locale, singular, plural, num, **variables)
+    return get_domain().ngettext(singular, plural, num, **variables)
 
 
-def pgettext(context, string, ctx, **variables):
+def pgettext(context, string, **variables):
     """Like :func:`gettext` but with a context.
 
     .. versionadded:: 0.7
     """
-    if isinstance(ctx, Interaction):
-        ctx = TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).pgettext(locale, context, string, **variables)
+    return get_domain().pgettext(context, string, **variables)
 
 
-def npgettext(context, singular, plural, num, ctx, **variables):
+def npgettext(context, singular, plural, num, **variables):
     """Like :func:`ngettext` but with a context.
 
     .. versionadded:: 0.7
     """
-    if isinstance(ctx, Interaction):
-        ctx = TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).npgettext(locale, context, singular, plural, num, **variables)
+    return get_domain().npgettext(context, singular, plural, num, **variables)
 
 
-def lazy_gettext(string, ctx, **variables):
+def lazy_gettext(string, **variables):
     """Like :func:`gettext` but the string returned is lazy which means
     it will be translated when it is used as an actual string.
 
@@ -299,25 +328,19 @@ def lazy_gettext(string, ctx, **variables):
         def index():
             return unicode(hello)
     """
-    if isinstance(ctx, Interaction):
-        ctx = TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).lazy_gettext(locale, string, **variables)
+    return get_domain().lazy_gettext(string, **variables)
 
 
-def lazy_pgettext(context, string, ctx, **variables):
+def lazy_pgettext(context, string, **variables):
     """Like :func:`pgettext` but the string returned is lazy which means
     it will be translated when it is used as an actual string.
 
     .. versionadded:: 0.7
     """
-    if isinstance(ctx, Interaction):
-        ctx = TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).lazy_pgettext(locale, context, string, **variables)
+    return get_domain().lazy_pgettext(context, string, **variables)
 
 
-def lazy_ngettext(singular, plural, num, ctx, **variables):
+def lazy_ngettext(singular, plural, num, **variables):
     """Like :func:`ngettext` but the string returned is lazy which means
     it will be translated when it is used as an actual string.
 
@@ -329,7 +352,4 @@ def lazy_ngettext(singular, plural, num, ctx, **variables):
         def index():
             return unicode(botles)
     """
-    if isinstance(ctx, Interaction):
-        ctx = TahoContext.from_interaction(ctx)
-    locale = ctx.babel_locale
-    return get_domain(ctx).lazy_ngettext(locale, singular, plural, num, **variables)
+    return get_domain().lazy_ngettext(singular, plural, num, **variables)
