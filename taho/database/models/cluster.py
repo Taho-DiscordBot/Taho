@@ -220,8 +220,9 @@ class Cluster(BaseModel):
         :class:`~taho.database.models.User`
             The user.
         """
+        from .user import User
         try:
-            return await self.users.get(id=user_id)
+            return await self.users.all().get(id=user_id)
         except t_exceptions.DoesNotExist:
             if create_if_not_exists:
                 return await User.create(user_id=user_id, cluster=self)
@@ -487,7 +488,7 @@ class Cluster(BaseModel):
 
         await self.add_server(bot, server[0], sync_server=sync_server)
         await server[0].refresh_from_db()
-        return server
+        return server[0]
 
     async def add_server(self, bot: Bot, server: Server, sync_server: bool=True) -> None:
         """|coro|
@@ -674,7 +675,8 @@ async def cluster_post_save(_, instance: Cluster, created: bool, *args, **kwargs
             cluster=instance, 
             name="Dollar",
             symbol="$",
-            code="USD"
+            code="USD",
+            is_default=True
             )
 
         # Create the default bank
