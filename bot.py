@@ -43,6 +43,17 @@ logger_tortoise = logging.getLogger("tortoise")
 logger_tortoise.setLevel(logging.DEBUG)
 logger_tortoise.addHandler(sh)
 
+
+logger_discord = logging.getLogger('discord')
+logger_discord.setLevel(logging.DEBUG)
+logging.getLogger('discord.http').setLevel(logging.INFO)
+
+handler = logging.FileHandler(filename='logs/discord.log', encoding='utf-8', mode='w')
+dt_fmt = '%Y-%m-%d %H:%M:%S'
+formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+handler.setFormatter(formatter)
+logger_discord.addHandler(handler)
+
 if TYPE_CHECKING:
     from sshtunnel import SSHTunnelForwarder
 
