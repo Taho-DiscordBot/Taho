@@ -351,10 +351,10 @@ RPEffect
 
         The stat is the ability of the user.
 
-ShortcutType
+ShortcutableType
 ~~~~~~~~~~~~~~
 
-.. class:: taho.enums.ShortcutType
+.. class:: taho.enums.ShortcutableType
 
     |int_enum|
 

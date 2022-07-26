@@ -218,11 +218,20 @@ class Sale(BaseModel):
         
         .. collapse:: price
 
+            Tortoise: :class:`tortoise.fields.DecimalField`
+
+                - :attr:`max_digits` ``32``
+                - :attr:`decimal_places` ``2``
+            
+            Python: :class:`float`
+        
+        .. collapse:: currency
+
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.CurrencyAmount`
-            
-            Python: :class:`~taho.database.models.CurrencyAmount`
+                - :attr:`related_model` :class:`~taho.database.models.Currency`
+
+            Python: :class:`~taho.database.models.Currency`
         
         .. collapse:: amount 
 
@@ -254,18 +263,16 @@ class Sale(BaseModel):
         The shop the sale is in.
     stuff_shortcut: :class:`taho.database.models.StuffShortcut`
         The stuff the sale is for.
-    price: :class:`taho.database.models.CurrencyAmount`
-        The sale's price in a specific
-        :class:`~taho.database.models.Currency`.
+    price: :class:`float`
+        The sale's price.
+    currency: :class:`taho.database.models.Currency`
+        The sale price's currency.
     amount: Optional[:class:`int`]
         The amount of stuff the sale is for.
     description: Optional[:class:`str`]
         The sale's description.
     end_time: Optional[:class:`datetime.datetime`]
         The sale's end time.
-    currency_price: :class:`~taho.CurrencyAmount`
-        The sale's price in the sale's currency.
-        Useful for converting currencies.
     """
     class Meta:
         table = "shop_sales"
@@ -275,7 +282,8 @@ class Sale(BaseModel):
     shop = fields.ForeignKeyField("main.Shop", related_name="sales")
     owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut")
     stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
-    price = fields.ForeignKeyField("main.CurrencyAmount")
+    price = fields.DecimalField(max_digits=32, decimal_places=2)
+    currency = fields.ForeignKeyField("main.Currency")
     amount = fields.IntField()
     description = fields.TextField(null=True)
     end_time = fields.DatetimeField(null=True)

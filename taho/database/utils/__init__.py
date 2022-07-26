@@ -21,24 +21,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from enum import IntEnum, Enum
-
-__all__ = (
-    "ShortcutableType",
-    "ShortcutType"
-)
-
-class ShortcutableType(IntEnum):
-    item = 0
-    stat = 1
-    currency = 2
-    role = 3
-    user = 4
-    inventory = 5
-    currency_amount = 6
-
-class ShortcutType(Enum):
-    owner = "OwnerShortcut"
-    stuff = "StuffShortcut"
-    access = "AccessShortcut"
-    trade_stuff = "TradeStuffShortcut"
+from .converter import *
+from .get import *
+from .shortcut import *

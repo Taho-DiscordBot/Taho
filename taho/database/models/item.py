@@ -179,7 +179,8 @@ class Item(BaseModel, StuffShortcutable):
     
     """
     class Meta:
-        table = 'items'
+        table = "items"
+        unique_together = (("cluster", "name"),)
 
     id = fields.IntField(pk=True)
     

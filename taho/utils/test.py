@@ -26,6 +26,8 @@ from typing import TYPE_CHECKING, Union
 import discord
 from taho.database.models import *
 from taho.exceptions import DoesNotExist, TahoException
+from taho.enums import *
+from taho import Emoji
 
 
 if TYPE_CHECKING:
@@ -189,5 +191,40 @@ async def setup_db_test(bot: Bot) -> List[str]:
         await NPCOwner.create(npc=npcs[2], user=users[3]),
         await NPCOwner.create(npc=npcs[3], user=users[2], original_owner=True),
     ]
+    items_data = [
+        {
+            "name": "Item 1",
+            "emoji": Emoji(bot, "💎"),
+            "description": "This is an item",
+            "type": ItemType.resource,
+        },
+        {
+            "name": "Item 2",
+            "type": ItemType.consumable,
+            "durability": 5,
+            "cooldown": 5
+        },
+        {
+            "name": "Item 3",
+            "type": ItemType.equipment,
+            "durability": 5,
+        }
+    ]
+    items = []
+    for cluster in clusters:
+        for item_data in items_data:
+            item = await cluster.create_item(**item_data)
+            items.append(item)
+            
+    items[0].edit(name="Item 1 edited")
+    items[2].ammo_id = items[0].id
+    items[2].charger_size = -1
+    await items[2].save()
+    items[5].ammo_id = items[3].id
+    items[5].charger_size = 5
+    await items[5].save()
     
+
+
+
     return None

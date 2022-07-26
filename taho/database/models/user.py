@@ -91,7 +91,7 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
                 - :attr:`related_name` ``users``
 
             Python: :class:`taho.database.models.Cluster`
-
+        
     Attributes
     -----------
     id: :class:`int`
@@ -344,6 +344,8 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
                     await members.get(r.guild.id).remove_roles(r)
                 except:
                     pass
+
+
 
 class UserStat(BaseModel):
     """Represents a stat a user have.

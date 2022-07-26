@@ -201,13 +201,32 @@ class ServerRole(BaseModel):
     discord_role_id = fields.BigIntField()
 
     @property
-    def d_role_id(self) -> int:
+    def role_id_(self) -> int:
         """
         :class:`int`: Shortcut for :attr:`.discord_role_id`.
         """
         return self.discord_role_id
+    
+    async def get_guild(self, bot: Bot) -> discord.Guild:
+        """|coro|
 
-    async def discord_role(self, bot: Bot) -> discord.Role:
+        Get the guild object corresponding to
+        the role's server.
+
+        This function is here to avoid an additional query
+        to get :attr:`.ServerRole.server`.
+        This function use :attr:`.ServerRole.server_id`
+        to get the guild object.
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        """
+        return bot.get_guild(self.server_id)
+        
+
+    async def get_role(self, bot: Bot) -> discord.Role:
         """
         Get the :class:`discord.Role` object for this role in the guild.
 
@@ -221,5 +240,5 @@ class ServerRole(BaseModel):
         :class:`discord.Role`
             The Discord role.
         """
-        server = await self.server
-        return  await server.get_role(bot, self.discord_role_id)
+        guild = await self.get_guild(bot)
+        return guild.get_role(self.discord_role_id)

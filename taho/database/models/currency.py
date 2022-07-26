@@ -99,6 +99,14 @@ class Currency(BaseModel, StuffShortcutable):
                 - :attr:`default` 1.0
             
             Python: :class:`float`
+        
+        .. collapse:: is_default
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` False
+
+            Python: :class:`bool`
 
     Attributes
     ----------
@@ -125,6 +133,8 @@ class Currency(BaseModel, StuffShortcutable):
 
             Please avoid setting the rate to 0, 
             as this will cause a division by zero.
+    is_default: :class:`bool`
+        Whether the currency is the default one.
     """
     class Meta:
         table = "currencies"
@@ -136,6 +146,7 @@ class Currency(BaseModel, StuffShortcutable):
     symbol = fields.CharField(max_length=255)
     code = fields.CharField(max_length=255, null=True)
     rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
+    is_default = fields.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name

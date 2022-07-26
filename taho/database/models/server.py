@@ -28,11 +28,14 @@ from tortoise import fields
 from tortoise import exceptions as t_exceptions
 from ..utils import convert_to_type, get_type
 from taho.enums import InfoType
+from taho.exceptions import DoesNotExist
 
 if TYPE_CHECKING:
-    from typing import Optional, Union
+    from typing import Optional, Union, List
     import discord
     from taho import Bot
+    from .cluster import Cluster
+    from .role import ServerRole
 
 
 __all__ = (
@@ -74,6 +77,7 @@ class Server(BaseModel):
 
                 - :attr:`related_model` :class:`~taho.database.models.Cluster`
                 - :attr:`related_name` ``servers``
+                - :attr:`null` ``True``
             
             Python: :class:`~taho.database.models.Cluster`       
     
@@ -99,15 +103,25 @@ class Server(BaseModel):
             My guild (ID: 123456789) ::
 
                 server = Server.create(id=123456789)
+    
+
+    .. note::
+
+        Define :attr:`.Server.cluster` to ``None``
+        only when you are going to use 
+        :func:`~taho.database.models.Cluster.add_server`
+        after. Otherwise, the server will seriously
+        bug.
 
     """
     class Meta:
         table = "servers"
 
     id = fields.BigIntField(pk=True)
-    cluster = fields.ForeignKeyField("main.Cluster", related_name="servers")
+    cluster: Cluster = fields.ForeignKeyField("main.Cluster", related_name="servers", null=True)
 
     infos: fields.ReverseRelation["ServerInfo"]
+    roles: fields.ReverseRelation["ServerRole"]
 
     async def get_info(self, key: str) -> Optional[Union[str, int, float, None]]:
         """|coro|
@@ -218,6 +232,120 @@ class Server(BaseModel):
             The role object, if found.
         """
         return (await self.get_guild(bot)).get_role(role_id)
+    
+    async def get_roles(self, bot: Bot) -> List[discord.Role]:
+        """|coro|
+
+        Get all the :class:`discord.Role`s from the server's guild.
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        
+        Returns
+        --------
+        List[:class:`discord.Role`]
+            The role objects.
+        """
+        guild = await self.get_guild(bot)
+        return guild.roles
+
+    @classmethod
+    async def from_guild(cls, guild: discord.Guild) -> Server:
+        """|coro|
+
+        Get the :class:`.Server` of a :class:`discord.guild`.
+
+        Parameters
+        -----------
+        guild: :class:`discord.Guild`
+            The guild to get the cluster from.
+        
+        Raises
+        -------
+        ~taho.exceptions.DoesNotExist
+            The guild is not stored as a :class:`~taho.database.models.Server` 
+            in the database.
+        
+        Returns
+        --------
+        :class:`.Server`
+            The Server corresponding to
+            the guild.
+        """
+        try:
+            return await Server.get(id=guild.id)
+        except t_exceptions.DoesNotExist:
+            raise DoesNotExist("The guild is not stored as a Server in the database.")
+
+    async def sync_server(self, bot: Bot) -> None:
+        """|coro|
+
+        Synchronize the server with the Cluster.
+
+        This function is called when the server is added
+        to a :class:`~taho.database.models.Cluster`.
+
+        This function will sync:
+        - roles
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        """
+        roles = await self.get_roles(bot)
+        # Create a role map for faster lookup.
+        # The map is a dict of {role_name: role}
+        roles_map = {role.name: role for role in roles}
+        cluster = await self.cluster
+        # Get all other servers of the cluster, and prefetch their roles.
+        cluster_servers = await cluster.servers.all().exclude(id=self.id).prefetch_related("roles")
+
+        if not cluster_servers:
+            return
+
+        # The ServerRole objects to create.
+        to_register = []
+        # The ServerRole objects already created.
+        roles_registered = []
+        for server in cluster_servers:
+            # For every server in the cluster
+            # Get the ServerRole objects of the server.
+            server_roles = await server.roles.all()
+            # Create a role map for faster lookup.
+            # The map is a dict of {role_name: role}
+            server_role_map = {r.get_role(bot).name: r for r in server_roles} 
+
+            for role_name in server_role_map:
+                # For every role in the server (looped)
+                # check if the role exists in the server (synced)'s roles
+                # and if it's not already registered.
+                if (
+                    role_name in roles_map
+                    and roles_map[role_name].id not in roles_registered
+                    and server_role_map[role_name].id not in roles_registered
+                ):
+                    # If not, add it to the list of roles to create.
+                    server_role = server_role_map[role_name]
+                    role = roles_map[role_name]
+
+                    roles_registered.append(server_role.id)
+                    roles_registered.append(role.id)
+
+                    to_register.append(
+                        ServerRole(
+                            server=self,
+                            role_id=server_role.role_id,
+                            discord_role_id=role.id
+                        )
+                    )
+        
+        # Create the ServerRole objects.
+        if to_register:
+            await ServerRole.bulk_create(to_register)
+
 
 class ServerInfo(BaseModel):
     """

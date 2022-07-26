@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 
 from .base import BaseModel
 from tortoise import fields
-from taho.enums import ShortcutType
+from taho.enums import ShortcutableType
 
 if TYPE_CHECKING:
     from taho.abc import (
@@ -42,6 +42,7 @@ __all__ = (
     "OwnerShortcut",
     "StuffShortcut",
     "AccessShortcut",
+    "TradeStuffShortcut",
 )
 
 class Shortcut(BaseModel):
@@ -50,7 +51,7 @@ class Shortcut(BaseModel):
         abstract = True
     
     id = fields.IntField(pk=True)
-    type = fields.IntEnumField(ShortcutType)
+    type = fields.IntEnumField(ShortcutableType)
     
     converters = {}
 
@@ -82,7 +83,7 @@ class OwnerShortcut(Shortcut):
     user = fields.ForeignKeyField("main.User")
 
     converters = {
-        ShortcutType.user: "user",
+        ShortcutableType.user: "user",
     }
 
     async def get(self) -> OwnerShortcutable:
@@ -114,12 +115,12 @@ class StuffShortcut(Shortcut):
     currency_amount = fields.ForeignKeyField("main.CurrencyAmount")
 
     converters = {
-        ShortcutType.item: "item",
-        ShortcutType.stat: "stat",
-        ShortcutType.role: "role",
-        ShortcutType.currency: "currency",
-        ShortcutType.inventory: "inventory",
-        ShortcutType.currency_amount: "currency_amount",
+        ShortcutableType.item: "item",
+        ShortcutableType.stat: "stat",
+        ShortcutableType.role: "role",
+        ShortcutableType.currency: "currency",
+        ShortcutableType.inventory: "inventory",
+        ShortcutableType.currency_amount: "currency_amount",
     }
 
     async def get(self) -> StuffShortcutable:
@@ -147,8 +148,8 @@ class AccessShortcut(Shortcut):
     role = fields.ForeignKeyField("main.Role")
 
     converters = {
-        ShortcutType.user: "user",
-        ShortcutType.role: "role",
+        ShortcutableType.user: "user",
+        ShortcutableType.role: "role",
     }
 
     async def get(self) -> AccessShortcutable:
@@ -176,8 +177,8 @@ class TradeStuffShortcut(Shortcut):
     currency_amount = fields.ForeignKeyField("main.CurrencyAmount")
 
     converters = {
-        ShortcutType.inventory: "inventory",
-        ShortcutType.currency_amount: "currency_amount",
+        ShortcutableType.inventory: "inventory",
+        ShortcutableType.currency_amount: "currency_amount",
     }
 
     async def get(self) -> TradeStuffShortcutable:
