@@ -27,7 +27,7 @@ from tortoise import exceptions as t_exceptions
 from taho.exceptions import DoesNotExist, AlreadyExists
 
 if TYPE_CHECKING:
-    from ..models import Server, Cluster, Currency
+    from ..models import Server, Cluster, Currency, User
     from taho import Bot
     from typing import List, Optional
     import discord
@@ -37,6 +37,8 @@ __all__ = (
     "new_server",
     "get_cluster",
     "get_default_currency",
+    "get_default_user",
+    "get_user",
 )
 
 async def get_server(bot: Bot, guild: discord.Guild, *fetch_related: List[str]) -> Server:
@@ -125,11 +127,47 @@ async def get_default_currency(cluster_id: int) -> Optional[Currency]:
     
     Returns
     --------
-    :class:`~taho.database.models.Currency`
+    Optional[:class:`~taho.database.models.Currency`]
         The default currency of the cluster.
     """
     from taho.database.models import Currency # avoid circular import
+
     try:
         return await Currency.get(cluster_id=cluster_id, is_default=True)
     except t_exceptions.DoesNotExist:
         return None
+
+async def get_default_user(cluster_id: int) -> User:
+    """|coro|
+
+    Get the default User of the cluster.
+
+    If the cluster has no default user, then it 
+    is created.
+    
+    Returns
+    --------
+    :class:`~taho.database.models.User`
+        The default user of the cluster.
+    """
+    from taho.database.models import User # avoid circular import
+    
+    user = await User.get_or_create(cluster_id=cluster_id, user_id=0)
+    return user[0]
+
+async def get_user(cluster_id: int, user_id: int) -> User:
+    """|coro|
+
+    Get a user of a cluster.
+
+    If the user does not exist, then it is created.
+    
+    Returns
+    --------
+    :class:`~taho.database.models.User`
+        The user of the cluster.
+    """
+    from taho.database.models import User # avoid circular import
+    
+    user = await User.get_or_create(cluster_id=cluster_id, user_id=user_id)
+    return user[0]
