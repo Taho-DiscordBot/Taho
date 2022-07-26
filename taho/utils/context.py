@@ -66,11 +66,24 @@ class TahoContext(commands.Context):
         if hasattr(self, "cluster"):
             return self.cluster
         
-        # This function will set the cluster attribute
+        # This function will set the server attribute
         await self.get_server()
+        self.cluster = await self.server.cluster
 
         return self.cluster
     
+    async def get_cluster_id(self) -> int:
+        """|coro|
+        
+        Get the cluster ID from the context's guild.
+        """
+        if hasattr(self, "cluster"):
+            return self.cluster.id
+        
+        server = await self.get_server()
+
+        return server.cluster_id
+
     async def get_server(self, *fetch_related: List[str]) -> Server:
         """|coro|
 
@@ -99,7 +112,6 @@ class TahoContext(commands.Context):
 
         self.server = await db_utils.get_server(self.bot, self.guild, *fetch_related)
 
-        self.cluster = await self.server.cluster
         return self.server
 
     async def get_user(self) -> User:
@@ -114,9 +126,9 @@ class TahoContext(commands.Context):
         if hasattr(self, "user"):
             return self.user
         
-        cluster = await self.get_cluster()
+        cluster_id = await self.get_cluster_id()
 
-        self.user = await cluster.get_user(self.author.id, create_if_not_exists=True)
+        self.user = await db_utils.get_user(cluster_id, self.author.id)
 
         return self.user
 
