@@ -69,7 +69,7 @@ class Shortcut(BaseModel):
             The shortcut's model.
         """
         attr = self.converters[self.type]
-        return getattr(self, attr)
+        return await getattr(self, attr)
 
 class OwnerShortcut(Shortcut):
     """Represents a shortcut to a
