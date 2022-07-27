@@ -29,6 +29,7 @@ __all__ = (
     "NPCException",
     "RoleException",
     "DoesNotExist",
+    "MissingPermissions",
 )
 
 class TahoException(Exception):
@@ -68,5 +69,11 @@ class RoleException(TahoException):
 class DoesNotExist(TahoException):
     """
     Raised when an object does not exist.
+    """
+    pass
+
+class MissingPermissions(TahoException):
+    """
+    Raised when a user is missing permissions.
     """
     pass

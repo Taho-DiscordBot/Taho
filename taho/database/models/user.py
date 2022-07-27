@@ -25,10 +25,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
+from tortoise.signals import post_save
 from taho.exceptions import QuantityException, NPCException
 from taho.enums import ItemUse, ItemType, ItemReason, RoleAddedBy
 from .npc import NPC
 from taho.abc import AccessShortcutable, OwnerShortcutable
+from permissions import Permissions
 
 if TYPE_CHECKING:
     from typing import Any, List
@@ -345,7 +347,37 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
                 except:
                     pass
 
+    async def get_permissions(self) -> Permissions:
+        """
+        Get the permissions of the user.
+        """
+        return (await self.permissions).get_permission()
 
+@post_save(User)
+async def user_post_save(_, instance: User, created: bool, *args, **kwargs) -> None:
+    """|coro|
+
+    Automatically create the permissions
+    for the user when it is created.
+    If the user already exists, do nothing.
+
+
+    .. warning::
+
+        This function is used as a signal, it's not meant to be called manually.
+
+    Parameters
+    ----------
+    instance: :class:`.User`
+        The saved user.
+    created: :class:`bool`
+        Whether the user was created or not.
+    """
+    if created:
+        # Create the permissions
+        await UserPermission.create(
+            user=instance, 
+        )
 
 class UserStat(BaseModel):
     """Represents a stat a user have.
@@ -479,6 +511,19 @@ class UserPermission(BaseModel):
 
     user = fields.OneToOneField("main.User", pk=True, related_name="permission")
     permission = fields.BigIntField(default=0)
+
+    def get_permission(self) -> Permissions:
+        """
+        Create a discord.py :class:`~discord.Permissions` 
+        object from the permission.
+
+        Returns
+        --------
+        :class:`~discord.Permissions`
+            The discord.py :class:`~discord.Permissions` object.
+
+        """
+        return Permissions(self.permission)
 
 class UserRole(BaseModel):
     """Represents a role of a :class:`~taho.database.models.User`.

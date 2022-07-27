@@ -24,4 +24,4 @@ DEALINGS IN THE SOFTWARE.
 from .context import *
 from .db import *
 from .ssh_tunnel_forwarder import *
-from ..emoji import *
+from .checks import *
