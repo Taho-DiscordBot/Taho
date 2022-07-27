@@ -29,13 +29,25 @@ from tortoise import Tortoise
 import os
 from .utils import init_ssh_tunnel, TahoContext
 from .database import init_db
+from .lazy import lazy_convert
+import json
+
 
 if TYPE_CHECKING:
     from sshtunnel import SSHTunnelForwarder
+    from typing import Any
 
 __all__ = (
     "Bot",
 )
+
+def override_json() -> None:
+
+    def _to_json(obj: Any) -> str:
+        obj = lazy_convert(obj)
+        return json.dumps(obj, separators=(',', ':'), ensure_ascii=True)
+
+    discord.utils._to_json = _to_json
 
 class Bot(commands.AutoShardedBot):
     def __init__(self, intents: discord.Intents, config, **kwargs):
@@ -60,7 +72,13 @@ class Bot(commands.AutoShardedBot):
         return True
 
     async def setup_hook(self):
+
+        # Override the json serializer
+        # to make it work with LazyString
+        override_json()
+
         for cog in self.config.get("cogs", []):
+            print(f"Loading cog {cog}")
             try:
                 await self.load_extension(cog)
             except Exception as exc:
@@ -73,11 +91,16 @@ class Bot(commands.AutoShardedBot):
         await init_db(self.config, ssh_tunnel=self.ssh_server)
         # Generate the schema for the database
         await Tortoise.generate_schemas()
+        print("Database successfully connected")
 
 
         MY_GUILD = discord.Object(724535633283907639)
+
         self.tree.copy_global_to(guild=MY_GUILD)
-        #await self.tree.sync(guild=MY_GUILD)
+
+        # await self.tree.sync(guild=MY_GUILD)
+
+        # await start_api(self)
 
     async def on_ready(self):
         duration = (discord.utils.utcnow() - self.uptime).total_seconds()
@@ -86,3 +109,6 @@ class Bot(commands.AutoShardedBot):
 
     async def get_context(self, message, *, cls=None):
         return await super().get_context(message, cls=TahoContext)
+    
+    async def on_command_error(self, context, exception, /) -> None:
+        raise exception
