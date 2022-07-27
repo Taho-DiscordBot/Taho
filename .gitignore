@@ -35,3 +35,4 @@ config.py
 logs/
 docs/_build/
 *.todo
+*.http
