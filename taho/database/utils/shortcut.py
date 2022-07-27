@@ -35,7 +35,7 @@ __all__ = (
     "create_shortcut",
 )
 
-async def create_shortcut(type: ShortcutType, model: Shortcutable) -> Shortcut: #todo update
+async def create_shortcut(type: ShortcutType, model: Shortcutable) -> Shortcut:
     """|coro|
 
     Creates a shortcut for the given model.
@@ -58,7 +58,7 @@ async def create_shortcut(type: ShortcutType, model: Shortcutable) -> Shortcut: 
         Currency,
         User,
         Role,
-        Shortcut,
+        CurrencyAmount,
     )
     converters = {
         Item: [ShortcutableType.item, "item"],
@@ -66,6 +66,7 @@ async def create_shortcut(type: ShortcutType, model: Shortcutable) -> Shortcut: 
         Currency: [ShortcutableType.currency, "currency"],
         User: [ShortcutableType.user, "user"],
         Role: [ShortcutableType.role, "role"],
+        CurrencyAmount: [ShortcutableType.currency_amount, "currency_amount"],
     }
     data = converters[type(model)]
     shortcut = await type.value.get_or_create(
