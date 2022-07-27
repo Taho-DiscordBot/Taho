@@ -21,12 +21,26 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-__version__ = '1.0.0.0a'
-from .exceptions import *
-from .utils import *
-from .bot import *
-from . import database
-from .currency_amount import *
-from .emoji import *
-from . import abc
-from .lazy import *
+from __future__ import annotations
+from taho.babel.speaklater import LazyString
+
+__all__ = (
+    "lazy_convert",
+)
+
+def lazy_convert(value):
+    """
+    Recursively convert LazyString to str
+    by going over objects.
+    """
+    if isinstance(value, LazyString):
+        return str(value)
+    elif isinstance(value, dict):
+        new_value = {}
+        for key, v in value.items():
+            new_value[lazy_convert(key)] = lazy_convert(v)
+        return new_value
+    elif isinstance(value, list):
+        return [lazy_convert(v) for v in value]
+    else:
+        return value 
