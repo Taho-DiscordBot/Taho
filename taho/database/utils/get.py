@@ -170,4 +170,5 @@ async def get_user(cluster_id: int, user_id: int) -> User:
     from taho.database.models import User # avoid circular import
     
     user = await User.get_or_create(cluster_id=cluster_id, user_id=user_id)
+
     return user[0]

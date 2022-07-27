@@ -651,7 +651,7 @@ async def cluster_post_save(_, instance: Cluster, created: bool, *args, **kwargs
 
     Automatically create the default user, bank
     and currency for the cluster when it is created.
-    If the bank already exists, do nothing.
+    If the cluster already exists, do nothing.
 
 
     .. warning::
@@ -663,7 +663,7 @@ async def cluster_post_save(_, instance: Cluster, created: bool, *args, **kwargs
     instance: :class:`.Cluster`
         The saved cluster.
     created: :class:`bool`
-        Whether the bank was created or not.
+        Whether the cluster was created or not.
     """
     if created:
         # Create the default user
