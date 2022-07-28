@@ -30,6 +30,7 @@ __all__ = (
     "RoleException",
     "DoesNotExist",
     "MissingPermissions",
+    "ValidationException",
 )
 
 class TahoException(Exception):
@@ -75,5 +76,11 @@ class DoesNotExist(TahoException):
 class MissingPermissions(TahoException):
     """
     Raised when a user is missing permissions.
+    """
+    pass
+
+class ValidationException(TahoException):
+    """
+    Raised when a validation fails.
     """
     pass
