@@ -22,13 +22,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from gc import is_finalized
 from typing import TYPE_CHECKING
 import discord
 from taho.babel import lazy_gettext
 
 if TYPE_CHECKING:
-    from typing import List, Optional, Tuple, Union
+    from typing import List, Optional, Tuple
     from .fields import Field
     from taho import TahoContext
     import discord
@@ -306,8 +305,6 @@ class FormView(discord.ui.View):
         elif message:
             await message.edit(embed=embed, view=None)
         
-    
-
 class Form:
     """Represents a form.
 
@@ -447,7 +444,7 @@ class Form:
         :class:`dict`
             The form as a dictionary.
 
-            
+
         """
         return {
             field.name: field.value for field in self.fields
