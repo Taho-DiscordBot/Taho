@@ -31,6 +31,8 @@ from .emoji import *
 from . import abc
 from .lazy import *
 from . import forms
+from . import babel
+from .babel import _
 
 from typing import NamedTuple, Literal
 
