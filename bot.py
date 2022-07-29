@@ -124,6 +124,9 @@ def compile_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace
 
 def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -> None:
     print("Starting bot...")
+
+    compile_babel()
+
     intents = discord.Intents.default()
     intents.message_content = True
     intents.members = True
