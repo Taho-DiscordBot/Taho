@@ -22,15 +22,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-import asyncio
-import discord
-from tortoise import Tortoise, run_async
-import config
-from taho.babel import Babel, _
-from taho.bot import Bot
 from typing import TYPE_CHECKING
-
+import discord
+import taho
+import config
+import argparse
+import os
+import sys
+import platform
 import logging
+
+if TYPE_CHECKING:
+    from typing import Tuple
+
+# Tortoise logger
 fmt = logging.Formatter(
     fmt="%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -43,7 +48,7 @@ logger_tortoise = logging.getLogger("tortoise")
 logger_tortoise.setLevel(logging.DEBUG)
 logger_tortoise.addHandler(sh)
 
-
+# Discord.py logger
 logger_discord = logging.getLogger('discord')
 logger_discord.setLevel(logging.DEBUG)
 logging.getLogger('discord.http').setLevel(logging.INFO)
