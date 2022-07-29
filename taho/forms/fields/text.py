@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from discord import Interaction, TextStyle
 from discord.ui import Modal, TextInput
 from pyparsing import str_type
-from taho.babel import lazy_gettext
+from taho.babel import _
 from .field import Field, FieldModal
 
 if TYPE_CHECKING:
@@ -49,7 +49,7 @@ class TextModal(FieldModal):
 
         self.answer = TextInput(
                 label=label,
-                placeholder=lazy_gettext("Enter a value"),
+                placeholder=_("Enter a value"),
                 style=TextStyle.short if max_length and max_length < 50 else TextStyle.long,
                 max_length=max_length,
                 min_length=min_length,
@@ -96,7 +96,7 @@ class Text(Field):
     async def ask(self, interaction: Interaction) -> None:
         modal = TextModal(
                 field=self,
-                title=lazy_gettext("Enter a value"),
+                title=_("Enter a value"),
                 label=self.label,
                 max_length=self.max_length,
                 min_length=self.min_length,
@@ -112,7 +112,7 @@ class Text(Field):
     
     async def display(self) -> str:
         if self.value is None:
-            self.display_value = lazy_gettext("*Unanswered*")
+            self.display_value = _("*Unanswered*")
         else:
             self.display_value = self.value
         

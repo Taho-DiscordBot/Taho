@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord import Interaction, SelectOption
 from discord.ui import Select as _Select
-from taho.babel import lazy_gettext
+from taho.babel import _
 from .field import Field, FieldModal
 from enum import Enum
 
@@ -54,7 +54,7 @@ class SelectModal(FieldModal):
         }
 
         self.answer = _Select(
-                placeholder=lazy_gettext("Select a value"),
+                placeholder=_("Select a value"),
                 min_values=min_values,
                 max_values=max_values,
                 options=[SelectOption(
@@ -126,7 +126,7 @@ class Select(Field):
     async def ask(self, interaction: Interaction) -> None:
         modal = SelectModal(
                 field=self,
-                title=lazy_gettext("Enter a value"),
+                title=_("Enter a value"),
                 choices=self.choices,
                 min_values=self.min_values,
                 max_values=self.max_values
@@ -139,7 +139,7 @@ class Select(Field):
     
     async def display(self) -> str:
         if self.value is None:
-            self.display_value = lazy_gettext("*Unanswered*")
+            self.display_value = _("*Unanswered*")
         else:
             response_map = {
                 c.value: c.label for c in self.choices

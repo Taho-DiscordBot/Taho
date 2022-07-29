@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import discord
-from taho.babel import lazy_gettext
+from taho.babel import _
 
 if TYPE_CHECKING:
     from typing import List, Optional, Tuple
@@ -41,9 +41,9 @@ class FormView(discord.ui.View):
 
         self.message = None
         
-        self.cancel.label = lazy_gettext("Cancel")
-        self.respond.label = lazy_gettext("Respond")
-        self.finish.label = lazy_gettext("Finish")
+        self.cancel.label = _("Cancel")
+        self.respond.label = _("Respond")
+        self.finish.label = _("Finish")
 
         self.disable_check()
     
@@ -335,8 +335,7 @@ class Form:
         self.description = description
 
         if not self.description:
-            self.description = lazy_gettext(
-                """
+            self.description = _("""
                 Please fill out the form below.
                 You can use the buttons below to navigate the form.
                 A title with `*` indicates a required field.

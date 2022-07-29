@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from taho.babel import lazy_gettext
+from taho.babel import _
 from taho.exceptions import ValidationException
 from discord.ui import Modal
 
@@ -80,7 +80,7 @@ class Field:
         self.form: Form = None
 
 
-        self.display_value = lazy_gettext("*Unanswered*")
+        self.display_value = _("*Unanswered*")
         self.kwargs = kwargs
     
     def __repr__(self) -> str:
@@ -217,7 +217,7 @@ class FieldModal(Modal):
 
         if is_valid:
             await interaction.response.send_message(
-                lazy_gettext(
+                _(
                     "Successfully set value to: %(value)s", 
                     value=self.field.display_value
                 ),

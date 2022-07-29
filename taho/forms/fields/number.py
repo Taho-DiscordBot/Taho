@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord import Interaction, TextStyle
 from discord.ui import TextInput
-from taho.babel import lazy_gettext
+from taho.babel import _
 from taho.forms.validators import is_number
 from .field import Field, FieldModal
 
@@ -45,7 +45,7 @@ class NumberModal(FieldModal):
 
         self.answer = TextInput(
                 label=label,
-                placeholder=lazy_gettext("Enter a value"),
+                placeholder=_("Enter a value"),
                 style=TextStyle.short,
                 min_length=1,
                 required=required,
@@ -105,7 +105,7 @@ class Number(Field):
     async def ask(self, interaction: Interaction) -> None:
         modal = NumberModal(
                 field=self,
-                title=lazy_gettext("Enter a value"),
+                title=_("Enter a value"),
                 label=self.label,
                 required=self.required,
             )
@@ -119,9 +119,9 @@ class Number(Field):
     
     async def display(self) -> str:
         if self.value is None:
-            self.display_value = lazy_gettext("*Unanswered*")
+            self.display_value = _("*Unanswered*")
         elif self.value == -1:
-            self.display_value = lazy_gettext("Infinite")
+            self.display_value = _("Infinite")
         else:
             self.display_value = str(self.value)
         
