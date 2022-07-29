@@ -59,27 +59,117 @@ formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', 
 handler.setFormatter(formatter)
 logger_discord.addHandler(handler)
 
-if TYPE_CHECKING:
-    from sshtunnel import SSHTunnelForwarder
 
 
-if __name__ == "__main__":
+def show_version() -> None:
+    entries = []
+
+    entries.append('- Python v{0.major}.{0.minor}.{0.micro}-{0.releaselevel}'.format(sys.version_info))
+    version_info = taho.version_info
+    entries.append('- Taho v{0.major}.{0.minor}.{0.micro}-{0.releaselevel}'.format(version_info))
+
+    discord_version = discord.version_info
+    entries.append('- discord.py v{0.major}.{0.minor}.{0.micro}-{0.releaselevel}'.format(discord_version))
+
+    uname = platform.uname()
+    entries.append('- system info: {0.system} {0.release} {0.version}'.format(uname))
+
+    print('\n'.join(entries))
+
+
+def core(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if args.version:
+        show_version()
+    else:
+        parser.print_help()
+
+def update_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -> None:
+    keywords = (
+        "gettext",
+        "ngettext",
+        "pgettext",
+        "npgettext",
+        "lazy_gettext",
+        "lazy_ngettext",
+        "lazy_pgettext",
+
+    )
+    command = "pybabel extract -o translations/messages.pot . "
+    for keyword in keywords:
+        command += f"-k {keyword} "
+    try:
+        os.system(command)
+        os.system("pybabel update -i translations/messages.pot -d translations")
+    except Exception as e:
+        print("==============================")
+        print(e)
+        print("Failed to update translations")
+        print("Make sure you have babel installed, and you activated the virtual environment")
+    else:
+        print("==============================")
+        print("Updated translations")
+
+def compile_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -> None:
+    try:
+        os.system("pybabel compile -d translations")
+    except Exception as e:
+        print("==============================")
+        print(e)
+        print("Failed to compile translations")
+        print("Make sure you have babel installed, and you activated the virtual environment")
+    else:
+        print("==============================")
+        print("Compiled translations")
+    
+
+def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -> None:
+    print("Starting bot...")
     intents = discord.Intents.default()
     intents.message_content = True
     intents.members = True
-    bot = Bot(intents=intents, config=config)
+    bot = taho.Bot(intents=intents, config=config)
 
-    babel = Babel(bot)
+    babel = taho.babel.Babel(bot)
     babel.load()
 
     try:
         bot.run(config.token)
+    except KeyboardInterrupt:
+        pass
     except Exception as e:
         raise e
     finally:
-        asyncio.set_event_loop(asyncio.new_event_loop())
-        run_async(Tortoise.close_connections())
         bot.stop_ssh_server()
-        asyncio.get_event_loop().close()
-        print("finish")
+        print("The bot has stopped")
 
+def add_update_babel_args(subparser: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    parser = subparser.add_parser('update_babel', help='Extracts messages from source code and updates messages.pot')
+    parser.set_defaults(func=update_babel)
+
+def add_compile_babel_args(subparser: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    parser = subparser.add_parser('compile_babel', help='Compiles translations to .mo files')
+    parser.set_defaults(func=update_babel)
+
+def add_start_args(subparser: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    parser = subparser.add_parser('start', help='Start the bot')
+    parser.set_defaults(func=start)
+
+
+def parse_args() -> Tuple[argparse.ArgumentParser, argparse.Namespace]:
+    parser = argparse.ArgumentParser(prog='taho', description='Tools for Taho (translations, update and start)')
+    parser.add_argument('-v', '--version', action='store_true', help='shows the bot version')
+    parser.set_defaults(func=core)
+
+    subparser = parser.add_subparsers(dest='subcommand', title='subcommands')
+    add_update_babel_args(subparser)
+    add_compile_babel_args(subparser)
+    add_start_args(subparser)
+    return parser, parser.parse_args()
+
+def main() -> None:
+    parser, args = parse_args()
+    args.func(parser, args)
+
+
+if __name__ == '__main__':
+    main()
