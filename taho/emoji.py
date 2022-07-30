@@ -24,13 +24,15 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from ctypes import Union
 from typing import TYPE_CHECKING
-import unicodedata
 import discord
+import emojis
 
 if TYPE_CHECKING:
-    from typing import Optional, Any, Dict
+    from typing import Optional, Dict, TypeVar
     import discord
-    from discord.ext.commands import AutoShardedBot
+    from taho import Bot
+
+    T = TypeVar("T")
 
 
 __all__ = (
@@ -79,7 +81,7 @@ class Emoji:
 
     __slots__ = ('animated', 'name', 'id', 'url')
 
-    def __init__(self, client: AutoShardedBot, emoji: Any):
+    def __init__(self, client: Bot, emoji: T) -> None:
         self.animated: bool = None
         self.name: str = ""
         self.id: Optional[int] = None
@@ -116,9 +118,10 @@ class Emoji:
         """:class:`bool`: Checks if this is a custom emoji."""
         return self.id is not None
     
-    def _init_emoji(self, bot: AutoShardedBot, emoji: Any) -> None:
+    def _init_emoji(self, bot: Bot, value: T) -> None:
         """
         Get data from the emoji and set the attributes.
+
 
         .. note::
             This method is called by the constructor.
@@ -126,66 +129,60 @@ class Emoji:
 
         Parameters
         ----------
-        emoji : Any
+        value:
             The raw emoji (id, name, etc.) to get the data from.
-        bot : AutoShardedBot
+        bot: :class:`~taho.Bot`
             The bot instance.
             It is used to get the emoji from Discord.
-        
-        Raises
-        ------
-
-        Returns
-        -------
-
         """
-        emoji_dict = {
-            "id": None,
-            "name": "",
-            "url": None,
-            "animated": False,
-        }
-        if not emoji:
+        if not value:
             return
-        # The Emoji is a Discord emoji object.
-        if isinstance(emoji, discord.Emoji):
-            emoji_dict["id"] = emoji.id
-            emoji_dict["name"] = emoji.name
-            emoji_dict["url"] = str(emoji.url)
-            emoji_dict["animated"] = emoji.animated
-        else:
-            try:
-                emoji_id = int(emoji)
-                # The emoji is an id.
-                # So we get the emoji from Discord with its id.
-                emoji = bot.get_emoji(emoji_id)
-                if not emoji:
-                    return # The emoji does not exist.
-                emoji_dict["id"] = emoji.id
-                emoji_dict["name"] = emoji.name
-                emoji_dict["url"] = str(emoji.url)
-                emoji_dict["animated"] = emoji.animated
-            except ValueError:
-                # The emoji is not an id
-                # Check if it is an emoji in the <a:name:id> Discord's format.
-                emoji = discord.PartialEmoji.from_str(emoji)
-                if emoji.is_custom_emoji:
-                    # The emoji is in the <a:name:id> Discord's format.
-                    emoji_dict["id"] = emoji.id
-                    emoji_dict["name"] = emoji.name
-                    emoji_dict["url"] = str(emoji.url)
-                    emoji_dict["animated"] = emoji.animated
-                else: # Check is the emoji is a unicode emoji.
-                    try:
-                        unicodedata.name(emoji)
-                        # It is, so we store the name
-                        emoji_dict["name"] = emoji
-                    except ValueError:
-                        # It is not.
-                        # The emoji is definitely not emoji recognized.
-                        return
-        for key, value in emoji_dict.items():
-            setattr(self, key, value)
+
+        # The value is a Discord Emoji object.
+        if isinstance(value, discord.Emoji) or isinstance(value, discord.PartialEmoji):
+
+            emoji = value
+
+            self.id = emoji.id
+            self.name = emoji.name
+            self.url = str(emoji.url)
+            self.animated = emoji.animated
+        
+        elif isinstance(value, str):
+            value = emojis.encode(value)
+
+            # The value is a unicode emoji.
+            if emojis.count(value) > 0:
+                emoji = emojis.get(value)[0]
+                self.name = emoji
+
+            # The value is a custom emoji, in a specific format:
+            # <:name:id>
+            # or <a:name:id>
+            elif discord.PartialEmoji.from_str(value).id is not None:
+                emoji = discord.PartialEmoji.from_str(value)
+                self.id = emoji.id
+                self.name = emoji.name
+                self.url = str(emoji.url)
+                self.animated = emoji.animated
+            
+            # The value is an id of a custom emoji.
+            else:
+                try:
+                    emoji_id = int(value)
+                except ValueError:
+                    # The value is not a valid emoji
+                    return
+                else:
+                    emoji = bot.get_emoji(emoji_id)
+                    emoji = bot.get_emoji(emoji_id)
+                    if not emoji:
+                        # The emoji does not exist.
+                        return 
+                    self.id = emoji.id
+                    self.name = emoji.name
+                    self.url = str(emoji.url)
+                    self.animated = emoji.animated
     
     def partial(self) -> discord.PartialEmoji:
         """
