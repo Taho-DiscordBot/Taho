@@ -28,6 +28,7 @@ from discord.ui import TextInput
 from taho.babel import _
 from taho.forms.validators import is_number
 from .field import Field, FieldModal
+from taho.utils import str_to_number
 
 if TYPE_CHECKING:
     from typing import Union, List, Callable, Optional
@@ -58,25 +59,16 @@ class NumberModal(FieldModal):
     async def on_submit(self, interaction: Interaction) -> None:
         self.field.value = self.answer.value.replace(",", ".")
 
-        old_validators = self.field.validators
-        self.field.validators = [
-            lambda x: is_number(x),
-        ]
-
-        is_valid = await self.field.validate(interaction)
-
-        await self.field.display()
+        is_valid = await self.field._validate(
+            interaction,
+            lambda x: is_number(x)
+        )
 
         if not is_valid:
             self.stop()
             return
-
-        self.field.validators = old_validators
-
-        try:
-            self.field.value = int(self.field.value)
-        except ValueError:
-            self.field.value = float(self.field.value)
+        
+        self.field.value = str_to_number(self.field.value)
         
         await super().on_submit(interaction)
     
