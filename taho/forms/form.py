@@ -335,11 +335,10 @@ class Form:
         self.description = description
 
         if not self.description:
-            self.description = _("""
-                Please fill out the form below.
-                You can use the buttons below to navigate the form.
-                A title with `*` indicates a required field.
-                """
+            self.description = _(
+                "Please fill out the form below.\n"
+                "You can use the buttons below to navigate the form.\n"
+                "A title with `*` indicates a required field.\n"
                 )
 
         # The current field of the form
