@@ -41,7 +41,6 @@ class TextModal(FieldModal):
         label: str, 
         max_length: Optional[int] = None, 
         min_length: Optional[int] = None,
-        required: bool=True
     ) -> None:
         super().__init__(field=field, title=title)
 
@@ -53,7 +52,7 @@ class TextModal(FieldModal):
                 style=TextStyle.short if max_length and max_length < 50 else TextStyle.long,
                 max_length=max_length,
                 min_length=min_length,
-                required=required,
+                required=True,
             )
 
         self.add_item(self.answer)
@@ -91,14 +90,14 @@ class Text(Field):
         self.max_length = max_length
         self.min_length = min_length
     
-    async def ask(self, interaction: Interaction) -> None:
+    async def ask(self, interaction: Interaction) -> Optional[bool]:
         modal = TextModal(
                 field=self,
                 title=_("Enter a value"),
                 label=self.label,
                 max_length=self.max_length,
                 min_length=self.min_length,
-                required=self.required,
+                required=True,
             )
         await interaction.response.send_modal(
             modal

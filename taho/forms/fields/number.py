@@ -40,7 +40,6 @@ class NumberModal(FieldModal):
         field: Field,
         *, title: str, 
         label: str, 
-        required: bool = True,
     ) -> None:
         super().__init__(field=field, title=title)
 
@@ -49,7 +48,7 @@ class NumberModal(FieldModal):
                 placeholder=_("Enter a value"),
                 style=TextStyle.short,
                 min_length=1,
-                required=required,
+                required=True,
             )
 
         self.add_item(self.answer)
@@ -96,7 +95,7 @@ class Number(Field):
                 field=self,
                 title=_("Enter a value"),
                 label=self.label,
-                required=self.required,
+                required=True,
             )
         await interaction.response.send_modal(
             modal
