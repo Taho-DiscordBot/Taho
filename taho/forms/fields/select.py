@@ -127,7 +127,7 @@ class Select(Field):
         self.max_values = max_values
         
     
-    async def ask(self, interaction: Interaction) -> None:
+    async def ask(self, interaction: Interaction) -> Optional[bool]:
         modal = SelectModal(
                 field=self,
                 title=_("Enter a value"),

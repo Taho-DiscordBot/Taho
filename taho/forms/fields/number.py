@@ -30,7 +30,7 @@ from taho.forms.validators import is_number
 from .field import Field, FieldModal
 
 if TYPE_CHECKING:
-    from typing import Union, List, Callable
+    from typing import Union, List, Callable, Optional
 
 
 class NumberModal(FieldModal):
@@ -99,8 +99,7 @@ class Number(Field):
             appear_validators, 
             **kwargs)
         
-    
-    async def ask(self, interaction: Interaction) -> None:
+    async def ask(self, interaction: Interaction) -> Optional[bool]:
         modal = NumberModal(
                 field=self,
                 title=_("Enter a value"),

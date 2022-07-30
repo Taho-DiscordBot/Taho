@@ -177,9 +177,9 @@ class FormView(discord.ui.View):
 
         if interaction.response._responded:
             original = await interaction.original_message()
-            await original.edit(embed=embed, view=self)
+            await original.edit(content=None, embed=embed, view=self)
         else:
-            await interaction.response.edit_message(embed=embed, view=self)
+            await interaction.response.edit_message(content=None, embed=embed, view=self)
         
     async def paginate_right(self, interaction: discord.Interaction) -> None:
         """|coro|
@@ -244,7 +244,7 @@ class FormView(discord.ui.View):
         current_field, current_index = self.get_current_field()
 
         # Ask for the response corresponding to the current field
-        await current_field.ask(interaction)
+        can_be_refreshed = await current_field.ask(interaction)
 
         # If the current field's value is valid
         # And the pagination is not finished
@@ -255,7 +255,8 @@ class FormView(discord.ui.View):
                 and self.form.fields[current_index + 1].value is None:
             return await self.paginate_right(interaction)
 
-        await self.refresh(interaction)
+        if can_be_refreshed in (True, None):
+            await self.refresh(interaction)
     
     
     @discord.ui.button(

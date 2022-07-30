@@ -28,7 +28,7 @@ from taho.exceptions import ValidationException
 from discord.ui import Modal
 
 if TYPE_CHECKING:
-    from typing import List, Callable
+    from typing import List, Callable, Optional
     from discord import Interaction
     from taho.forms import Form
 
@@ -108,7 +108,7 @@ class Field:
     def __hash__(self) -> int:
         return hash(self.__repr__())
     
-    async def ask(self, interaction: Interaction) -> None:
+    async def ask(self, interaction: Interaction) -> Optional[bool]:
         """|coro|
 
         Ask the user for the field's value.
@@ -117,6 +117,12 @@ class Field:
         --------
         interaction: :class:`~discord.Interaction`
             The interaction of the user.
+        
+        Returns
+        --------
+        Optional[:class:`bool`]
+            Whether the form can be refreshed.
+            If ``None``, the form can be refreshed.
         """
         raise NotImplementedError()
     
