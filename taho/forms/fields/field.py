@@ -126,6 +126,36 @@ class Field:
         """
         raise NotImplementedError()
     
+    async def _validate(self, interaction: Interaction, validator: Callable[[str], bool]) -> bool:
+        """|coro|
+
+        Validate the field's value.
+        
+        This function calls the ``validator``.
+        If the validator fails, the field is invalid and
+        an error message is displayed to the user.
+
+        Parameters
+        -----------
+        interaction: :class:`~discord.Interaction`
+            The interaction of the user.
+        validator: :class:`callable`
+            The validator of the field.
+        
+        Returns
+        --------
+        :class:`bool`
+            Whether the field is valid.
+        """
+        try:
+            await validator(self.value)
+        except ValidationException as e:
+            self.value = None
+            self.value_display = str(e)
+            await interaction.response.send_message(str(e), ephemeral=True)
+            return False
+        return True
+
     async def validate(self, interaction: Interaction) -> bool:
         """|coro|
 
@@ -146,12 +176,8 @@ class Field:
             Whether the field is valid.
         """
         for validator in self.validators:
-            try:
-                await validator(self.value)
-            except ValidationException as e:
-                self.value = None
-                self.value_display = str(e)
-                await interaction.response.send_message(str(e), ephemeral=True)
+            valid = await self._validate(interaction, validator)
+            if not valid:
                 return False
         return True
     
