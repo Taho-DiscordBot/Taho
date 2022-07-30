@@ -86,17 +86,15 @@ class Field:
         required: bool = False,
         validators: List[Callable[[str], bool]] = [],
         appear_validators: List[Callable[[str], bool]] = [],
-        is_current: bool = False,
         **kwargs
-
     ) -> None:
         self.name = name
         self.label = label
         self.required = required
         self.validators = validators
         self.appear_validators = appear_validators
-        self.is_current = is_current
-
+        
+        self.is_current = False
         self.value = None
         self.form: Form = None
 

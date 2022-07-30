@@ -76,7 +76,6 @@ class Text(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
-        current: bool = False, 
         max_length: Optional[int] = None,
         min_length: Optional[int] = 3,
         **kwargs
@@ -87,7 +86,6 @@ class Text(Field):
             required, 
             validators, 
             appear_validators, 
-            current, 
             **kwargs)
         
         self.max_length = max_length

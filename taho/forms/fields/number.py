@@ -89,7 +89,6 @@ class Number(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
-        current: bool = False,
         **kwargs
     ) -> None:
         super().__init__(
@@ -98,7 +97,6 @@ class Number(Field):
             required, 
             validators, 
             appear_validators, 
-            current, 
             **kwargs)
         
     

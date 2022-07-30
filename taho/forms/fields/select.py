@@ -109,7 +109,6 @@ class Select(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
-        current: bool = False,
         choices: List[Choice] = [],
         min_values : Optional[int] = 1,
         max_values: Optional[int] = 1,
@@ -121,7 +120,6 @@ class Select(Field):
             required, 
             validators, 
             appear_validators, 
-            current, 
             **kwargs)
         
         self.choices = choices
