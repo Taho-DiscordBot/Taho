@@ -21,8 +21,37 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .context import *
-from .db import *
-from .ssh_tunnel_forwarder import *
-from .checks import *
-from .utils import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Union
+
+__all__ = (
+    "str_to_number",
+)
+
+def str_to_number(string: str) -> Union[int, float]:
+    """
+    Convert a string to a number (int or float).
+    If possible, this function will return a :class:`int`.
+
+    Parameters
+    -----------
+    string: str
+        The string to convert.
+    
+    Raises
+    -------
+    ValueError
+        If the string can't be converted to a number.
+    
+    Returns
+    --------
+    Union[:class:`int`, :class:`float`]
+        The converted number.
+    """
+    try:
+        return int(string)
+    except ValueError:
+        return float(string)
