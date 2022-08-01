@@ -24,12 +24,14 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.babel import _
+from taho.database.models import Item
 from enum import Enum
+from discord import SelectOption
+
 
 if TYPE_CHECKING:
     from typing import Optional, TypeVar
     from taho import Emoji
-    from discord import SelectOption
 
     T = TypeVar("T")
 
@@ -58,6 +60,8 @@ class Choice:
     def _get_discord_value(self) -> str:
         if isinstance(self.value, Enum):
             return str(self.value.value)
+        elif isinstance(self.value, Item):
+            return str(self.value.id)
         
         return str(self.value)
     
