@@ -25,14 +25,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Union
+    from typing import Union, List, TypeVar
     from taho.bot import Bot
+
+    T = TypeVar("T")
 
 __all__ = (
     "str_to_number",
     "bot",
     "register_bot",
     "get_bot",
+    "split_list",
 )
 bot: Bot = None
 
@@ -85,3 +88,22 @@ def get_bot() -> Bot:
         The bot.
     """
     return bot
+
+def split_list(to_split: List[T], split_at: int) -> List[List[T]]:
+    """
+    Split a list into a list of lists.
+    This function splits a list into a list of lists, where each list has a maximum length of ``split_at``.
+
+    Parameters
+    -----------
+    to_split: List[T]
+        The list to split.
+    split_at: int
+        The maximum length of each list.
+
+    Returns
+    --------
+    List[List[T]]
+        The split list.
+    """
+    return [to_split[i:i+split_at] for i in range(0, len(to_split), split_at)]
