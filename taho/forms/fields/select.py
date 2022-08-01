@@ -23,60 +23,23 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from discord import Interaction, SelectOption
+from discord import Interaction
 from discord.ui import Select as _Select
 from taho.babel import _
-from taho.emoji import Emoji
-from .field import Field, FieldModal, FieldView
-from enum import Enum
+from .field import Field, FieldView
+from ..validators import min_length, max_length
+from taho.utils import split_list
 
 if TYPE_CHECKING:
     from typing import Optional, List, Callable, TypeVar
+    from ..choice import Choice
 
     T = TypeVar("T")
 
 __all__ = (
-    "Choice",
     "SelectView",
     "Select"
 )
-
-class Choice:
-    def __init__(
-        self, 
-        label: str, 
-        value: T,
-        *,
-        selected: bool = False,
-        description: Optional[str] = None,
-        emoji: Optional[Emoji] = None,
-    ) -> None:
-        self.label = label
-        self.value = value
-
-        self.discord_value = self._get_discord_value()
-        self.selected = selected
-        self.description = description
-        self.emoji = emoji
-    
-    def _get_discord_value(self) -> str:
-        if isinstance(self.value, Enum):
-            return str(self.value.value)
-        
-        return str(self.value)
-    
-    def to_select_option(self) -> SelectOption:
-        if self.emoji:
-            emoji = self.emoji.to_partial()
-        else:
-            emoji = None
-        return SelectOption(
-                label=self.label,
-                value=self.discord_value,
-                default=self.selected,
-                description=self.description,
-                emoji=emoji,
-            )
 
 class SelectView(FieldView):
     def __init__(
@@ -103,27 +66,48 @@ class SelectView(FieldView):
             c.discord_value: c.value for c in choices
         }
 
-        self.answer = _Select(
-                placeholder=_("Select a value"),
-                min_values=min_values,
-                max_values=max_values,
-                options=[
-                    c.to_select_option() for c in choices
-                ]
-            )
+        if len(self.choices) > 125:
+            raise ValueError("Too many choices")
         
-        self.answer.callback = self.on_submit
+        choices_lists = split_list(self.choices, 25)
+        print(choices_lists)
+        self.answers = []
 
-        self.add_item(self.answer)
+        for choices_list in choices_lists:
+            select = _Select(
+                    placeholder=_("Select a value"),
+                    min_values=self.min_values,
+                    max_values=self.max_values,
+                    options=[
+                        c.to_select_option() for c in choices_list
+                    ],
+                )
+            select.callback = self.on_submit
+            self.answers.append(select)
+            self.add_item(select)
 
         self.value: str = None
     
     async def on_submit(self, interaction: Interaction) -> None:
+        values = []
+        for answer in self.answers:
+            values.extend(answer.values)
+
         self.field.value = [
-            self.response_map[a] for a in self.answer.values
+            self.response_map[v] for v in values
         ]
 
         self.field.default = self.field.value
+
+        is_valid = await self.field._validate(
+            self.field.value,
+            lambda x: min_length(x, self.min_values),
+            lambda x: max_length(x, self.max_values),
+        )
+
+        if not is_valid:
+            self.stop()
+            return
 
         if self.min_values == 1 and self.max_values == 1:
             self.field.value = self.field.value[0]
@@ -135,11 +119,12 @@ class Select(Field):
         self, 
         name: str, 
         label: str, 
+        description: str = None,
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
         default: Optional[T] = None,
-        choices: List[Choice] = [],
+        choices: List[Choice] = None,
         min_values : Optional[int] = 1,
         max_values: Optional[int] = 1,
         **kwargs
@@ -153,12 +138,31 @@ class Select(Field):
             default,
             **kwargs)
         
+        self.description = description
+
+        if not self.description:
+            self.description = _(
+                "Select between %(min_values)s and %(max_values)s values.",
+                min_values=min_values,
+                max_values=max_values,
+            )
+        
         self.choices = choices
         self.min_values = min_values
         self.max_values = max_values
 
-    
+    async def get_choices(self, interaction: Interaction) -> bool:
+        await interaction.response.send_message(
+            _("No choices available.")
+        )
+        return False
+
     async def ask(self, interaction: Interaction) -> Optional[bool]:
+        if not self.choices:
+            is_valid = await self.get_choices(interaction)
+            if not is_valid:
+                return
+        
         view = SelectView(
                 field=self,
                 choices=self.choices,
@@ -167,11 +171,7 @@ class Select(Field):
                 default=self.default
             )
         await interaction.response.send_message(
-            content=_(
-                "Select between %(min_values)s and %(max_values)s values.",
-                min_values=self.min_values,
-                max_values=self.max_values,
-            ),
+            content=self.description,
             embed=None,
             view=view,
             ephemeral=True,

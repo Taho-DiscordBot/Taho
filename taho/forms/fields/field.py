@@ -133,7 +133,7 @@ class Field:
         """
         raise NotImplementedError()
     
-    async def _validate(self, interaction: Interaction, validator: Callable[[str], bool]) -> bool:
+    async def _validate(self, interaction: Interaction, *validators: Callable[[str], bool]) -> bool:
         """|coro|
 
         Validate the field's value.
@@ -154,13 +154,14 @@ class Field:
         :class:`bool`
             Whether the field is valid.
         """
-        try:
-            await validator(self.value)
-        except ValidationException as e:
-            self.value = None
-            self.value_display = str(e)
-            await interaction.response.send_message(str(e), ephemeral=True)
-            return False
+        for validator in validators:
+            try:
+                await validator(self.value)
+            except ValidationException as e:
+                self.value = None
+                self.value_display = str(e)
+                await interaction.response.send_message(str(e), ephemeral=True)
+                return False
         return True
 
     async def validate(self, interaction: Interaction) -> bool:
