@@ -31,7 +31,6 @@ __all__ = (
 class ItemType(IntEnum):
     resource = 0
     consumable = 1
-    equipment = 2
 
 class ItemReason(IntEnum):
     item_used = 1

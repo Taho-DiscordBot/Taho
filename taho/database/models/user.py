@@ -209,7 +209,7 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
         Returns True if done, False if one of the following is true:
         - the item's type is not "equipEMENT"
         """
-        if hotbar.type != ItemType.equipment: # Check if the item is an equipement
+        if hotbar.type != ItemType.consumable: # Check if the item is a consummable
             return False
         async for inventory in self.inventories:
             if inventory.hotbar == slot: # Check if the slot is already occupied
@@ -262,7 +262,7 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
             await self.take_item(inventory, amount)
         except QuantityException as e:
             raise e
-        if inventory.item.type in (ItemType.equipment, ItemType.consumable):
+        if inventory.item.type == ItemType.consumable:
             await self.item_after_use(inventory, amount, use_type)
 
     async def item_after_use(self, inventory: Inventory, amount: int=1, use_type: int=None) -> None:

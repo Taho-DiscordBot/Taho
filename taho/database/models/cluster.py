@@ -566,23 +566,10 @@ class Cluster(BaseModel):
             The description of the item.
         durability: Optional[int]
             The durability of the item.
-            Only if ``type`` is :
-
-                - :attr:`~taho.enums.ItemType.consumable`
-                - :attr:`~taho.enums.ItemType.equipment`.
+            Only if ``type`` is :attr:`~taho.enums.ItemType.consumable`
         cooldown: Optional[int]
             The cooldown between two item use.
-            Only if ``type`` is :
-
-                - :attr:`~taho.enums.ItemType.consumable`
-                - :attr:`~taho.enums.ItemType.equipment`.
-        ammo: Optional[:class:`~taho.Item`]
-            The ammo of the item.
-            Only if ``type`` is :attr:`~taho.enums.ItemType.equipment`.
-        charger_size: Optional[int]
-            The size of the charger.
-            Only if ``type`` is :attr:`~taho.enums.ItemType.equipment`
-            and ``ammo`` is defined.
+            Only if ``type`` is :attr:`~taho.enums.ItemType.consumable`
 
         Raises
         -------

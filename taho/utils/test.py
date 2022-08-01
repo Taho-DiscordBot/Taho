@@ -206,7 +206,7 @@ async def setup_db_test(bot: Bot) -> List[str]:
         },
         {
             "name": "Item 3",
-            "type": ItemType.equipment,
+            "type": ItemType.consumable,
             "durability": 5,
         }
     ]

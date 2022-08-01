@@ -165,14 +165,12 @@ class Inventory(BaseModel, StuffShortcutable, TradeStuffShortcutable):
         elif self.item.type == ItemType.consumable:
             self.durability = self.dura if (self.dura <= self.item.dura) else self.item.dura #TODO better
             self.ammo = None
-        elif self.item.type == ItemType.equipment:
-            self.ammo = self.ammo if (self.ammo<=self.item.charger_size) else self.item.charger_size #TODO better       
-            await super().save(
-            using_db=using_db,
-            update_fields=update_fields,
-            force_create=force_create,
-            force_update=force_update,
-            )
+        await super().save(
+        using_db=using_db,
+        update_fields=update_fields,
+        force_create=force_create,
+        force_update=force_update,
+        )
 
 class Hotbar(BaseModel):
     """Represents a :class:`~taho.database.models.Item` in a

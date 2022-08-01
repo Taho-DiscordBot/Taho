@@ -113,10 +113,6 @@ ItemType
 
         The item is a consumable.
     
-    .. attribute:: equipment
-
-        The item is an equipment.
-
 ItemReason
 ~~~~~~~~~~~
 
