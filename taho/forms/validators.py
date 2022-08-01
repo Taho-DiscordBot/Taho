@@ -25,6 +25,7 @@ from __future__ import annotations
 from taho.babel import _
 from taho.exceptions import ValidationException
 from typing import TYPE_CHECKING
+from taho.emoji import Emoji
 
 if TYPE_CHECKING:
     from typing import TypeVar
@@ -36,6 +37,7 @@ __all__ = (
     "max_length",
     "is_number",
     "is_int",
+    "is_emoji",
     "min_value",
     "max_value",
     "forbidden_value",
@@ -218,6 +220,38 @@ async def is_int(value: str) -> bool:
             _("The value must be an integer.")
         )
 
+async def is_emoji(value: str) -> bool:
+    """|coro|
+    
+    Check if the value is a valid emoji.
+    
+    Parameters
+    -----------
+    value: :class:`str`
+        The value to check.
+    
+    Raises
+    -------
+    ~taho.exceptions.ValidationException
+        If the value is not a valid emoji.
+    
+    Returns
+    --------
+    :class:`bool`
+        ``True`` if the value is a valid emoji.
+    """
+    if value is None:
+        return True
+
+    emoji = Emoji(None, value)
+
+    if not bool(emoji):
+        raise ValidationException(
+            _("The value must be a valid emoji.")
+        )
+
+    return True
+
 async def min_value(value: int, min_value: int) -> bool:
     """|coro|
 
@@ -326,3 +360,7 @@ async def forbidden_value(value: T, *forbidden: T) -> bool:
             )
             
     return True
+
+
+
+

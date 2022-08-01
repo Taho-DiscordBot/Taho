@@ -25,3 +25,4 @@ from .field import *
 from .select import *
 from .text import *
 from .number import *
+from .emoji import *
