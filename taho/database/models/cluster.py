@@ -457,7 +457,8 @@ class Cluster(BaseModel):
             server = await Server.get(id=guild.id)
         except t_exceptions.DoesNotExist:
             raise DoesNotExist("The guild is not stored as a Server in the database.")
-        return await server.cluster
+        else:
+            return await server.cluster
 
     
         
