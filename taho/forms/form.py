@@ -170,7 +170,6 @@ class FormView(discord.ui.View):
             The interaction of the user.
             Used to send the embed
         """
-        print("refresh")
         self.disable_check()
         
         embed = await self.form.generate_embed()
