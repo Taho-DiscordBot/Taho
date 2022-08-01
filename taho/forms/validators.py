@@ -24,11 +24,11 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from taho.babel import _
 from taho.exceptions import ValidationException
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 from taho.emoji import Emoji
 
 if TYPE_CHECKING:
-    from typing import TypeVar
+    from typing import TypeVar, Union
     T = TypeVar('T')
 
 __all__ = (
@@ -71,14 +71,22 @@ async def required(value: T) -> bool:
             
     return True
 
+@overload
 async def min_length(value: str, min_length: int) -> bool:
+    ...
+
+@overload
+async def min_length(value: list, min_length: int) -> bool:
+    ...
+
+async def min_length(value: Union[str, list], min_length: int) -> bool:
     """|coro|
     
     Check if the value is at least ``min_length`` characters long.
 
     Parameters
     ----------
-    value: :class:`str`
+    value: Union[:class:`str`, :class:`list`]
         The value to check.
     min_length: :class:`int`
         The minimum length of the value.
@@ -107,6 +115,14 @@ async def min_length(value: str, min_length: int) -> bool:
             
     return True
 
+@overload
+async def max_length(value: str, max_length: int) -> bool:
+    ...
+
+@overload
+async def max_length(value: list, max_length: int) -> bool:
+    ...
+
 async def max_length(value: str, max_length: int) -> bool:
     """|coro|
     
@@ -114,7 +130,7 @@ async def max_length(value: str, max_length: int) -> bool:
     
     Parameters
     -----------
-    value: :class:`str`
+    value: Union[:class:`str`, :class:`list`]
         The value to check.
     max_length: :class:`int`
         The maximum length of the value.
