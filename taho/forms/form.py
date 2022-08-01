@@ -122,7 +122,7 @@ class FormView(discord.ui.View):
 
         # Check for every fields before the current one
         # If they must appear, if so, return as the previous field
-        for i, field in enumerate(self.form.fields[:current_index - 1]):
+        for i, field in enumerate(reversed(self.form.fields[:current_index])):
             # i is the index of the field before the current one (plus 1)
             if field.must_appear():
                 return field, current_index - i - 1
@@ -246,6 +246,9 @@ class FormView(discord.ui.View):
         # Ask for the response corresponding to the current field
         can_be_refreshed = await current_field.ask(interaction)
 
+        if can_be_refreshed is False:
+            return
+
         # If the current field's value is valid
         # And the pagination is not finished
         # And the next field's value is not valid
@@ -255,8 +258,7 @@ class FormView(discord.ui.View):
                 and self.form.fields[current_index + 1].value is None:
             return await self.paginate_right(interaction)
 
-        if can_be_refreshed in (True, None):
-            await self.refresh(interaction)
+        await self.refresh(interaction)
     
     
     @discord.ui.button(
