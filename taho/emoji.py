@@ -185,7 +185,7 @@ class Emoji:
                     self.url = str(emoji.url)
                     self.animated = emoji.animated
     
-    def partial(self) -> discord.PartialEmoji:
+    def to_partial(self) -> discord.PartialEmoji:
         """
         
         Get the Emoji as a :class:`discord.PartialEmoji` object.
@@ -202,7 +202,11 @@ class Emoji:
             The :class:`discord.PartialEmoji` object.
 
         """
-        return discord.PartialEmoji(self.name, self.animated, self.id)
+        return discord.PartialEmoji(
+            name=self.name, 
+            animated=self.animated, 
+            id=self.id
+            )
     
     def to_dict(self) -> Dict[str, Union[int, str, bool]]:
         """
