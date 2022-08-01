@@ -22,13 +22,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from ctypes import Union
 from typing import TYPE_CHECKING
 import discord
 import emojis
 
 if TYPE_CHECKING:
-    from typing import Optional, Dict, TypeVar
+    from typing import Optional, Dict, TypeVar, Union
     import discord
     from taho import Bot
 
@@ -81,12 +80,15 @@ class Emoji:
 
     __slots__ = ('animated', 'name', 'id', 'url')
 
-    def __init__(self, client: Bot, emoji: T) -> None:
+    def __init__(self, bot: Optional[Bot], emoji: T) -> None:
+        if not bot:
+            from taho.utils import get_bot
+            bot = get_bot()
         self.animated: bool = None
         self.name: str = ""
         self.id: Optional[int] = None
         self.url: Optional[str] = None
-        self._init_emoji(client, emoji)
+        self._init_emoji(bot, emoji)
 
     def __str__(self) -> str:
         if self.id is None:
@@ -153,7 +155,7 @@ class Emoji:
 
             # The value is a unicode emoji.
             if emojis.count(value) > 0:
-                emoji = emojis.get(value)[0]
+                emoji = list(emojis.iter(value))[0]
                 self.name = emoji
 
             # The value is a custom emoji, in a specific format:
@@ -174,7 +176,6 @@ class Emoji:
                     # The value is not a valid emoji
                     return
                 else:
-                    emoji = bot.get_emoji(emoji_id)
                     emoji = bot.get_emoji(emoji_id)
                     if not emoji:
                         # The emoji does not exist.
