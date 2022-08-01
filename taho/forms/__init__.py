@@ -24,4 +24,4 @@ DEALINGS IN THE SOFTWARE.
 from .form import *
 from .fields import *
 from .validators import *
-# from .item import *
+from .choice import *
