@@ -25,12 +25,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord import Interaction, TextStyle
 from discord.ui import Modal, TextInput
-from pyparsing import str_type
 from taho.babel import _
 from .field import Field, FieldModal
 
 if TYPE_CHECKING:
-    from typing import Optional, List, Callable
+    from typing import Optional, List, Callable, TypeVar
 
 
 class TextModal(FieldModal):
@@ -39,10 +38,11 @@ class TextModal(FieldModal):
         field: Field,
         *, title: str, 
         label: str, 
+        default: Optional[str] = None,
         max_length: Optional[int] = None, 
         min_length: Optional[int] = None,
     ) -> None:
-        super().__init__(field=field, title=title)
+        super().__init__(field=field, title=title, default=default)
 
         self.field = field
 
@@ -53,6 +53,7 @@ class TextModal(FieldModal):
                 max_length=max_length,
                 min_length=min_length,
                 required=True,
+                default=self.default
             )
 
         self.add_item(self.answer)
@@ -61,7 +62,10 @@ class TextModal(FieldModal):
     
     async def on_submit(self, interaction: Interaction) -> None:
 
-        self.field.value = self.answer.value
+        value = self.answer.value
+
+        self.field.value = value
+        self.field.default = value
 
 
         await super().on_submit(interaction)
@@ -75,6 +79,7 @@ class Text(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        default: Optional[str] = None,
         max_length: Optional[int] = None,
         min_length: Optional[int] = 3,
         **kwargs
@@ -85,6 +90,7 @@ class Text(Field):
             required, 
             validators, 
             appear_validators, 
+            default,
             **kwargs)
         
         self.max_length = max_length
@@ -97,7 +103,7 @@ class Text(Field):
                 label=self.label,
                 max_length=self.max_length,
                 min_length=self.min_length,
-                required=True,
+                default=self.default
             )
         await interaction.response.send_modal(
             modal

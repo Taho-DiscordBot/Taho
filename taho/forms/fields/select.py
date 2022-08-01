@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord import Interaction, SelectOption
 from discord.ui import Select as _Select
+from soupsieve import select
 from taho.babel import _
 from .field import Field, FieldModal
 from enum import Enum
@@ -48,12 +49,18 @@ class SelectModal(FieldModal):
         choices: List[Choice] = [],
         min_values: Optional[int] = 1, 
         max_values: Optional[int] = 1,
+        default: Optional[List[T]] = None,
     ) -> None:
-        super().__init__(field=field, title=title)
+        super().__init__(field=field, title=title, default=default)
 
         self.field = field
         self.min_values = min_values
         self.max_values = max_values
+
+        if self.default is not None:
+            for c in self.choices:
+                if c.value in self.default:
+                    c.selected = True
 
         self.response_map = {
             c.discord_value: c.value for c in choices
@@ -66,6 +73,7 @@ class SelectModal(FieldModal):
                 options=[SelectOption(
                         label=c.label,
                         value=c.discord_value,
+                        default=c.selected
                     ) for c in choices
                 ]
             )
@@ -78,6 +86,9 @@ class SelectModal(FieldModal):
         self.field.value = [
             self.response_map[a] for a in self.answer.values
         ]
+
+        self.field.default = self.field.value
+
         if self.min_values == 1 and self.max_values == 1:
             self.field.value = self.field.value[0]
         
@@ -93,13 +104,13 @@ class Choice:
         self.value = value
 
         self.discord_value = self._get_discord_value()
+        self.selected: bool = False
     
     def _get_discord_value(self) -> str:
         if isinstance(self.value, Enum):
             return str(self.value.value)
         
         return str(self.value)
-
 
 class Select(Field):
     def __init__(
@@ -109,6 +120,7 @@ class Select(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        default: Optional[T] = None,
         choices: List[Choice] = [],
         min_values : Optional[int] = 1,
         max_values: Optional[int] = 1,
@@ -120,12 +132,13 @@ class Select(Field):
             required, 
             validators, 
             appear_validators, 
+            default,
             **kwargs)
         
         self.choices = choices
         self.min_values = min_values
         self.max_values = max_values
-        
+
     
     async def ask(self, interaction: Interaction) -> Optional[bool]:
         modal = SelectModal(
@@ -133,7 +146,8 @@ class Select(Field):
                 title=_("Enter a value"),
                 choices=self.choices,
                 min_values=self.min_values,
-                max_values=self.max_values
+                max_values=self.max_values,
+                default=self.default
             )
         await interaction.response.send_modal(
             modal

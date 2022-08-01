@@ -28,9 +28,11 @@ from taho.exceptions import ValidationException
 from discord.ui import Modal
 
 if TYPE_CHECKING:
-    from typing import List, Callable, Optional
+    from typing import List, Callable, Optional, TypeVar
     from discord import Interaction
     from taho.forms import Form
+
+    T = TypeVar('T')
 
 __all__ = (
     "Field", 
@@ -78,6 +80,8 @@ class Field:
 
         In general, keep it to ``False`` when
         creating a field.
+    default: Optional[:class:`str`]
+        The default value of the field.
     """
     def __init__(
         self,
@@ -86,6 +90,7 @@ class Field:
         required: bool = False,
         validators: List[Callable[[str], bool]] = [],
         appear_validators: List[Callable[[str], bool]] = [],
+        default: Optional[T] = None,
         **kwargs
     ) -> None:
         self.name = name
@@ -93,7 +98,8 @@ class Field:
         self.required = required
         self.validators = validators
         self.appear_validators = appear_validators
-        
+        self.default = default
+
         self.is_current = False
         self.value = None
         self.form: Form = None
@@ -238,15 +244,19 @@ class FieldModal(Modal):
         The field corresponding to the modal.
     title: :class:`str`
         The title of the modal.
+    default: Optional[:class:`str`]
+        The default value of the field.
     """
     def __init__(
         self,
         field: Field,
-        *, title: str
+        *, title: str,
+        default: Optional[str] = None,
     ) -> None:
         super().__init__(title=title)
 
         self.field = field
+        self.default = default
 
 
     async def on_submit(self, interaction: Interaction) -> None:
@@ -259,9 +269,6 @@ class FieldModal(Modal):
         - get the display value of the field using :meth:`~taho.forms.Field.display`
         - send a message to the user with the display value, if the field is valid
         """
-
-
-        
         is_valid = await self.field.validate(interaction)
 
         await self.field.display()

@@ -39,9 +39,14 @@ class NumberModal(FieldModal):
         self,
         field: Field,
         *, title: str, 
-        label: str, 
+        label: str,
+        default: Optional[Union[int, float]] = None,
     ) -> None:
-        super().__init__(field=field, title=title)
+        super().__init__(field=field, title=title, default=default)
+
+        if self.default is not None:
+            self.default = str(self.default)
+
 
         self.answer = TextInput(
                 label=label,
@@ -49,6 +54,7 @@ class NumberModal(FieldModal):
                 style=TextStyle.short,
                 min_length=1,
                 required=True,
+                default=self.default,
             )
 
         self.add_item(self.answer)
@@ -68,6 +74,8 @@ class NumberModal(FieldModal):
             return
         
         self.field.value = str_to_number(self.field.value)
+
+        self.default = self.field.value
         
         await super().on_submit(interaction)
     
@@ -96,6 +104,7 @@ class Number(Field):
                 title=_("Enter a value"),
                 label=self.label,
                 required=True,
+                default=self.default,
             )
         await interaction.response.send_modal(
             modal
