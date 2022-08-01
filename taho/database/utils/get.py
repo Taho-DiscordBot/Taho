@@ -117,8 +117,32 @@ async def new_server(bot: Bot, guild: discord.Guild, *fetch_related: List[str]) 
 
     return server
 
-async def get_cluster(guild: discord.Guild) -> Cluster:
-    pass
+async def get_cluster(bot: Bot, guild: discord.Guild) -> Cluster:
+    """|coro|
+
+    Get the cluster instance corresponding to the 
+    :class:`discord.Guild`.
+
+    Parameters
+    -----------
+    bot: :class:`~taho.Bot`
+        The bot instance.
+    guild: :class:`discord.Guild`
+        The guild to get the cluster instance for.
+    
+    Returns
+    --------
+    :class:`~taho.database.models.Cluster`
+        The Cluster. 
+
+
+    .. note::
+
+        If the cluster (and so the server) does not exist in the DB,
+        then it is created using :func:`~taho.database.utils.new_server`. 
+    """
+    server = await get_server(bot, guild, "cluster")
+    return server.cluster
 
 async def get_default_currency(cluster_id: int) -> Optional[Currency]:
     """|coro|
