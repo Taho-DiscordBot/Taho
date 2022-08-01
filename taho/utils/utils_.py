@@ -26,10 +26,15 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Union
+    from taho.bot import Bot
 
 __all__ = (
     "str_to_number",
+    "bot",
+    "register_bot",
+    "get_bot",
 )
+bot: Bot = None
 
 def str_to_number(string: str) -> Union[int, float]:
     """
@@ -55,3 +60,28 @@ def str_to_number(string: str) -> Union[int, float]:
         return int(string)
     except ValueError:
         return float(string)
+
+def register_bot(_bot: Bot) -> None:
+    """
+    Register the bot.
+    This function is called by the bot when it is loaded.
+
+    Parameters
+    -----------
+    _bot: :class:`~taho.Bot`
+        The bot to register.
+    """
+    global bot
+    bot = _bot
+
+def get_bot() -> Bot:
+    """
+    Get the bot.
+    This function is called by the bot when it is loaded.
+
+    Returns
+    --------
+    :class:`~taho.Bot`
+        The bot.
+    """
+    return bot

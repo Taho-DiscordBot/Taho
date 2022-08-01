@@ -60,7 +60,6 @@ handler.setFormatter(formatter)
 logger_discord.addHandler(handler)
 
 
-
 def show_version() -> None:
     entries = []
 
@@ -130,10 +129,14 @@ def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -
     intents = discord.Intents.default()
     intents.message_content = True
     intents.members = True
+
     bot = taho.Bot(intents=intents, config=config)
 
     babel = taho.babel.Babel(bot)
     babel.load()
+
+
+    taho.utils.register_bot(bot)
 
     try:
         bot.run(config.token)
