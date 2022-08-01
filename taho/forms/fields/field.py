@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.babel import _
 from taho.exceptions import ValidationException
-from discord.ui import Modal
+from discord.ui import Modal, View
 
 if TYPE_CHECKING:
     from typing import List, Callable, Optional, TypeVar
@@ -37,6 +37,7 @@ if TYPE_CHECKING:
 __all__ = (
     "Field", 
     "FieldModal",
+    "FieldView",
 )
 
 class Field:
@@ -205,7 +206,7 @@ class Field:
 
         return True
     
-    def is_finished(self) -> bool:
+    def is_completed(self) -> bool:
         """
         Check if the field is finished.
 
@@ -244,16 +245,64 @@ class FieldModal(Modal):
         The field corresponding to the modal.
     title: :class:`str`
         The title of the modal.
-    default: Optional[:class:`str`]
+    default:
         The default value of the field.
     """
     def __init__(
         self,
         field: Field,
         *, title: str,
-        default: Optional[str] = None,
+        default: Optional[T] = None,
     ) -> None:
         super().__init__(title=title)
+
+        self.field = field
+        self.default = default
+
+
+    async def on_submit(self, interaction: Interaction) -> None:
+        """|coro|
+
+        Called when the user submit the modal.
+
+        This function performs the following actions:
+        - check if the field is valid using :meth:`~taho.forms.Field.validate`
+        - get the display value of the field using :meth:`~taho.forms.Field.display`
+        - send a message to the user with the display value, if the field is valid
+        """
+        is_valid = await self.field.validate(interaction)
+
+        await self.field.display()
+
+        if is_valid:
+            await interaction.response.send_message(
+                _(
+                    "Successfully set value to: %(value)s", 
+                    value=self.field.display_value
+                ),
+                ephemeral=True
+            )
+
+        self.stop() 
+
+class FieldView(View):
+    """The default view for any field.
+    
+    Attributes
+    -----------
+    field: :class:`~taho.forms.Field`
+        The field corresponding to the modal.
+    title: :class:`str`
+        The title of the modal.
+    default:
+        The default value of the field.
+    """
+    def __init__(
+        self,
+        field: Field,
+        default: Optional[T] = None,
+    ) -> None:
+        super().__init__()
 
         self.field = field
         self.default = default

@@ -25,9 +25,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord import Interaction, SelectOption
 from discord.ui import Select as _Select
-from soupsieve import select
 from taho.babel import _
-from .field import Field, FieldModal
+from taho.emoji import Emoji
+from .field import Field, FieldModal, FieldView
 from enum import Enum
 
 if TYPE_CHECKING:
@@ -70,11 +70,8 @@ class SelectModal(FieldModal):
                 placeholder=_("Select a value"),
                 min_values=min_values,
                 max_values=max_values,
-                options=[SelectOption(
-                        label=c.label,
-                        value=c.discord_value,
-                        default=c.selected
-                    ) for c in choices
+                options=[
+                    c.to_select_option() for c in choices
                 ]
             )
 
@@ -98,19 +95,90 @@ class Choice:
     def __init__(
         self, 
         label: str, 
-        value: T, 
+        value: T,
+        *,
+        selected: bool = False,
+        description: Optional[str] = None,
+        emoji: Optional[Emoji] = None,
     ) -> None:
         self.label = label
         self.value = value
 
         self.discord_value = self._get_discord_value()
-        self.selected: bool = False
+        self.selected = selected
+        self.description = description
+        self.emoji = emoji
     
     def _get_discord_value(self) -> str:
         if isinstance(self.value, Enum):
             return str(self.value.value)
         
         return str(self.value)
+    
+    def to_select_option(self) -> SelectOption:
+        if self.emoji:
+            emoji = self.emoji.to_partial()
+        else:
+            emoji = None
+        return SelectOption(
+                label=self.label,
+                value=self.discord_value,
+                default=self.selected,
+                description=self.description,
+                emoji=emoji,
+            )
+
+class SelectView(FieldView):
+    def __init__(
+        self,
+        field: Field,
+        *,
+        choices: List[Choice] = [],
+        min_values: Optional[int] = 1, 
+        max_values: Optional[int] = 1,
+        default: Optional[List[T]] = None,
+    ) -> None:
+        super().__init__(field=field, default=default)
+
+        self.choices = choices
+        self.min_values = min_values
+        self.max_values = max_values
+
+        if self.default is not None:
+            for c in self.choices:
+                if c.value in self.default:
+                    c.selected = True
+
+        self.response_map = {
+            c.discord_value: c.value for c in choices
+        }
+
+        self.answer = _Select(
+                placeholder=_("Select a value"),
+                min_values=min_values,
+                max_values=max_values,
+                options=[
+                    c.to_select_option() for c in choices
+                ]
+            )
+        
+        self.answer.callback = self.on_submit
+
+        self.add_item(self.answer)
+
+        self.value: str = None
+    
+    async def on_submit(self, interaction: Interaction) -> None:
+        self.field.value = [
+            self.response_map[a] for a in self.answer.values
+        ]
+
+        self.field.default = self.field.value
+
+        if self.min_values == 1 and self.max_values == 1:
+            self.field.value = self.field.value[0]
+        
+        await super().on_submit(interaction)
 
 class Select(Field):
     def __init__(
@@ -141,18 +209,36 @@ class Select(Field):
 
     
     async def ask(self, interaction: Interaction) -> Optional[bool]:
-        modal = SelectModal(
+        # modal = SelectModal(
+        #         field=self,
+        #         title=_("Enter a value"),
+        #         choices=self.choices,
+        #         min_values=self.min_values,
+        #         max_values=self.max_values,
+        #         default=self.default
+        #     )
+        # await interaction.response.send_modal(
+        #     modal
+        # )
+        # await modal.wait()
+        view = SelectView(
                 field=self,
-                title=_("Enter a value"),
                 choices=self.choices,
                 min_values=self.min_values,
                 max_values=self.max_values,
                 default=self.default
             )
-        await interaction.response.send_modal(
-            modal
+        await interaction.response.send_message(
+            content=_(
+                "Select between %(min_values)s and %(max_values)s values.",
+                min_values=self.min_values,
+                max_values=self.max_values,
+            ),
+            embed=None,
+            view=view,
+            ephemeral=True,
         )
-        await modal.wait()
+        await view.wait()
 
     
     async def display(self) -> str:

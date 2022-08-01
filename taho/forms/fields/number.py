@@ -103,7 +103,6 @@ class Number(Field):
                 field=self,
                 title=_("Enter a value"),
                 label=self.label,
-                required=True,
                 default=self.default,
             )
         await interaction.response.send_modal(

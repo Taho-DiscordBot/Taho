@@ -23,6 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import asyncio
 import discord
 from taho.babel import _
 
@@ -39,8 +40,6 @@ class FormView(discord.ui.View):
 
         self.form = form
 
-        self.message = None
-        
         self.cancel.label = _("Cancel")
         self.respond.label = _("Respond")
         self.finish.label = _("Finish")
@@ -150,7 +149,7 @@ class FormView(discord.ui.View):
             self.next.disabled = True
         
         # If the form is finished, the finish button is enabled
-        if self.form.is_finished():
+        if self.form.is_completed():
             self.finish.disabled = False
         else:
             self.finish.disabled = True
@@ -171,13 +170,15 @@ class FormView(discord.ui.View):
             The interaction of the user.
             Used to send the embed
         """
+        print("refresh")
         self.disable_check()
         
         embed = await self.form.generate_embed()
 
-        if interaction.response._responded:
-            original = await interaction.original_message()
-            await original.edit(content=None, embed=embed, view=self)
+        if interaction.response.is_done():
+            # original = await interaction.original_message()
+            # await original.edit(content=None, embed=embed, view=self)
+            await self.form.message.edit(content=None, embed=embed, view=self)
         else:
             await interaction.response.edit_message(content=None, embed=embed, view=self)
         
@@ -297,6 +298,8 @@ class FormView(discord.ui.View):
         embed = await self.form.generate_embed(finished=True)
 
         await interaction.response.edit_message(embed=embed, view=None)
+        
+        self.form.stop()
 
 
     async def cancel_form(self, interaction: discord.Interaction = None, message: discord.Message = None) -> None:
@@ -307,6 +310,8 @@ class FormView(discord.ui.View):
             await interaction.response.edit_message(embed=embed, view=None)
         elif message:
             await message.edit(embed=embed, view=None)
+        
+        self.form.stop(cancel=True)
         
 class Form:
     """Represents a form.
@@ -337,6 +342,8 @@ class Form:
         self.fields = fields
         self.description = description
 
+        self.message: discord.Message = None
+
         if not self.description:
             self.description = _(
                 "Please fill out the form below.\n"
@@ -351,6 +358,8 @@ class Form:
         for field in self.fields:
             field.form = self
         
+        self.__stopped: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
+        
     async def send(self, ctx: TahoContext) -> None:
         """|coro|
         
@@ -364,7 +373,10 @@ class Form:
         """
         view = await self.generate_view()
         embed = await self.generate_embed()
-        await ctx.send(embed=embed, view=view)
+        msg = await ctx.send(embed=embed, view=view)
+
+        self.message = msg
+
     
     async def generate_embed(self, canceled: bool = False, finished: bool = False) -> discord.Embed:
         """|coro|
@@ -419,7 +431,7 @@ class Form:
         view = FormView(self)
         return view
     
-    def is_finished(self) -> bool:
+    def is_completed(self) -> bool:
         """
         Check if the form is finished.
 
@@ -434,8 +446,49 @@ class Form:
         :class:`bool`
             Whether the form is finished or not.
         """
-        return all(field.is_finished() for field in self.fields)
+        return all(field.is_completed() for field in self.fields)
     
+    def is_finished(self) -> bool:
+        """
+        Check if the form is done.
+
+        The form is done when the user clicked
+        on the finish or the cancel buttons.
+
+        This is different from :meth:`.is_completed`
+
+        Returns
+        --------
+        :class:`bool`
+            Whether the form is done or not.
+        """
+        return self.__stopped.done()
+    
+    async def wait(self) -> bool:
+        """|coro|
+        
+        Waits until the form has finished interacting.
+
+        A form is considered finished when :meth:`stop` is called
+        or it times out.
+
+        Returns
+        --------
+        :class:`bool`
+            If ``True``, then the form timed out. If ``False`` then
+            the form finished normally.
+        """
+        return await self.__stopped
+
+    def stop(self, cancel: bool=False) -> None:
+        """Stops listening to interaction events from this form.
+
+        This operation cannot be undone.
+        """
+        if not self.__stopped.done():
+            self.__stopped.set_result(cancel)
+
+
     def to_dict(self) -> dict:
         """
         Convert the form to a dictionary.
