@@ -36,61 +36,11 @@ if TYPE_CHECKING:
     T = TypeVar("T")
 
 __all__ = (
-    "SelectModal",
     "Choice",
+    "SelectView",
     "Select"
 )
 
-class SelectModal(FieldModal):
-    def __init__(
-        self,
-        field: Field,
-        *, title: str, 
-        choices: List[Choice] = [],
-        min_values: Optional[int] = 1, 
-        max_values: Optional[int] = 1,
-        default: Optional[List[T]] = None,
-    ) -> None:
-        super().__init__(field=field, title=title, default=default)
-
-        self.field = field
-        self.min_values = min_values
-        self.max_values = max_values
-
-        if self.default is not None:
-            for c in self.choices:
-                if c.value in self.default:
-                    c.selected = True
-
-        self.response_map = {
-            c.discord_value: c.value for c in choices
-        }
-
-        self.answer = _Select(
-                placeholder=_("Select a value"),
-                min_values=min_values,
-                max_values=max_values,
-                options=[
-                    c.to_select_option() for c in choices
-                ]
-            )
-
-        self.add_item(self.answer)
-
-        self.value: str = None
-    
-    async def on_submit(self, interaction: Interaction) -> None:
-        self.field.value = [
-            self.response_map[a] for a in self.answer.values
-        ]
-
-        self.field.default = self.field.value
-
-        if self.min_values == 1 and self.max_values == 1:
-            self.field.value = self.field.value[0]
-        
-        await super().on_submit(interaction)
-    
 class Choice:
     def __init__(
         self, 
@@ -209,18 +159,6 @@ class Select(Field):
 
     
     async def ask(self, interaction: Interaction) -> Optional[bool]:
-        # modal = SelectModal(
-        #         field=self,
-        #         title=_("Enter a value"),
-        #         choices=self.choices,
-        #         min_values=self.min_values,
-        #         max_values=self.max_values,
-        #         default=self.default
-        #     )
-        # await interaction.response.send_modal(
-        #     modal
-        # )
-        # await modal.wait()
         view = SelectView(
                 field=self,
                 choices=self.choices,
