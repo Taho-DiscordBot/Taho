@@ -23,8 +23,8 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from discord import Interaction
-from discord.ui import Select as _Select
+from discord import ButtonStyle, Interaction
+from discord.ui import Select as _Select, Button
 from taho.babel import _
 from .field import Field, FieldView
 from ..validators import min_length, max_length
@@ -66,14 +66,13 @@ class SelectView(FieldView):
             c.discord_value: c.value for c in choices
         }
 
-        if len(self.choices) > 125:
+        if len(self.choices) > 100:
             raise ValueError("Too many choices")
         
         choices_lists = split_list(self.choices, 25)
-        print(choices_lists)
-        self.answers = []
+        self.answers: List[_Select] = []
 
-        for choices_list in choices_lists:
+        for i, choices_list in enumerate(choices_lists):
             select = _Select(
                     placeholder=_("Select a value"),
                     min_values=self.min_values,
@@ -81,10 +80,22 @@ class SelectView(FieldView):
                     options=[
                         c.to_select_option() for c in choices_list
                     ],
+                    row=i,
                 )
-            select.callback = self.on_submit
             self.answers.append(select)
             self.add_item(select)
+        
+        if len(self.answers) == 1:
+            self.answers[0].callback = self.on_submit
+        else:
+        
+            submit_button = Button(
+                style=ButtonStyle.green,
+                label=_("Submit"),
+                row=i+1
+            )
+            submit_button.callback = self.on_submit
+            self.add_item(submit_button)
 
         self.value: str = None
     
