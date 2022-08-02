@@ -142,8 +142,6 @@ class Cluster(BaseModel):
     items: fields.ReverseRelation["Item"]
     roles: fields.ReverseRelation["Role"]
 
-
-
     async def __aiter__(self) -> AsyncGenerator[Server]:
         async for server in self.servers:
             yield server
@@ -175,7 +173,7 @@ class Cluster(BaseModel):
             return await self.infos.get(key=key).py_value #test that
         except t_exceptions.DoesNotExist:
             raise KeyError(f"No info with key {key}")
-        
+
     async def set_info(self, key: str, value: Optional[Union[str, int, float, None]]) -> None:
         """|coro|
 
@@ -227,6 +225,151 @@ class Cluster(BaseModel):
             if create_if_not_exists:
                 return await User.create(user_id=user_id, cluster=self)
             raise DoesNotExist(f"User with ID {user_id} doesn't exist")
+
+    async def create_role(self, type: RoleType, *roles: discord.Role) -> Role:
+        """|coro|
+
+        Creates a role in the cluster.
+
+        Parameters
+        -----------
+        type: :class:`taho.enums.RoleType`
+            The role's type.
+        roles: :class:`discord.Role`
+            The roles to create.
+        
+        Returns
+        --------
+        :class:`~taho.database.models.Role`
+            The role.
+        """
+        from .role import Role
+        role = await Role.create(cluster=self, type=type)
+        await role.add_roles(*roles)
+
+        return role
+        #try:
+        #    return await self.roles.all().get(type=type)
+        #except t_exceptions.DoesNotExist:
+        #    return await Role.create(type=type, cluster=self, *roles)
+    
+    async def get_guilds(self, bot: Bot) -> List[discord.Guild]:
+        """|coro|
+
+        Gets the cluster's guilds corresponding to the cluster's
+        servers.
+
+        Parameters
+        -----------
+        bot: :class:`taho.bot.Bot`
+            The bot.
+        
+        Returns
+        --------
+        List[discord.Guild]
+            The guilds.
+        """
+        guilds_ids = await self.servers.all().values_list("id", flat=True)
+
+        return [bot.get_guild(guild_id) for guild_id in guilds_ids]
+
+    async def get_roles_by_name(self, bot: Bot) -> Dict[str, Role]:
+        """|coro|
+        
+        Gets all the roles in the cluster and organizes 
+        them by name (of the servers roles).
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+
+        Returns
+        --------
+        Dict[:class:`str`, :class:`~taho.database.models.Role`]
+            The roles organized by name.
+        
+
+        Example
+        --------
+        How are roles organized by name?
+
+        .. code-block:: python3
+
+            {
+                "role_name": Role,
+                "role_name2": Role2,
+                ...
+            }
+
+        
+        .. note:: 
+
+            Role names are taken from Discord roles associated with Server roles.
+            So a Role can appear several times, under a different name.
+        """
+        # Get all the cluster's roles
+
+        roles = await self.roles.all().prefetch_related("server_roles")
+        roles_by_name = {}
+
+        # For every Role in cluster
+        for c_role in roles:
+            # Get every Discord roles of the Role
+            async for s_role in c_role.get_discord_roles(bot):
+                roles_by_name[s_role.name] = c_role
+
+        return roles_by_name
+
+    async def get_users_by_name(self, bot: Bot) -> Dict[str, User]:
+        """|coro|
+        
+        Gets all the users in the cluster and organizes 
+        them by name (of the servers users).
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+
+        Returns
+        --------
+        Dict[:class:`str`, :class:`~taho.database.models.User`]
+            The users organized by name.
+        
+
+        Example
+        --------
+        How are users organized by name?
+
+        .. code-block:: python3
+
+            {
+                "user_name": User,
+                "user_name2": User2,
+                ...
+            }
+
+        
+        .. note:: 
+
+            User names are taken from Discord users associated with Server members.
+            So a User can appear several times, under a different name.
+        """
+        # Get all the cluster's users
+
+        users = await self.users.all()
+        guilds = await self.get_guilds(bot)
+        users_by_name = {}
+
+        # For every User in cluster
+        for c_user in users:
+            for guild in guilds:
+                user = guild.get_member(c_user.user_id)
+                if user:
+                    users_by_name[user.display_name] = c_user
+
+        return users_by_name
 
     # async def get_guilds_members(self, bot: Bot) -> Dict[Server, List[discord.Member]]:
     #     """|coro|
@@ -460,8 +603,6 @@ class Cluster(BaseModel):
         else:
             return await server.cluster
 
-    
-        
     async def add_guild(self, bot: Bot, guild: discord.Guild, sync_server: bool=True) -> Server:
         """|coro|
         
