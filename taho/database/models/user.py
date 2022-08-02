@@ -94,6 +94,14 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
 
             Python: :class:`taho.database.models.Cluster`
         
+        .. collapse:: is_npc
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` ``False``
+            
+            Python: :class:`bool`
+        
     Attributes
     -----------
     id: :class:`int`
@@ -101,7 +109,11 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
     user_id: :class:`int`
         The user's Discord ID.
     cluster: :class:`~taho.database.models.Cluster`
+        |coro_attr|
+
         The cluster the user is in.
+    is_npc: :class:`bool`
+        Whether the user is an NPC.
     hotbars: List[:class:`~taho.database.models.Hotbar`]
         |coro_attr|
 
@@ -138,6 +150,7 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
     
     user_id = fields.BigIntField()
     cluster: Cluster = fields.ForeignKeyField("main.Cluster", related_name="users")
+    is_npc: bool = fields.BooleanField(default=False)
 
     hotbars: fields.ReverseRelation["Hotbar"] # The hotbars of the user
     npcs: fields.ReverseRelation["NPCOwner"] # The npcs owned by the user
@@ -148,12 +161,6 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-
-    async def is_npc(self) -> bool:
-        """
-        Check if the user is an NPC.
-        """
-        return await self._get_npc() is not None
 
     async def get_npcs(self) -> List[NPCOwner]:
         """
@@ -177,16 +184,13 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
             The NPC if the user is an NPC.
             Otherwise, ``None``.
         """
-        if hasattr(self, "_npc"):
+        if not self.is_npc:
+            return None
+        elif hasattr(self, "_npc"):
             return self._npc
-        try:
-            npc = await NPC.get(id=self.user_id)
-        except t_exception.DoesNotExist:
-            self._npc = None
         else:
-            self._npc = npc
-        
-        return self._npc
+            self._npc = await NPC.get(id=self.user_id)
+            return self._npc
 
     async def get_npc(self) -> NPC:
         """
@@ -194,7 +198,7 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
         Raises an exception if:
         - NPCException: the user is not an NPC
         """
-        if not await self.is_npc():
+        if not self.is_npc:
             raise NPCException("The user is not an NPC")
 
         return await self._get_npc()
