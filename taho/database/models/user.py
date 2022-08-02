@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from tortoise.signals import post_save
+from tortoise import exceptions as t_exceptions
 from taho.exceptions import QuantityException, NPCException
 from taho.enums import ItemUse, ItemType, ItemReason, RoleAddedBy
 from .npc import NPC
@@ -33,8 +34,7 @@ from taho.abc import AccessShortcutable, OwnerShortcutable
 from permissions import Permissions
 
 if TYPE_CHECKING:
-    from typing import Any, List
-    from .bank import Bank, BankAccount
+    from typing import Any, List, Optional
     from .role import Role
     from .inventory import Inventory, Hotbar
     from .item import Item, ItemStat, ItemRole
@@ -153,9 +153,7 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
         """
         Check if the user is an NPC.
         """
-        if not hasattr(self, "_is_npc") or self._is_npc is None:
-            self._is_npc = await NPC.exists(id=self.user_id)
-        return self._is_npc
+        return await self._get_npc() is not None
 
     async def get_npcs(self) -> List[NPCOwner]:
         """
@@ -167,6 +165,29 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
             raise NPCException("The user is an NPC")
         return await self.npcs.all()
 
+    async def _get_npc(self) -> Optional[NPC]:
+        """|coro|
+        
+        If the user is an NPC, return the NPC.
+        Otherwise, return ``None``.
+
+        Returns
+        --------
+        Optional[:class:`~taho.database.models.NPC`]
+            The NPC if the user is an NPC.
+            Otherwise, ``None``.
+        """
+        if hasattr(self, "_npc"):
+            return self._npc
+        try:
+            npc = await NPC.get(id=self.user_id)
+        except t_exception.DoesNotExist:
+            self._npc = None
+        else:
+            self._npc = npc
+        
+        return self._npc
+
     async def get_npc(self) -> NPC:
         """
         Get the NPC object if the user in an NPC.
@@ -175,7 +196,8 @@ class User(BaseModel, OwnerShortcutable, AccessShortcutable):
         """
         if not await self.is_npc():
             raise NPCException("The user is not an NPC")
-        return await NPC.get(id=self.user_id)
+
+        return await self._get_npc()
 
     async def get_discord_member(self, bot: Bot) -> List[Member]:
         """
