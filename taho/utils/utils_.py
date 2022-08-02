@@ -23,6 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import uuid
 
 if TYPE_CHECKING:
     from typing import Union, List, TypeVar
@@ -36,6 +37,7 @@ __all__ = (
     "register_bot",
     "get_bot",
     "split_list",
+    "RandomHash",
 )
 bot: Bot = None
 
@@ -107,3 +109,24 @@ def split_list(to_split: List[T], split_at: int) -> List[List[T]]:
         The split list.
     """
     return [to_split[i:i+split_at] for i in range(0, len(to_split), split_at)]
+
+class RandomHash:
+    """
+    A class that generates a random hash even if 
+    its value is the same as another object of the 
+    same type.
+
+    Used to generate dicts and use it as keys.
+    """
+    def __init__(self, obj: T):
+        self.obj = obj
+        self.hash = hash(uuid.uuid4())
+
+    def __hash__(self):
+        return self.hash
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+    
+    def __call__(self) -> T:
+        return self.obj
