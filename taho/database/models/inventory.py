@@ -29,10 +29,8 @@ from typing import TYPE_CHECKING
 from taho.abc import StuffShortcutable, TradeStuffShortcutable
 
 if TYPE_CHECKING:
-    from typing import Iterable, Optional
+    from typing import Iterable, Optional, Union
     from tortoise import BaseDBAsyncClient
-
-
 
 __all__ = (
     "Inventory",
@@ -139,9 +137,39 @@ class Inventory(BaseModel, StuffShortcutable, TradeStuffShortcutable):
     owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut")
     item = fields.ForeignKeyField("main.Item", related_name="inventories")
 
-    amount = fields.IntField(default=0)
+    amount = fields.DecimalField(max_digits=32, decimal_places=2, default=0)
     durability = fields.IntField(null=True)
-    ammo = fields.IntField(null=True)
+
+    async def get_amount(self) -> Union[int, float]:
+        """|coro|
+        
+        Returns the amount of the item in the inventory.
+
+        If the :attr:`.item` is a cash item, returns a
+        :class:`float` instead of an :class:`int`.
+
+        Returns
+        -------
+        Union[:class:`int`, :class:`float`]
+            The amount of the item in the inventory.
+        """
+
+        if float(int(self.amount)) == self.amount:
+            # The amount is already an int
+            
+            return int(self.amount)
+
+        elif (await self.item).is_currency:
+            # The item is a currency, so
+            # return a float
+
+            return self.amount
+
+        else:
+            # The item is not a currency, so
+            # return an int
+
+            return int(self.amount)
 
 
 
