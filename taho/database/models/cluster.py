@@ -29,11 +29,9 @@ from tortoise import exceptions as t_exceptions
 from tortoise.signals import post_save
 from .role import Role
 from taho.exceptions import DoesNotExist, AlreadyExists
-from ..utils import convert_to_type, get_type
 from taho.database import utils as db_utils
 from taho.enums import InfoType
 from taho.babel import _
-
 
 if TYPE_CHECKING:
     from taho import Bot, Emoji
@@ -46,9 +44,6 @@ if TYPE_CHECKING:
     from .item import Item
     from .currency import Currency
     import discord
-
-
-
 
 __all__ = (
     "Cluster",
@@ -368,6 +363,13 @@ class Cluster(BaseModel):
                 user = guild.get_member(c_user.user_id)
                 if user:
                     users_by_name[user.display_name] = c_user
+                else:
+                    try:
+                        npc = await c_user.get_npc()
+                    except DoesNotExist:
+                        pass
+                    else:
+                        users_by_name[npc.name] = c_user
 
         return users_by_name
 
