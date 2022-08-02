@@ -27,6 +27,7 @@ __all__ = (
     "ItemType",
     "ItemReason",
     "ItemUse",
+    "ItemRewardType",
 )
 class ItemType(IntEnum):
     resource = 0
@@ -43,3 +44,8 @@ class ItemUse(IntEnum):
     equip = 2
     unequip = 3
     give = 4
+
+class ItemRewardType(IntEnum):
+    passive = 0
+    active = 1
+    equip = 2
