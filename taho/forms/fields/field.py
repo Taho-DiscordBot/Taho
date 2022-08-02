@@ -138,7 +138,7 @@ class Field:
         else:
             self.cluster = await db_utils.get_cluster(
                 interaction.client,
-                interaction.guild_id
+                interaction.guild
             )
             return self.cluster
     
