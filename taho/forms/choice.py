@@ -23,9 +23,8 @@ DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
 from typing import TYPE_CHECKING
+import uuid
 from taho.babel import _
-from taho.database.models import Item
-from enum import Enum
 from discord import SelectOption
 
 
@@ -58,12 +57,7 @@ class Choice:
         self.emoji = emoji
     
     def _get_discord_value(self) -> str:
-        if isinstance(self.value, Enum):
-            return str(self.value.value)
-        elif isinstance(self.value, Item):
-            return str(self.value.id)
-        
-        return str(self.value)
+        return str(uuid.uuid4())
     
     def to_select_option(self) -> SelectOption:
         if self.emoji:
