@@ -290,9 +290,9 @@ class FormView(discord.ui.View):
         self.stop()
     
     async def on_timeout(self) -> None:
-        await self.cancel_form(message=self.message)
+        await self.cancel_form(message=self.form.message)
     
-    async def finish_form(self,interaction: discord.Interaction) -> None:
+    async def finish_form(self, interaction: discord.Interaction) -> None:
 
         embed = await self.form.generate_embed(finished=True)
 
