@@ -26,11 +26,13 @@ from typing import TYPE_CHECKING
 from taho.babel import _
 from taho.exceptions import ValidationException
 from discord.ui import Modal, View
+from taho.database import utils as db_utils
 
 if TYPE_CHECKING:
     from typing import List, Callable, Optional, TypeVar
     from discord import Interaction
     from taho.forms import Form
+    from taho.database.models import Cluster
 
     T = TypeVar('T')
 
@@ -114,6 +116,31 @@ class Field:
 
     def __hash__(self) -> int:
         return hash(self.__repr__())
+    
+    async def get_cluster(self, interaction: Interaction) -> Cluster:
+        """|coro|
+
+        Get the cluster corresponding of the guild where 
+        the field's form is displayed.
+
+        Parameters
+        -----------
+        interaction: :class:`~discord.Interaction`
+            The interaction of the user.
+        
+        Returns
+        --------
+        :class:`~taho.database.models.Cluster`
+            The cluster.
+        """
+        if hasattr(self, "cluster"):
+            return self.cluster
+        else:
+            self.cluster = await db_utils.get_cluster(
+                interaction.client,
+                interaction.guild_id
+            )
+            return self.cluster
     
     async def ask(self, interaction: Interaction) -> Optional[bool]:
         """|coro|
