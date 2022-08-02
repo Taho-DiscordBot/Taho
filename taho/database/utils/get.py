@@ -22,14 +22,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, overload
 from tortoise import exceptions as t_exceptions
+from taho.abc import StuffShortcutable
+from taho.database.models.base import BaseModel
+from taho.database.models.shortcut import StuffShortcut
 from taho.exceptions import DoesNotExist, AlreadyExists
+from taho.enums import ShortcutableType
 
 if TYPE_CHECKING:
     from ..models import Server, Cluster, Currency, User
     from taho import Bot
-    from typing import List, Optional
+    from typing import List, Optional, Union
     import discord
 
 __all__ = (
@@ -39,6 +43,8 @@ __all__ = (
     "get_default_currency",
     "get_default_user",
     "get_user",
+    "get_stuff_amount",
+    "get_stuff",
 )
 
 async def get_server(bot: Bot, guild: discord.Guild, *fetch_related: List[str]) -> Server:
@@ -196,3 +202,122 @@ async def get_user(cluster_id: int, user_id: int) -> User:
     user = await User.get_or_create(cluster_id=cluster_id, user_id=user_id)
 
     return user[0]
+
+@overload
+async def get_stuff_amount(model: BaseModel, force: bool = ...) -> Union[int, float]:
+    ...
+
+@overload
+async def get_stuff_amount(stuff: StuffShortcut, amount: float, force: bool = ...) -> Union[int, float]:
+    ...
+
+@overload
+async def get_stuff_amount(stuff: StuffShortcutable, amount: float, force: bool = ...) -> Union[int, float]:
+    ...
+
+async def get_stuff_amount(
+    model: Optional[BaseModel] = None,
+    stuff: Optional[Union[StuffShortcut, StuffShortcutable]] = None, 
+    amount: Optional[float] = None,
+    force: bool = False
+    ) -> Union[int, float]:
+    """|coro|
+
+    Get the real amount of stuff.
+
+    If ``model`` is not ``None`` then ``stuff`` and
+    ``amount`` are ignored.
+
+    ``stuff`` or ``model`` are required, but not both.
+
+    Parameters
+    -----------
+    model: :class:`~taho.database.models.BaseModel`
+        The model to get the stuff amount for.
+    stuff: Union[:class:`~taho.database.models.StuffShortcut`, :class:`~taho.abc.StuffShortcutable`]
+        The stuff to get the amount for.
+    amount: :class:`int`
+        The amount of stuff.
+    force: :class:`bool`
+        Whether to force the retrieval of the amount
+        from the DB.
+        If ``False``, the amount will only be retrieved
+        if it is not already in the cache.
+    
+    Raises
+    -------
+    TypeError
+        If both ``model`` and ``stuff`` are ``None``,
+        or if they are both not ``None``.
+
+    Returns
+    --------
+    Union[int, float]
+        The real amount of stuff.
+    """
+    if model and stuff:
+        raise TypeError("Only one of model and stuff can be specified.")
+    elif not model and not stuff:
+        raise TypeError("Either model or stuff must be specified.")
+    
+    if model:
+        if hasattr(model, "_amount") and not force:
+            return model._amount
+        elif hasattr(model, "_stuff"):
+            stuff = model._stuff
+        else:
+            stuff = model.stuff_shortcut
+        value = await get_stuff_amount(stuff=stuff, amount=model.amount)
+        setattr(model, "_amount", value)
+        return value
+        
+    if isinstance(stuff, StuffShortcut):
+        stuff: StuffShortcutable = await stuff.get()
+
+    TYPE = ShortcutableType
+
+    if stuff.type == TYPE.currency or \
+        (stuff.type == TYPE.inventory and (await stuff).is_cash == True):
+        return amount
+    elif stuff.type == TYPE.role:
+        return 1
+    else:
+        return round(amount)
+
+async def get_stuff(model: BaseModel, force: bool = False) -> StuffShortcutable:
+    """|coro|
+
+    Get the stuff of a model, from the model's ``stuff_shortcut``
+    attribute.
+
+    Parameters
+    -----------
+    model: :class:`~taho.database.models.BaseModel`
+        The model to get the stuff for.
+    force: :class:`bool`
+        Whether to force the retrieval of the stuff
+        from the DB.
+        If ``False``, the stuff will only be retrieved
+        if it is not already in the cache.
+    
+    Raises
+    -------
+    TypeError
+        If the model has no ``stuff_shortcut`` attribute.
+    
+    Returns
+    --------
+    :class:`~taho.database.models.StuffShortcutable`
+        The stuff of the model.
+    """
+    if not hasattr(model, "stuff_shortcut"):
+        raise TypeError("Model has no stuff_shortcut attribute.")
+    
+    if hasattr(model, "_stuff") and not force:
+        return model._stuff
+    else:
+        stuff = await model.stuff_shortcut
+        stuff = await stuff.get()
+        setattr(model, "_stuff", stuff)
+        return stuff
+    
