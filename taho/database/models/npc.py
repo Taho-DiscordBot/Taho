@@ -174,8 +174,16 @@ class NPC(BaseModel):
         :class:`~taho.database.models.User`
             The user.
         """
-        from .user import User # Avoid circular import
-        return (await User.get_or_create(user_id=self.id, cluster=self.cluster))[0]
+        if hasattr(self, "_user"):
+            return self._user
+        else:
+            from .user import User # Avoid circular import
+
+            self._user = (await User.get_or_create(user_id=self.id, cluster=self.cluster))[0]
+            if not self._user.is_npc:
+                self._user.is_npc = True
+                await self._user.save()
+            return self._user
 
     async def get_users(self) -> List[NPCOwner]:
         """|coro|
@@ -199,8 +207,7 @@ class NPC(BaseModel):
 @post_save(NPC)
 async def on_npc_save(_, instance: NPC, created: bool, *args, **kwargs) -> None:
     if created:
-        from .user import User # circular import
-        await User.get_or_create(user_id=instance.id, cluster=instance.cluster)
+        await instance.get_user()
 
 class NPCOwner(BaseModel):
     """Represents an owner of a NPC.
