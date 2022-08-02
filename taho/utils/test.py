@@ -94,20 +94,40 @@ async def check_guilds_test(bot: Bot) -> Dict[str, Union[List[discord.Guild], Li
     """
     guilds = []
     users = []
+    roles = []
+
+    roles_names = ["green", "red", "blue", "yellow"]
+
     for i in range(1, 4):
         guild = discord.utils.find(lambda g: g.name == f"Taho Unit Test {i}", bot.guilds)
         if not guild:
             raise NoTestGuilds(f"The guild Taho Unit Test {i} is not created or the bot is not in.")
+        
         await guild.chunk()
+
         if guild.member_count < 3:
             raise UsersNotInGuilds(f"The guild Taho Unit Test {i} has not at least 2 users.")
+
         for m in guild.members:
             if m.id not in users and m.id != bot.user.id:
                 users.append(m.id)
+        
+        _roles = [
+            discord.utils.find(lambda r: r.name == name, guild.roles) for name in roles_names
+        ]
+
+        for i, r in enumerate(_roles):
+            if not r:
+                raise TahoException(f"The role {roles_names[i]} is not created.")
+        
+        roles.append(_roles)
+
+
         guilds.append(guild)
     return {
         "guilds": guilds,
-        "users": users
+        "users": users,
+        "roles": roles
     }
 
 async def setup_db_test(bot: Bot) -> List[str]:
@@ -150,40 +170,41 @@ async def setup_db_test(bot: Bot) -> List[str]:
         2 & 3, please don't change the name of the guilds.
     """
     data = await check_guilds_test(bot)
-    guilds = data["guilds"]
-    members = data["users"]
+    guilds: List[discord.Guild] = data["guilds"]
+    members: List[int] = data["users"]
+    roles: List[List[discord.Role]] = data["roles"]
     
     # Clear data
     for guild in guilds:
         try:
-            cluster = await Cluster.from_guild(bot, guild)
+            cluster = await Cluster.from_guild(guild)
             await cluster.delete()
         except DoesNotExist:
             continue
     
     # Create new data
-    clusters = [
+    clusters: List[Cluster] = [
         await Cluster.create(name="Cluster A"),
         await Cluster.create(name="Cluster B"),
     ]
-    servers = [
+    servers: List[Server] = [
         await Server.create(cluster=clusters[0], id=guilds[0].id),
         await Server.create(cluster=clusters[0], id=guilds[1].id),
         await Server.create(cluster=clusters[1], id=guilds[2].id),
     ]
-    users = [
+    users: List[User] = [
         await User.create(cluster=clusters[0], user_id=members[0]),
         await User.create(cluster=clusters[0], user_id=members[1]),
         await User.create(cluster=clusters[1], user_id=members[0]),
         await User.create(cluster=clusters[1], user_id=members[1]),
     ]
-    npcs = [
+    npcs: List[NPC] = [
         await NPC.create(cluster=clusters[0], name="NPC 1"),
         await NPC.create(cluster=clusters[0], name="NPC 2"),
         await NPC.create(cluster=clusters[1], name="NPC 3"),
         await NPC.create(cluster=clusters[1], name="NPC 4"),
     ]
-    npc_owners = [
+    npc_owners: List[NPCOwner] = [
         await NPCOwner.create(npc=npcs[0], user=users[0], original_owner=True),
         await NPCOwner.create(npc=npcs[0], user=users[1]),
         await NPCOwner.create(npc=npcs[1], user=users[0], original_owner=True),
@@ -191,38 +212,47 @@ async def setup_db_test(bot: Bot) -> List[str]:
         await NPCOwner.create(npc=npcs[2], user=users[3]),
         await NPCOwner.create(npc=npcs[3], user=users[2], original_owner=True),
     ]
-    items_data = [
-        {
-            "name": "Item 1",
-            "emoji": Emoji(bot, "💎"),
-            "description": "This is an item",
-            "type": ItemType.resource,
-        },
-        {
-            "name": "Item 2",
-            "type": ItemType.consumable,
-            "durability": 5,
-            "cooldown": 5
-        },
-        {
-            "name": "Item 3",
-            "type": ItemType.consumable,
-            "durability": 5,
-        }
+
+    _roles = [
+        await clusters[0].create_role(RoleType.default, *[roles[0][0], roles[1][0]]),
+        await clusters[0].create_role(RoleType.other, *[roles[0][1], roles[1][1]]),
+        await clusters[1].create_role(RoleType.default, *[roles[2][0]]),
+        await clusters[1].create_role(RoleType.other, *[roles[2][1]]),
     ]
-    items = []
-    for cluster in clusters:
-        for item_data in items_data:
-            item = await cluster.create_item(**item_data)
-            items.append(item)
+    
+
+    # items_data = [
+    #     {
+    #         "name": "Item 1",
+    #         "emoji": Emoji(bot, "💎"),
+    #         "description": "This is an item",
+    #         "type": ItemType.resource,
+    #     },
+    #     {
+    #         "name": "Item 2",
+    #         "type": ItemType.consumable,
+    #         "durability": 5,
+    #         "cooldown": 5
+    #     },
+    #     {
+    #         "name": "Item 3",
+    #         "type": ItemType.consumable,
+    #         "durability": 5,
+    #     }
+    # ]
+    # items = []
+    # for cluster in clusters:
+    #     for item_data in items_data:
+    #         item = await cluster.create_item(**item_data)
+    #         items.append(item)
             
-    items[0].edit(name="Item 1 edited")
-    items[2].ammo_id = items[0].id
-    items[2].charger_size = -1
-    await items[2].save()
-    items[5].ammo_id = items[3].id
-    items[5].charger_size = 5
-    await items[5].save()
+    # items[0].edit(name="Item 1 edited")
+    # items[2].ammo_id = items[0].id
+    # items[2].charger_size = -1
+    # await items[2].save()
+    # items[5].ammo_id = items[3].id
+    # items[5].charger_size = 5
+    # await items[5].save()
     
 
 
