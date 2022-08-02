@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING
 from taho.babel import _
 from taho.exceptions import ValidationException
 from discord.ui import Modal, View
+from discord import AllowedMentions
 from taho.database import utils as db_utils
 
 if TYPE_CHECKING:
@@ -187,7 +188,14 @@ class Field:
             except ValidationException as e:
                 self.value = None
                 self.value_display = str(e)
-                await interaction.response.send_message(str(e), ephemeral=True)
+                params = {
+                    "content": str(e),
+                    "ephemeral": True,
+                }
+                if interaction.response.is_done():
+                    await interaction.followup.send(**params)
+                else:
+                    await interaction.response.send_message(**params)
                 return False
         return True
 
@@ -308,7 +316,8 @@ class FieldModal(Modal):
                     "Successfully set value to: %(value)s", 
                     value=self.field.display_value
                 ),
-                ephemeral=True
+                ephemeral=True,
+                allowed_mentions=AllowedMentions.none()
             )
 
         self.stop() 
@@ -319,9 +328,7 @@ class FieldView(View):
     Attributes
     -----------
     field: :class:`~taho.forms.Field`
-        The field corresponding to the modal.
-    title: :class:`str`
-        The title of the modal.
+        The field corresponding to the view.
     default:
         The default value of the field.
     """
@@ -339,7 +346,7 @@ class FieldView(View):
     async def on_submit(self, interaction: Interaction) -> None:
         """|coro|
 
-        Called when the user submit the modal.
+        Called when the user submit the view.
 
         This function performs the following actions:
         - check if the field is valid using :meth:`~taho.forms.Field.validate`
@@ -351,12 +358,17 @@ class FieldView(View):
         await self.field.display()
 
         if is_valid:
-            await interaction.response.send_message(
-                _(
+            params = {
+                "content": _(
                     "Successfully set value to: %(value)s", 
                     value=self.field.display_value
                 ),
-                ephemeral=True
-            )
+                "ephemeral": True,
+                "allowed_mentions": AllowedMentions.none()
+            }
+            if interaction.response.is_done():
+                await interaction.followup.send(**params)
+            else:
+                await interaction.response.send_message(**params)
 
         self.stop() 
