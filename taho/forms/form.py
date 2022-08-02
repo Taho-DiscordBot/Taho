@@ -44,6 +44,12 @@ class FormView(discord.ui.View):
         self.respond.label = _("Respond")
         self.finish.label = _("Finish")
 
+        self.go_to.placeholder = _("Go to")
+        
+
+        self.previous.label = _("Previous")
+        self.next.label = _("Next")
+
         self.disable_check()
     
     def get_current_field(self) -> Tuple[Field, int]:
@@ -153,6 +159,13 @@ class FormView(discord.ui.View):
             self.finish.disabled = False
         else:
             self.finish.disabled = True
+        
+        self.go_to.options = [
+            discord.SelectOption(
+                label=field.label,
+                value=field.name
+            ) for field in self.form.fields if field.must_appear()
+        ]
     
     async def refresh(self, interaction: discord.Interaction) -> None:
         """|coro|
@@ -225,22 +238,38 @@ class FormView(discord.ui.View):
         previous_field.is_current = True
 
         await self.refresh(interaction)
-            
 
-    @discord.ui.button(
-        emoji="⬅",
-        style=discord.ButtonStyle.gray,
-        row=1
-    )
-    async def previous(self, interaction: discord.Interaction, _) -> None:
-        await self.paginate_left(interaction)
+    async def _go_to(self, interaction: discord.Interaction, field: Field) -> None:
+        """|coro|
+
+        Go to the given field.
+
+        Parameters
+        -----------
+        interaction: :class:`discord.Interaction`
+            The interaction of the user.
+            Used to refresh the form.
+        field: :class:`~taho.forms.Field`
+            The field to go to.
+        """
+        current_field, _ = self.get_current_field()
+
+        current_field.is_current = False
+        field.is_current = True
+
+        await self._respond(interaction)
     
-    @discord.ui.button(
-        label="respond",
-        style=discord.ButtonStyle.blurple,
-        row=1
-    )
-    async def respond(self, interaction: discord.Interaction, _) -> None:
+    async def _respond(self, interaction: discord.Interaction) -> None:
+        """|coro|
+
+        Respond to the current field.
+
+        Parameters
+        -----------
+        interaction: :class:`discord.Interaction`
+            The interaction of the user.
+            Used to refresh the form.
+        """
         current_field, current_index = self.get_current_field()
 
         # Ask for the response corresponding to the current field
@@ -259,6 +288,22 @@ class FormView(discord.ui.View):
             return await self.paginate_right(interaction)
 
         await self.refresh(interaction)
+
+    @discord.ui.button(
+        emoji="⬅",
+        style=discord.ButtonStyle.gray,
+        row=1
+    )
+    async def previous(self, interaction: discord.Interaction, _) -> None:
+        await self.paginate_left(interaction)
+    
+    @discord.ui.button(
+        label="respond",
+        style=discord.ButtonStyle.blurple,
+        row=1
+    )
+    async def respond(self, interaction: discord.Interaction, _) -> None:
+        await self._respond()
     
     
     @discord.ui.button(
@@ -289,6 +334,18 @@ class FormView(discord.ui.View):
 
         self.stop()
     
+    @discord.ui.select(
+        placeholder="go_to",
+        min_values=1,
+        max_values=1,
+        row=3
+    )
+    async def go_to(self, interaction: discord.Interaction, _) -> None:
+        field_name = self.go_to.values[0]
+        field = discord.utils.find(lambda f: f.name == field_name, self.form.fields)
+
+        await self._go_to(interaction, field)
+
     async def on_timeout(self) -> None:
         await self.cancel_form(message=self.form.message)
     
