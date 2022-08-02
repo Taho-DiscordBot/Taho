@@ -72,7 +72,7 @@ class Item(Select):
     async def get_choices(self, interaction: Interaction) -> None:
         cluster = await db_utils.get_cluster(
                 interaction.client, 
-                interaction.guild_id
+                interaction.guild
             )
         item_list = await _Item.filter(
             cluster__id=cluster.id,
