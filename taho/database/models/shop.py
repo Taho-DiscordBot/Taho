@@ -22,15 +22,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-
-from taho.currency_amount import CurrencyAmount
+from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
-from typing import TYPE_CHECKING
 from taho.enums import ShopType
 
 if TYPE_CHECKING:
-    from typing import Any
+    from taho.abc import StuffShortcutable
+    from typing import Union
 
 __all__ = (
     "Shop",
@@ -288,5 +287,13 @@ class Sale(BaseModel):
     description = fields.TextField(null=True)
     end_time = fields.DatetimeField(null=True)
 
-    def __init__(self, **kwargs: Any) -> None:
-        super().__init__(**kwargs)
+    
+    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
+        from taho.database.utils import get_stuff # avoid circular import
+
+        return await get_stuff(self, force=force)
+    
+    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
+        from taho.database.utils import get_stuff_amount # avoid circular import
+
+        return await get_stuff_amount(self, force=force)

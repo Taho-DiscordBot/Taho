@@ -26,7 +26,10 @@ from .base import BaseModel
 from typing import TYPE_CHECKING
 from tortoise import fields
 from taho.enums import SalaryCondition
-from taho.abc import Shortcutable
+
+if TYPE_CHECKING:
+    from taho.abc import StuffShortcutable
+    from typing import Union
 
 __all__ = (
     "Job",
@@ -275,17 +278,15 @@ class JobReward(BaseModel):
 
 
     
-    async def get_reward(self) -> Shortcutable:
-        """|coro|
+    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
+        from taho.database.utils import get_stuff # avoid circular import
 
-        Get the real reward from the :attr:`.JobReward.stuff_shortcut`
+        return await get_stuff(self, force=force)
+    
+    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
+        from taho.database.utils import get_stuff_amount # avoid circular import
 
-        Returns
-        --------
-        :class:`~taho.abc.StuffShortcutable`
-            The shortcut's item, stat, or currency.
-        """
-        return await self.stuff_shortcut.get()
+        return await get_stuff_amount(self, force=force)
 
 class JobCost(BaseModel):
     """Represents a cost for a job.
@@ -420,17 +421,15 @@ class JobCost(BaseModel):
 
 
     
-    async def get_cost(self) -> Shortcutable:
-        """|coro|
+    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
+        from taho.database.utils import get_stuff # avoid circular import
 
-        Get the real cost from the :attr:`.JobCost.stuff_shortcut`
+        return await get_stuff(self, force=force)
+    
+    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
+        from taho.database.utils import get_stuff_amount # avoid circular import
 
-        Returns
-        --------
-        :class:`~taho.abc.StuffShortcutable`
-            The shortcut's item, stat, or currency.
-        """
-        return await self.stuff_shortcut.get()
+        return await get_stuff_amount(self, force=force)
 
 class JobHistory(BaseModel):
     """Represents a job execution by a user.
