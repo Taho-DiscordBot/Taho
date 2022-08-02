@@ -25,12 +25,13 @@ from __future__ import annotations
 from taho.enums import RoleType
 from .base import BaseModel
 from tortoise import fields
-from typing import TYPE_CHECKING, AsyncGenerator
+from typing import TYPE_CHECKING
 from taho.abc import AccessShortcutable, StuffShortcutable
 
 if TYPE_CHECKING:
     from taho import Bot
     import discord
+    from typing import AsyncGenerator, Optional, List
 
 __all__ = (
     "Role",
@@ -123,10 +124,51 @@ class Role(BaseModel, StuffShortcutable, AccessShortcutable):
         AsyncGenerator[:class:`discord.Role`]
             The Discord roles.
         """
+        server_roles = await self.server_roles.all().prefetch_related("server")
         # Go through all guilds
-        async for s_role in self.server_roles.prefetch_related("server"):
+        for s_role in server_roles:
             # Get the role from the Server object
-            yield await s_role.server.get_role(bot, s_role.discord_role_id)
+            server = s_role.server
+            yield await server.get_role(bot, s_role.discord_role_id)
+
+    async def add_roles(self, *roles: discord.Role, return_roles: bool = False) -> Optional[List[ServerRole]]:
+        """|coro|
+
+        Create a :class:`.ServerRole` for each role 
+        and add it to the database.
+
+        Parameters
+        -----------
+        roles: List[:class:`discord.Role`]
+            The roles to add.
+        return_roles: :class:`bool`
+            Whether to return the created roles.
+        
+        Returns
+        --------
+        Optional[List[:class:`.ServerRole`]]
+            The created roles.
+            Only if ``return_roles`` is ``True``.
+        
+
+        .. note::
+
+            Set ``return_roles`` to ``True`` will create a query
+            for each role, which will be slower.
+        """
+        models = []
+        for role in roles:
+            models.append(ServerRole(
+                server_id=role.guild.id,
+                discord_role_id=role.id,
+                role=self
+            ))
+        if return_roles:
+            for model in models:
+                await model.save()
+            return models
+        else:
+            await ServerRole.bulk_create(models)
 
 class ServerRole(BaseModel):
     """
