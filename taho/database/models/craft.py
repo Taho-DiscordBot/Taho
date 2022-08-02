@@ -25,16 +25,18 @@ from __future__ import annotations
 from .base import BaseModel
 from typing import TYPE_CHECKING
 from tortoise import fields
+from tortoise.validators import MinValueValidator, MaxValueValidator
 
 if TYPE_CHECKING:
     from taho.abc import StuffShortcutable
+    from typing import Union, List, Dict
 
 __all__ = (
     "Craft",
-    "CraftCost",
+    "CraftRewardPack",
     "CraftReward",
-    "CraftAccess",
     "CraftHistory",
+    "CraftAccess",
 )
 
 class Craft(BaseModel):
@@ -144,27 +146,65 @@ class Craft(BaseModel):
     per = fields.IntField()
     success = fields.DecimalField(max_digits=32, decimal_places=2, null=True)
 
-    rewards: fields.ReverseRelation["CraftReward"]
-    costs: fields.ReverseRelation["CraftCost"]
+    accesses: fields.ReverseRelation["CraftAccess"]
+    reward_packs: fields.ReverseRelation["CraftRewardPack"]
 
+    async def get_rewards(self) -> Dict[float, List[CraftReward]]:
+        """
+        |coro|
+        
+        Returns the craft's rewards.
+        
+        Returns
+        -------
+        :class:`dict`
+            The craft's rewards.
+        
 
+        .. note::
 
-class CraftReward(BaseModel):
-    """Represents a reward for a craft.
+            The returned dictionary is of the form::
+
+                {
+                    probability: [
+                        CraftReward(),
+                        ...
+                    ],
+                    ...
+                }
+        
+        """
+        from taho.utils import RandomHash
+
+        rewards = {}
+        async for _rewards in self.reward_packs.all().prefetch_related('rewards'):
+
+            reward_list = await _rewards.rewards.all().prefetch_related("stuff_shortcut")
+            rewards[_rewards.type][RandomHash(_rewards.luck)] = reward_list
+        
+        return rewards
+    
+class CraftRewardPack(BaseModel):
+    """
+    Represents a reward pack for an craft.
 
     .. container:: operations
 
         .. describe:: x == y
 
-            Checks if two rewards are equal.
+            Checks if two reward packs are equal.
 
         .. describe:: x != y
 
-            Checks if two rewards are not equal.
+            Checks if two reward packs are not equal.
         
         .. describe:: hash(x)
 
-            Returns the reward's hash.
+            Returns the reward pack's hash.
+        
+        .. describe:: str(x)
+
+            Returns the reward pack's name.
         
     .. container:: fields
 
@@ -175,199 +215,174 @@ class CraftReward(BaseModel):
                 - :attr:`pk` True
 
             Python: :class:`int`
-            
+        
         .. collapse:: craft
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.Craft`
-                - :attr:`related_name` ``rewards``
+                - :attr:`related_name` ``reward_packs``
             
             Python: :class:`~taho.database.models.Craft`
+        
+        .. collapse:: type
+
+            Tortoise: :class:`tortoise.fields.IntEnumField`
+
+                - :attr:`enum` :class:`~taho.enums.CraftRewardType`
+            
+            Python: :class:`~taho.enums.CraftRewardType`
+        
+        .. collapse:: luck
+
+            Tortoise: :class:`tortoise.fields.DecimalField`
+
+                - :attr:`max_digits` ``1``
+                - :attr:`decimal_places` ``4``
+                - :attr:`default` 1
+            
+            Python: :class:`float`
+    
+    Attributes
+    -----------
+    id: :class:`int`
+        The reward pack's ID.
+    craft: :class:`~taho.database.models.Craft`
+        |coro_attr|
+
+        The reward pack's craft.
+    type: :class:`~taho.enums.CraftRewardType`
+        The craft reward's type.
+    luck: :class:`float`
+        The reward pack's luck.
+    rewards: List[:class:`~taho.database.models.CraftReward`]
+        |coro_attr|
+
+        The rewards included in the reward pack.
+    """
+    class Meta:
+        table = "craft_reward_packs"
+    
+    id = fields.IntField(pk=True)
+
+    craft = fields.ForeignKeyField('main.Craft', related_name='reward_packs')
+
+    luck = fields.FloatField(default=1, validators=[MinValueValidator(0), MaxValueValidator(1)])
+
+    rewards: fields.ReverseRelation["CraftReward"]
+
+class CraftReward(BaseModel):
+    """
+    Represents an craft reward.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two craft rewards are equal.
+
+        .. describe:: x != y
+
+            Checks if two craft rewards are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the craft reward's hash.
+        
+        .. describe:: str(x)
+
+            Returns the craft reward's name.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: pack
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.CraftRewardPack`
+                - :attr:`related_name` ``rewards``
+            
+            Python: :class:`~taho.database.models.CraftRewardPack`
         
         .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
-                - :attr:`related_name` ``craft_rewards``
             
             Python: :class:`~taho.database.models.StuffShortcut`
-
-        .. collapse:: give_regeneration
+        
+        .. collapse:: regeneration
 
             Tortoise: :class:`tortoise.fields.BooleanField`
 
-                - :attr:`null` True
+                - :attr:`default` ``False``
             
-            Python: Optional[:class:`bool`]
+            Python: :class:`bool`
+        
+        .. collapse:: durability
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` ``False``
+            
+            Python: :class:`bool`
         
         .. collapse:: amount
 
-            Tortoise: :class:`tortoise.fields.IntField`
+            Tortoise: :class:`tortoise.fields.DecimalField`
 
-            Python: :class:`int`    
+                - :attr:`default` ``1``
+                - :attr:`max_digits` ``10``
+                - :attr:`decimal_places` ``2``
+            
+            Python: :class:`float`
 
     Attributes
     -----------
     id: :class:`int`
-        The reward's ID.
-    craft: :class:`~taho.database.models.Craft`
-        The craft linked to the reward.
+        The craft reward's ID.
+    pack: :class:`~taho.database.models.CraftRewardPack`
+        The craft reward's pack.
     stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
-        A shortcut to the reward (item, stat or currency).
-    give_regeneration: Optional[:class:`bool`]
-        If the reward is a :class:`~taho.database.models.Stat`, then a regenerable point
-        will be rewarded.
-    amount: :class:`int`
-        The amount rewarded.
-    
-
-    .. note::
-
-        In this model, the :attr:`.CraftReward.stuff_shortcut` is
-        an :class:`~taho.database.models.StuffShortcut` that
-        point to a :class:`~taho.abc.StuffShortcutable` model.
-
-        See :ref:`Shortcuts <shortcut>` for more information.
+        The craft reward's shortcut.
+    regeneration: :class:`bool`
+        If the shortcut points to a :class:`~taho.database.models.Stat`,
+        then this is whether the stat should be regenerated.
+    durability: :class:`bool`
+        If the shortcut points to a :class:`~taho.database.models.Craft`,
+        then this is whether it should add durability to it.
+    amount: :class:`float`
+        The amount of the reward.
     """
     class Meta:
         table = "craft_rewards"
     
     id = fields.IntField(pk=True)
 
-    craft = fields.ForeignKeyField("main.Craft", related_name="rewards")
+    pack = fields.ForeignKeyField("main.CraftRewardPack", related_name="rewards")
     stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
-    give_regeneration = fields.BooleanField(null=True)
-    amount = fields.IntField()
+    regeneration = fields.BooleanField(default=False)
+    durability = fields.BooleanField(default=False)
+    amount = fields.DecimalField(max_digits=10, decimal_places=2, default=1)
     
-    async def get_reward(self) -> StuffShortcutable:
-        """|coro|
+    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
+        from taho.database.utils import get_stuff # avoid circular import
 
-        Get the real reward from the :attr:`.CraftReward.stuff_shortcut`.
-
-        Returns
-        --------
-        :class:`~taho.abc.StuffShortcutable`
-            The shortcut's item, stat, or currency.
-        """
-        return await self.stuff_shortcut
-
-class CraftCost(BaseModel):
-    """Represents a cost for a craft.
-
-    .. container:: operations
-
-        .. describe:: x == y
-
-            Checks if two costs are equal.
-
-        .. describe:: x != y
-
-            Checks if two costs are not equal.
-        
-        .. describe:: hash(x)
-
-            Returns the cost's hash.
-        
-    .. container:: fields
-
-        .. collapse:: id
-            
-            Tortoise: :class:`tortoise.fields.IntField`
-
-                - :attr:`pk` True
-
-            Python: :class:`int`
-            
-        .. collapse:: craft
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Craft`
-                - :attr:`related_name` ``costs``
-            
-            Python: :class:`~taho.database.models.Craft`
-        
-        .. collapse:: stuff_shortcut
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
-                - :attr:`related_name` ``craft_costs``
-            
-            Python: :class:`~taho.database.models.StuffShortcut`
-        
-        .. collapse:: use_durabilty
-
-            Tortoise: :class:`tortoise.fields.BooleanField`
-
-                - :attr:`null` True
-            
-            Python: Optional[:class:`bool`]
-        
-        .. collapse:: use_regeneration
-
-            Tortoise: :class:`tortoise.fields.BooleanField`
-
-                - :attr:`null` True
-            
-            Python: Optional[:class:`bool`]
-        
-        .. collapse:: amount
-
-            Tortoise: :class:`tortoise.fields.IntField`
-
-            Python: :class:`int`    
-
-    Attributes
-    -----------
-    id: :class:`int`
-        The cost's ID.
-    craft: :class:`~taho.database.models.Craft`
-        The craft linked to the cost.
-    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
-        A shortcut to the cost (item, stat, ...).
-    use_durabilty: Optional[:class:`bool`]
-        If the cost is a :class:`~taho.database.models.Item`, then durability will be
-        removed to the item.
-    use_regeneration: Optional[:class:`bool`]
-        If the cost is a :class:`~taho.database.models.Stat`, then regenerable points
-        will be removed.
-    amount: :class:`int`
-        The amount costed.
+        return await get_stuff(self, force=force)
     
+    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
+        from taho.database.utils import get_stuff_amount # avoid circular import
 
-    .. note::
-
-        In this model, the :attr:`.CraftCost.stuff_shortcut` is
-        an :class:`~taho.database.models.StuffShortcut` that
-        point to a :class:`~taho.abc.StuffShortcutable` model.
-
-        See :ref:`Shortcuts <shortcut>` for more information.
-    """
-    class Meta:
-        table = "craft_costs"
-    
-    id = fields.IntField(pk=True)
-
-    craft = fields.ForeignKeyField("main.Craft", related_name="costs")
-    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
-    use_durability = fields.BooleanField(null=True)
-    use_regeneration = fields.BooleanField(null=True)
-    amount = fields.IntField()
-    
-    async def get_cost(self) -> StuffShortcutable:
-        """|coro|
-
-        Get the real cost from the :attr:`.CraftCost.stuff_shortcut`
-
-        Returns
-        --------
-        :class:`~taho.abc.StuffShortcutable`
-            The shortcut's item, stat, or currency.
-        """
-        return await self.stuff_shortcut
+        return await get_stuff_amount(self, force=force)
 
 class CraftHistory(BaseModel):
     """Represents a craft done by a user.
@@ -484,12 +499,11 @@ class CraftAccess(BaseModel):
 
             Python: :class:`bool`
         
-        .. collapse:: stuff_shortcut
+        .. collapse:: access_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
-                - :attr:`related_name` ``craft_accesses``
+                - :attr:`related_model` :class:`~taho.database.models.AccessShortcut`
             
             Python: :class:`~taho.database.models.StuffShortcut`
         
@@ -498,22 +512,15 @@ class CraftAccess(BaseModel):
     id: :class:`int`
         The craft access's ID.
     craft: :class:`~taho.database.models.Craft`
+        |coro_attr|
+
         The craft linked to this access.
     have_access: :class:`bool`
         Whether the user/role has access to the craft.
-    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
-        The shortcut to the :class:`~taho.database.models.User`
-        or :class:`~taho.database.models.Role` who has access 
-        to the craft.
-
-
-    .. note::
-
-        In this model, the :attr:`.CraftAccess.stuff_shortcut` is
-        an :class:`~taho.database.models.AccessShortcut` that
-        point to a :class:`~taho.abc.AccessShortcutable` model.
-
-        See :ref:`Shortcuts <shortcut>` for more information.
+    access_shortcut: :class:`~taho.database.models.AccessShortcut`
+        |coro_attr|
+        
+        The shortcut to the entity which has access to the craft.
     """
     class Meta:
         table = "craft_access"
