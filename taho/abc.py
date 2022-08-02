@@ -37,7 +37,6 @@ class StuffShortcutable(Shortcutable):
     - :class:`~taho.database.models.Item`
     - :class:`~taho.database.models.Stat`
     - :class:`~taho.database.models.Currency`
-    - :class:`~taho.database.models.CurrencyAmount`
     - :class:`~taho.database.models.Role`
     - :class:`~taho.database.models.Inventory`
     """
