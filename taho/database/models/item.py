@@ -25,17 +25,19 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
-from taho.enums import ItemType, ItemReason
+from tortoise.validators import MinValueValidator, MaxValueValidator
+from taho.enums import ItemType, ItemRewardType
 from taho.abc import StuffShortcutable
 
 if TYPE_CHECKING:
-    from typing import Any, Iterable, Optional
+    from typing import Any, Iterable, Optional, Union, Dict, List
     from tortoise import BaseDBAsyncClient
 
 __all__ = (
     "Item",
-    "ItemStat",
-    "ItemRole",
+    "ItemRewardPack",
+    "ItemReward",
+    "ItemAccess",
 )
 
 class Item(BaseModel, StuffShortcutable):
@@ -130,22 +132,6 @@ class Item(BaseModel, StuffShortcutable):
             
             Python: Optional[:class:`int`]
         
-        .. collapse:: ammo_id
-
-            Tortoise: :class:`tortoise.fields.IntField`
-
-                - :attr:`null` True
-
-            Python: Optional[:class:`int`]
-        
-        .. collapse:: charger_size
-
-            Tortoise: :class:`tortoise.fields.IntField`
-
-                - :attr:`null` True
-            
-            Python: Optional[:class:`int`]
-        
     Attributes
     -----------
     id: :class:`int`
@@ -164,10 +150,6 @@ class Item(BaseModel, StuffShortcutable):
         The item's durability.
     cooldown: Optional[:class:`int`]
         The item's cooldown.
-    ammo_id: Optional[:class:`int`]
-        The item's ammo ID.
-    charger_size: Optional[:class:`int`]
-        The item's charger size.
     stats: List[:class:`~taho.database.models.ItemStat`]
         |coro_attr|
 
@@ -189,23 +171,20 @@ class Item(BaseModel, StuffShortcutable):
     emoji = fields.CharField(max_length=255, null=True)
     description = fields.TextField(null=True)
     type = fields.IntEnumField(ItemType, default=ItemType.resource)
+
     durability: Optional[int] = fields.IntField(null=True)
     cooldown = fields.IntField(null=True) #TODO typing in fields
-    ammo_id = fields.IntField(null=True)
-    charger_size = fields.IntField(null=True)
 
-    stats: fields.ReverseRelation["ItemStat"]
-    roles: fields.ReverseRelation["ItemRole"]
+    currency = fields.ForeignKeyField('main.Currency', null=True)
 
-
+    accesses: fields.ReverseRelation["ItemAccess"]
+    reward_packs: fields.ReverseRelation["ItemRewardPack"]
     
     def __str__(self) -> str:
         return self.name
 
-
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self._ammo = None
     
     @property
     def dura(self) -> Optional[int]:
@@ -214,20 +193,92 @@ class Item(BaseModel, StuffShortcutable):
         """
         return self.durability
     
-    async def get_ammo(self) -> Optional[Item]:
-        """|coro|
-
-        Returns the item's ammo.
-
+    @property
+    def is_currency(self) -> bool:
+        """
+        :class:`bool`: Whether the item is a currency item.
+        """
+        return self.type == ItemType.currency
+    
+    async def get_rewards(self) -> Dict[ItemRewardType, Dict[float, List[ItemReward]]]:
+        """
+        |coro|
+        
+        Returns the item's rewards.
+        
         Returns
         -------
-        Optional[:class:`~taho.database.models.Item`]
-            The item's ammo if it has one.        
+        :class:`dict`
+            The item's rewards.
+        
+
+        .. note::
+
+            The returned dictionary is of the form::
+
+                {
+                    ItemRewardType.x: {
+                        probability: [
+                            ItemReward(),
+                            ...
+                        ],
+                    },
+                    ...
+                }
+        
         """
-        if not self.ammo_id:
-            return None
-        return await Item.get(id=self.ammo_id)
+        from taho.utils import RandomHash
+
+        rewards = {x: {} for x in ItemRewardType}
+        async for _rewards in self.reward_packs.all().prefetch_related('rewards'):
+
+            reward_list = await _rewards.rewards.all().prefetch_related("stuff_shortcut")
+            rewards[_rewards.type][RandomHash(_rewards.luck)] = reward_list
+        
+        return rewards
     
+    @classmethod
+    async def from_json(cls, data: Dict[str, Any]) -> Item:
+        """
+        |coro|
+        
+        Creates an item from a JSON dictionary.
+        
+        Parameters
+        ----------
+        data: :class:`dict`
+            The JSON dictionary.
+        
+        Returns
+        -------
+        :class:`Item`
+            The item.
+        
+        """
+        from taho.database.models import Cluster, Currency, ItemStat, Role
+
+        
+
+
+        # cluster = await Cluster.get_or_none(id=data['cluster'])
+        # currency = await Currency.get_or_none(id=data['currency']) if 'currency' in data else None
+        # stats = [await ItemStat.from_json(x) for x in data['stats']] if 'stats' in data else []
+        # roles = [await Role.from_json(x) for x in data['roles']] if 'roles' in data else []
+
+        # return cls(
+        #     id=data['id'],
+        #     cluster=cluster,
+        #     name=data['name'],
+        #     emoji=data['emoji'],
+        #     description=data['description'],
+        #     type=ItemType(data['type']),
+        #     durability=data['durability'],
+        #     cooldown=data['cooldown'],
+        #     currency=currency,
+        #     stats=stats,
+        #     roles=roles,
+        # )
+
     async def save(
         self,
         using_db: Optional[BaseDBAsyncClient] = None,
@@ -236,15 +287,7 @@ class Item(BaseModel, StuffShortcutable):
         force_update: bool = False,
     ) -> None:
         if self.type == ItemType.resource:
-            self.ammo_id = None
-            self._ammo = None
-            self.charger_size = None
             self.durability = None
-            self.cooldown = None
-        elif self.type == ItemType.consumable:
-            self.ammo_id = None
-            self._ammo = None
-            self.charger_size = None
             self.cooldown = None
         await super().save(
             using_db=using_db, 
@@ -253,22 +296,27 @@ class Item(BaseModel, StuffShortcutable):
             force_update=force_update
             )
 
-class ItemStat(BaseModel):
-    """Represents an item stat.
+class ItemRewardPack(BaseModel):
+    """
+    Represents a reward pack for an item.
 
     .. container:: operations
 
         .. describe:: x == y
 
-            Checks if two item stats are equal.
+            Checks if two reward packs are equal.
 
         .. describe:: x != y
 
-            Checks if two item stats are not equal.
+            Checks if two reward packs are not equal.
         
         .. describe:: hash(x)
 
-            Returns the item stat's hash.
+            Returns the reward pack's hash.
+        
+        .. describe:: str(x)
+
+            Returns the reward pack's name.
         
     .. container:: fields
 
@@ -285,88 +333,187 @@ class ItemStat(BaseModel):
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.Item`
-                - :attr:`related_name` ``stats``
+                - :attr:`related_name` ``reward_packs``
             
             Python: :class:`~taho.database.models.Item`
         
-        .. collapse:: stat
+        .. collapse:: type
+
+            Tortoise: :class:`tortoise.fields.IntEnumField`
+
+                - :attr:`enum` :class:`~taho.enums.ItemRewardType`
+            
+            Python: :class:`~taho.enums.ItemRewardType`
+        
+        .. collapse:: luck
+
+            Tortoise: :class:`tortoise.fields.DecimalField`
+
+                - :attr:`max_digits` ``1``
+                - :attr:`decimal_places` ``4``
+                - :attr:`default` 1
+            
+            Python: :class:`float`
+    
+    Attributes
+    -----------
+    id: :class:`int`
+        The reward pack's ID.
+    item: :class:`~taho.database.models.Item`
+        |coro_attr|
+
+        The reward pack's item.
+    type: :class:`~taho.enums.ItemRewardType`
+        The item reward's type.
+    luck: :class:`float`
+        The reward pack's luck.
+    rewards: List[:class:`~taho.database.models.ItemReward`]
+        |coro_attr|
+
+        The rewards included in the reward pack.
+    """
+    class Meta:
+        table = "item_reward_packs"
+    
+    id = fields.IntField(pk=True)
+
+    item = fields.ForeignKeyField('main.Item', related_name='reward_packs')
+
+    type = fields.IntEnumField(ItemRewardType)
+
+    luck = fields.FloatField(default=1, validators=[MinValueValidator(0), MaxValueValidator(1)])
+
+    rewards: fields.ReverseRelation["ItemReward"]
+
+class ItemReward(BaseModel):
+    """
+    Represents an item reward.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two item rewards are equal.
+
+        .. describe:: x != y
+
+            Checks if two item rewards are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the item reward's hash.
+        
+        .. describe:: str(x)
+
+            Returns the item reward's name.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+        
+        .. collapse:: pack
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Stat`
-                - :attr:`related_name` ``stats``
+                - :attr:`related_model` :class:`~taho.database.models.ItemRewardPack`
+                - :attr:`related_name` ``rewards``
             
-            Python: :class:`~taho.database.models.Stat`
+            Python: :class:`~taho.database.models.ItemRewardPack`
+        
+        .. collapse:: stuff_shortcut
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.StuffShortcut`
+            
+            Python: :class:`~taho.database.models.StuffShortcut`
+        
+        .. collapse:: regeneration
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` ``False``
+            
+            Python: :class:`bool`
+        
+        .. collapse:: durability
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+                - :attr:`default` ``False``
+            
+            Python: :class:`bool`
         
         .. collapse:: amount
 
-            Tortoise: :class:`tortoise.fields.IntField`
+            Tortoise: :class:`tortoise.fields.DecimalField`
 
-            Python: :class:`int`
-        
-        .. collapse:: type
-
-            Tortoise: :class:`tortoise.fields.IntEnumField`
-
-                - :attr:`enum` :class:`~taho.enums.ItemReason`
-                - :attr:`default` :attr:`taho.enums.ItemReason.item_in_inventory`
+                - :attr:`default` ``1``
+                - :attr:`max_digits` ``10``
+                - :attr:`decimal_places` ``2``
             
-            Python: :class:`~taho.enums.ItemReason`
-        
-        .. collapse:: is_regen
+            Python: :class:`float`
 
-            Tortoise: :class:`tortoise.fields.BooleanField`        
-
-                - :attr:`default` True
-
-            Python: :class:`bool`
-    
     Attributes
     -----------
     id: :class:`int`
-        The item stat's ID.
-    item: :class:`~taho.database.models.Item`
-        |coro_attr|
-
-        The item stat's item.
-    stat: :class:`~taho.database.models.Stat`
-        |coro_attr|
-
-        The item stat's stat.
-    amount: :class:`int`
-        The item stat's amount.
-    type: :class:`~taho.enums.ItemReason`
-        The item stat's type.
-    is_regen: :class:`bool`
-        Whether the item stat is a regeneration stat.
+        The item reward's ID.
+    pack: :class:`~taho.database.models.ItemRewardPack`
+        The item reward's pack.
+    stuff_shortcut: :class:`~taho.database.models.StuffShortcut`
+        The item reward's shortcut.
+    regeneration: :class:`bool`
+        If the shortcut points to a :class:`~taho.database.models.Stat`,
+        then this is whether the stat should be regenerated.
+    durability: :class:`bool`
+        If the shortcut points to a :class:`~taho.database.models.Item`,
+        then this is whether it should add durability to it.
+    amount: :class:`float`
+        The amount of the reward.
     """
     class Meta:
-        table = 'item_stats'
+        table = "item_rewards"
     
     id = fields.IntField(pk=True)
 
-    item = fields.ForeignKeyField('main.Item', related_name='stats')
-    stat =  fields.ForeignKeyField('main.Stat', related_name='stats')
-    amount = fields.IntField()
-    type = fields.IntEnumField(ItemReason, default=ItemReason.item_in_inventory)
-    is_regen = fields.BooleanField(default=True)
+    pack = fields.ForeignKeyField("main.ItemRewardPack", related_name="rewards")
+    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
+    regeneration = fields.BooleanField(default=False)
+    durability = fields.BooleanField(default=False)
+    amount = fields.DecimalField(max_digits=10, decimal_places=2, default=1)
+    
+    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
+        from taho.database.utils import get_stuff # avoid circular import
 
-class ItemRole(BaseModel):
-    """Represents an item role.
+        return await get_stuff(self, force=force)
+    
+    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
+        from taho.database.utils import get_stuff_amount # avoid circular import
+
+        return await get_stuff_amount(self, force=force)
+
+class ItemAccess(BaseModel):
+    """Represents an access to a item.
 
     .. container:: operations
 
         .. describe:: x == y
 
-            Checks if two item roles are equal.
+            Checks if two item accesses are equal.
 
         .. describe:: x != y
 
-            Checks if two item roles are not equal.
+            Checks if two item accesses are not equal.
         
         .. describe:: hash(x)
 
-            Returns the item role's hash.
+            Returns the item access's hash.
         
     .. container:: fields
 
@@ -377,56 +524,50 @@ class ItemRole(BaseModel):
                 - :attr:`pk` True
 
             Python: :class:`int`
-        
+            
         .. collapse:: item
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.Item`
-                - :attr:`related_name` ``roles``
+                - :attr:`related_name` ``accesses``
             
             Python: :class:`~taho.database.models.Item`
         
-        .. collapse:: role
+        .. collapse:: have_access
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+            Python: :class:`bool`
+        
+        .. collapse:: access_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.Role`
-                - :attr:`related_name` ``roles``
+                - :attr:`related_model` :class:`~taho.database.models.AccessShortcut`
             
-            Python: :class:`~taho.database.models.Role`
-        
-        .. collapse:: type
-
-            Tortoise: :class:`tortoise.fields.IntEnumField`
-
-                - :attr:`enum` :class:`~taho.enums.ItemReason`
-                - :attr:`default` :attr:`taho.enums.ItemReason.item_in_inventory`
-            
-            Python: :class:`~taho.enums.ItemReason`
+            Python: :class:`~taho.database.models.StuffShortcut`
         
     Attributes
     -----------
     id: :class:`int`
-        The item role's ID.
+        The item access's ID.
     item: :class:`~taho.database.models.Item`
         |coro_attr|
 
-        The item role's item.
-    role: :class:`~taho.database.models.Role`
+        The item linked to this access.
+    have_access: :class:`bool`
+        Whether the user/role has access to the item.
+    access_shortcut: :class:`~taho.database.models.AccessShortcut`
         |coro_attr|
-
-        The item role's role.
-    type: :class:`~taho.enums.ItemReason`
-        The item role's type.
+        
+        The shortcut to the entity which has access to the item.
     """
     class Meta:
-        table = 'item_roles'
-
+        table = "item_access"
+    
     id = fields.IntField(pk=True)
 
-    item = fields.ForeignKeyField('main.Item', related_name='roles')
-    role = fields.ForeignKeyField('main.Role', related_name='roles')
-    amount = fields.IntField()
-    type = fields.IntEnumField(ItemReason, default=ItemReason.item_in_inventory)
-    
+    item = fields.ForeignKeyField("main.Item", related_name="accesses")
+    have_access = fields.BooleanField()
+    stuff_shortcut = fields.ForeignKeyField("main.AccessShortcut")
