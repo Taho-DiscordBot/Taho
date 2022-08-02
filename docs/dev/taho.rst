@@ -113,6 +113,12 @@ ItemType
 
         The item is a consumable.
     
+    .. attribute:: currency
+        
+        The item is a currency.
+        It's used to represent the currency as
+        cash in users inventories.
+    
 ItemReason
 ~~~~~~~~~~~
 
@@ -163,6 +169,29 @@ ItemUse
     .. attribute:: give
 
         The item is given to the user.
+
+ItemRewardType
+~~~~~~~~~~~~~~~
+
+.. class:: taho.enums.ItemRewardType
+
+    |int_enum|
+
+    The type of a :class:`~taho.database.models.ItemReward`.
+
+    .. attribute:: passive
+    
+        The reward is a passive reward.
+
+    .. attribute:: active
+
+        The reward is an active reward.
+    
+    .. attribute:: equip
+
+        The reward is an equip reward.
+        It's added when the item is equiped
+        to the hotbar.
 
 SalaryCondition
 ~~~~~~~~~~~~~~~~
