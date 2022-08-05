@@ -24,25 +24,27 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.enums import ShortcutableType
+from taho.abc import Shortcutable
+
 
 if TYPE_CHECKING:
-    from ..models import Shortcut
-    from taho.abc import Shortcutable
+    from ..models import Shortcut, BaseModel
     from taho.enums import ShortcutType
 
 
 __all__ = (
     "create_shortcut",
+    "get_shortcut",
 )
 
-async def create_shortcut(type: ShortcutType, model: Shortcutable) -> Shortcut:
+async def create_shortcut(type_: ShortcutType, model: Shortcutable) -> Shortcut:
     """|coro|
 
     Creates a shortcut for the given model.
 
     Parameters
     -----------
-    type: :class:`~taho.enums.ShortcutType`
+    type_: :class:`~taho.enums.ShortcutType`
         The type of the shortcut.
     model: :class:`~taho.abc.Shortcutable`
         The model to create a shortcut for.
@@ -69,10 +71,50 @@ async def create_shortcut(type: ShortcutType, model: Shortcutable) -> Shortcut:
         CurrencyAmount: [ShortcutableType.currency_amount, "currency_amount"],
     }
     data = converters[type(model)]
-    shortcut = await type.value.get_or_create(
+
+    from taho.database.models import shortcut
+
+    shortcut_class = getattr(shortcut, type_.value)
+
+    shortcut = await shortcut_class.get_or_create(
         **{
             "type": data[0],
             data[1]: model,
         }
     )
     return shortcut[0]
+
+
+async def get_shortcut(model: BaseModel, field_name: str) -> Shortcutable:
+    """|coro|
+
+    Gets the shortcut for the given model and field name.
+
+    Parameters
+    -----------
+    model: :class:`~taho.database.models.base.BaseModel`
+        The model to get the shortcut for.
+    field_name: :class:`str`
+        The name of the field to get the shortcut for.
+    
+    Returns
+    --------
+    :class:`~taho.abc.Shortcutable`
+        The shortcut.    
+    """
+    id_name = field_name + "_id"
+    short_name = field_name.replace("_shortcut", "")
+    field_value_name = "_" + short_name
+    if hasattr(model, id_name) and hasattr(model, field_value_name):
+        shortcut = getattr(model, field_value_name)
+        if isinstance(shortcut, Shortcutable):
+            return shortcut
+        else:
+            shortcut = await shortcut.get()
+            setattr(model, field_value_name, shortcut)
+            return shortcut
+    elif hasattr(model, id_name) and not hasattr(model, field_value_name):
+        shortcut: Shortcut = await getattr(model, field_name)
+        shortcut = await shortcut.get()
+        setattr(model, field_value_name, shortcut)
+        return shortcut
