@@ -183,6 +183,8 @@ class FormView(discord.ui.View):
             The interaction of the user.
             Used to send the embed
         """
+        if self.is_finished():
+            return
         self.disable_check()
         
         embed = await self.form.generate_embed()
@@ -468,8 +470,8 @@ class Form:
             if not field.must_appear():
                 continue
             
-            name = f"__**{field.label}**__" if field.is_current else field.label
-            if field.required: 
+            name = f"▶️ __**{field.label}**__" if field.is_current else field.label
+            if field.required:
                 name += " `*`"
 
             embed.add_field(
