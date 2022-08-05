@@ -73,8 +73,6 @@ def show_version() -> None:
     uname = platform.uname()
     entries.append('- system info: {0.system} {0.release} {0.version}'.format(uname))
 
-    print('\n'.join(entries))
-
 
 def core(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
     if args.version:
