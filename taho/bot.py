@@ -27,15 +27,17 @@ from discord.ext import commands
 import discord
 from tortoise import Tortoise
 import os
-from .utils import init_ssh_tunnel, TahoContext
-from .database import init_db
+from .utils import init_ssh_tunnel, TahoContext, register_bot, register_before_invoke
+from .database import init_db, models as db_models
+from .babel import Babel
 from .lazy import lazy_convert
+
 import json
 
 
 if TYPE_CHECKING:
     from sshtunnel import SSHTunnelForwarder
-    from typing import Any
+    from typing import Any, List
 
 __all__ = (
     "Bot",
@@ -56,6 +58,8 @@ class Bot(commands.AutoShardedBot):
         self.config = vars(config)
         self.root_path = os.getcwd()
         self.ssh_server: SSHTunnelForwarder
+        self.registered_servers: List[int] = None
+        self.babel: Babel = None
     
     def start_ssh_server(self):
         # The ssh server is only stared if wanted
@@ -100,7 +104,13 @@ class Bot(commands.AutoShardedBot):
 
         # await self.tree.sync(guild=MY_GUILD)
 
-        # await start_api(self)
+        self.registered_servers = await db_models.Server.all().values_list("id", flat=True)
+
+        babel = Babel(self)
+        babel.load()
+
+        register_bot(self)
+        register_before_invoke(self)
 
     async def on_ready(self):
         duration = (discord.utils.utcnow() - self.uptime).total_seconds()

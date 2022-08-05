@@ -189,10 +189,6 @@ class Babel(object):
 
         self._current_locale = contextvars.ContextVar("_current_locale", default=self.default_locale)
 
-        async def pre(ctx: TahoContext):
-            self.set_current_locale(await ctx.babel_locale())
-        
-        self.bot.before_invoke(pre)
         Babel.default_instance = self
     
 

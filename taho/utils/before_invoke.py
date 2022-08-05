@@ -21,10 +21,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .context import *
-from .db import *
-from .ssh_tunnel_forwarder import *
-from .checks import *
-from .utils_ import *
-from .sequence_matcher import *
-from .before_invoke import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from taho import Bot, TahoContext
+
+__all__ = (
+    "register_before_invoke",
+)
+
+def register_before_invoke(bot: Bot) -> None:
+
+    async def pre(ctx: TahoContext):
+        bot.babel.set_current_locale(await ctx.babel_locale())
+
+        await ctx.init_server()
+    
+    bot.before_invoke(pre)
+    

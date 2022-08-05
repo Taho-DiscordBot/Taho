@@ -130,12 +130,6 @@ def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -
 
     bot = taho.Bot(intents=intents, config=config)
 
-    babel = taho.babel.Babel(bot)
-    babel.load()
-
-
-    taho.utils.register_bot(bot)
-
     try:
         bot.run(config.token)
     except KeyboardInterrupt:
