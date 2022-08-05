@@ -603,13 +603,10 @@ class Cluster(BaseModel):
         :class:`.Cluster`
             The cluster of the guild.
         """
-        from .server import Server # avoid circular import
         try:
-            server = await Server.get(id=guild.id)
+            return await Cluster.get(servers__id=guild.id)
         except t_exceptions.DoesNotExist:
             raise DoesNotExist("The guild is not stored as a Server in the database.")
-        else:
-            return await server.cluster
 
     async def add_guild(self, bot: Bot, guild: discord.Guild, sync_server: bool=True) -> Server:
         """|coro|
