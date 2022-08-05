@@ -93,27 +93,3 @@ async def init_db(config: dict, ssh_tunnel: SSHTunnelForwarder=None, _create_db:
 
     if _create_db:
         await Tortoise.generate_schemas()
-    #print(Tortoise)
-    #conn = Tortoise.get_connection('default')
-    #await conn.execute_script("""
-    #DROP TABLE IF EXISTS guild_clusters CASCADE;
-    #DROP TABLE IF EXISTS guilds CASCADE;
-    #DROP TABLE IF EXISTS users CASCADE;
-    #DROP TABLE IF EXISTS banks CASCADE;
-    #DROP TABLE IF EXISTS guild_infos CASCADE;
-    #DROP TABLE IF EXISTS cluster_infos CASCADE;
-    #DROP TABLE IF EXISTS bank_accounts CASCADE;
-    #DROP TABLE IF EXISTS bank_operations CASCADE;
-    #DROP TABLE IF EXISTS bank_infos CASCADE;
-    #DROP TABLE IF EXISTS items CASCADE;
-    #DROP TABLE IF EXISTS inventories CASCADE;
-    #DROP TABLE IF EXISTS roles CASCADE;
-    #DROP TABLE IF EXISTS stats CASCADE;
-    #DROP TABLE IF EXISTS item_roles CASCADE;
-    #DROP TABLE IF EXISTS item_stats CASCADE;
-    #DROP TABLE IF EXISTS jobs CASCADE;
-    #DROP TABLE IF EXISTS job_rewards CASCADE;
-    #DROP TABLE IF EXISTS npcs CASCADE;
-    #DROP TABLE IF EXISTS npc_roles CASCADE;
-    #DROP TABLE IF EXISTS npc_owners CASCADE;
-    #""")
