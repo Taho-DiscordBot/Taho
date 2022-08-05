@@ -42,6 +42,7 @@ if TYPE_CHECKING:
     from .user import User
     from .bank import Bank
     from .item import Item
+    from .stat import Stat
     from .currency import Currency
     import discord
 
@@ -122,6 +123,10 @@ class Cluster(BaseModel):
         |coro_attr|
 
         The cluster's RP roles.
+    stats: List[:class:`~taho.database.models.Stat`]
+        |coro_attr|
+
+        The cluster's stats.
     """
     class Meta:
         table = "clusters"
@@ -135,6 +140,7 @@ class Cluster(BaseModel):
     users: fields.ReverseRelation["User"]
     banks: fields.ReverseRelation["Bank"]
     items: fields.ReverseRelation["Item"]
+    stats: fields.ReverseRelation["Stat"]
     roles: fields.ReverseRelation["Role"]
 
     async def __aiter__(self) -> AsyncGenerator[Server]:
