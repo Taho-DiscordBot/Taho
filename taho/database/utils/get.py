@@ -33,7 +33,7 @@ from taho.enums import ShortcutableType
 if TYPE_CHECKING:
     from ..models import Server, Cluster, Currency, User
     from taho import Bot
-    from typing import List, Optional, Union
+    from typing import List, Optional, Union, Tuple
     import discord
 
 __all__ = (
@@ -120,6 +120,8 @@ async def new_server(bot: Bot, guild: discord.Guild, *fetch_related: List[str]) 
 
     if fetch_related:
         await server.fetch_related(*fetch_related)
+    
+    bot.registered_servers.append(guild.id)
 
     return server
 
@@ -215,20 +217,35 @@ async def get_stuff_amount(stuff: StuffShortcut, amount: float, force: bool = ..
 async def get_stuff_amount(stuff: StuffShortcutable, amount: float, force: bool = ...) -> Union[int, float]:
     ...
 
+@overload
+async def get_stuff_amount(stuff: StuffShortcut, min_amount: float, max_amount: float, force: bool = ...) -> Tuple[Union[int, float]]:
+    ...
+
+@overload
+async def get_stuff_amount(stuff: StuffShortcutable, min_amount: float, max_amount: float, force: bool = ...) -> Tuple[Union[int, float]]:
+    ...
+
 async def get_stuff_amount(
     model: Optional[BaseModel] = None,
     stuff: Optional[Union[StuffShortcut, StuffShortcutable]] = None, 
-    amount: Optional[float] = None,
+    amount: float = None, 
+    min_amount: float = None, 
+    max_amount: float = None, 
     force: bool = False
-    ) -> Union[int, float]:
+    ) -> Union[int, float, Tuple[Union[int, float]]]:
     """|coro|
 
     Get the real amount of stuff.
 
     If ``model`` is not ``None`` then ``stuff`` and
-    ``amount`` are ignored.
+    ``amount``/``min_amount``/``max_amount`` are ignored.
 
     ``stuff`` or ``model`` are required, but not both.
+
+    ``amount`` or ``min_amount``/``max_amount`` are required, but not both.
+
+    If ``min_amount`` is not ``None`` and ``max_amount`` is ``None``,
+    then ``min_amount`` is considered to be the amount.
 
     Parameters
     -----------
@@ -236,8 +253,12 @@ async def get_stuff_amount(
         The model to get the stuff amount for.
     stuff: Union[:class:`~taho.database.models.StuffShortcut`, :class:`~taho.abc.StuffShortcutable`]
         The stuff to get the amount for.
-    amount: :class:`int`
+    amount: :class:`float`
         The amount of stuff.
+    min_amount: :class:`float`
+        The minimum amount of stuff.
+    max_amount: :class:`float`
+        The maximum amount of stuff.
     force: :class:`bool`
         Whether to force the retrieval of the amount
         from the DB.
@@ -249,16 +270,32 @@ async def get_stuff_amount(
     TypeError
         If both ``model`` and ``stuff`` are ``None``,
         or if they are both not ``None``.
+        If ``amount`` and ``min_amount``/``max_amount``
+        are ``None``, or if they are both not ``None``.
 
     Returns
     --------
-    Union[int, float]
+    Union[Union[:class:`int`, :class:`float`], Tuple[Union[:class:`int`, :class:`float`]]]
         The real amount of stuff.
+
+        If ``amount`` is not ``None``, then the returned type
+        is Union[:class:`int`, :class:`float`].
+
+        If ``min_amount`` and ``max_amount`` are not ``None``,
+        then the returned type is Tuple[Union[:class:`int`, :class:`float`]].
     """
     if model and stuff:
         raise TypeError("Only one of model and stuff can be specified.")
     elif not model and not stuff:
         raise TypeError("Either model or stuff must be specified.")
+    elif amount and (min_amount or max_amount):
+        raise TypeError("Either amount, or min_amount and max_amount, can be specified.")
+    elif not amount and (not min_amount or not max_amount):
+        raise TypeError("Either amount, or min_amount and max_amount, must be specified.")
+    
+    if min_amount and max_amount is None:
+        amount = min_amount
+        min_amount = None
     
     if model:
         if hasattr(model, "_amount") and not force:
@@ -267,7 +304,17 @@ async def get_stuff_amount(
             stuff = model._stuff
         else:
             stuff = model.stuff_shortcut
-        value = await get_stuff_amount(stuff=stuff, amount=model.amount)
+        
+        if "amount" in model._meta.db_fields:
+            params = {
+                "amount": model.amount
+            }
+        elif "min_amount" in model._meta.db_fields and "max_amount" in model._meta.db_fields:
+            params = {
+                "min_amount": model.min_amount,
+                "max_amount": model.max_amount
+            }
+        value = await get_stuff_amount(stuff=stuff, **params)
         setattr(model, "_amount", value)
         return value
         
@@ -278,11 +325,11 @@ async def get_stuff_amount(
 
     if stuff.type == TYPE.currency or \
         (stuff.type == TYPE.inventory and (await stuff).is_cash == True):
-        return amount
+        return amount if amount is not None else min_amount, max_amount
     elif stuff.type == TYPE.role:
         return 1
     else:
-        return round(amount)
+        return int(amount) if amount is not None else int(min_amount), int(max_amount)
 
 async def get_stuff(model: BaseModel, force: bool = False) -> StuffShortcutable:
     """|coro|
