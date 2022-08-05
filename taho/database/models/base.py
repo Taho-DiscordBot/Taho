@@ -32,6 +32,17 @@ class BaseModel(Model):
     class Meta:
         abstract = True
     
+    def get_fields(self) -> List[dict]:
+        desc = self.describe(serializable=True)
+        return [
+            field
+            for field in chain(
+                desc.get("data_fields", []),
+                desc.get("fk_fields", []),
+                desc.get("o2o_fields", []),
+            )
+        ]
+    
     def __eq__(self, other: object) -> bool:
         return super().__eq__(other)
     
