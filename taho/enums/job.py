@@ -25,7 +25,6 @@ from enum import IntEnum
 
 __all__ = (
     "SalaryCondition",
-    "RewardType",
 )
 
 class SalaryCondition(IntEnum):
@@ -37,11 +36,3 @@ class SalaryCondition(IntEnum):
     every_day_if_worked = 2
     every_week = 3
     every_week_if_worked = 4
-
-class RewardType(IntEnum):
-    """
-    Represents the reward types of a job.
-    """
-    money = 0
-    item = 1
-    stat = 2
