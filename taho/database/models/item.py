@@ -25,12 +25,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
-from tortoise.validators import MinValueValidator, MaxValueValidator
-from taho.enums import ItemType, ItemRewardType
+from tortoise.exceptions import ValidationError
+from taho.enums import ItemType, RewardType
 from taho.abc import StuffShortcutable
+from .reward import RewardPack, Reward
 
 if TYPE_CHECKING:
-    from typing import Any, Iterable, Optional, Union, Dict, List
+    from typing import Any, Iterable, Optional, Dict, List
     from tortoise import BaseDBAsyncClient
 
 __all__ = (
@@ -200,7 +201,7 @@ class Item(BaseModel, StuffShortcutable):
         """
         return self.type == ItemType.currency
     
-    async def get_rewards(self) -> Dict[ItemRewardType, Dict[float, List[ItemReward]]]:
+    async def get_rewards(self) -> Dict[RewardType, Dict[float, List[ItemReward]]]:
         """
         |coro|
         
@@ -217,7 +218,7 @@ class Item(BaseModel, StuffShortcutable):
             The returned dictionary is of the form::
 
                 {
-                    ItemRewardType.x: {
+                    RewardType.x: {
                         probability: [
                             ItemReward(),
                             ...
@@ -229,7 +230,7 @@ class Item(BaseModel, StuffShortcutable):
         """
         from taho.utils import RandomHash
 
-        rewards = {x: {} for x in ItemRewardType}
+        rewards = {x: {} for x in RewardType}
         async for _rewards in self.reward_packs.all().prefetch_related('rewards'):
 
             reward_list = await _rewards.rewards.all().prefetch_related("stuff_shortcut")
@@ -296,7 +297,16 @@ class Item(BaseModel, StuffShortcutable):
             force_update=force_update
             )
 
-class ItemRewardPack(BaseModel):
+
+def validate_item_reward_type(value:RewardType):
+    if value not in (
+        RewardType.passive,
+        RewardType.active,
+        RewardType.equip,
+    ):
+        raise ValidationError("Invalid reward type")
+
+class ItemRewardPack(RewardPack):
     """
     Represents a reward pack for an item.
 
@@ -341,9 +351,9 @@ class ItemRewardPack(BaseModel):
 
             Tortoise: :class:`tortoise.fields.IntEnumField`
 
-                - :attr:`enum` :class:`~taho.enums.ItemRewardType`
+                - :attr:`enum` :class:`~taho.enums.RewardType`
             
-            Python: :class:`~taho.enums.ItemRewardType`
+            Python: :class:`~taho.enums.RewardType`
         
         .. collapse:: luck
 
@@ -359,15 +369,15 @@ class ItemRewardPack(BaseModel):
     -----------
     id: :class:`int`
         The reward pack's ID.
-    item: :class:`~taho.database.models.Item`
+    item: :class:`.Item`
         |coro_attr|
 
         The reward pack's item.
-    type: :class:`~taho.enums.ItemRewardType`
+    type: :class:`~taho.enums.RewardType`
         The item reward's type.
     luck: :class:`float`
         The reward pack's luck.
-    rewards: List[:class:`~taho.database.models.ItemReward`]
+    rewards: List[:class:`.ItemReward`]
         |coro_attr|
 
         The rewards included in the reward pack.
@@ -375,17 +385,14 @@ class ItemRewardPack(BaseModel):
     class Meta:
         table = "item_reward_packs"
     
-    id = fields.IntField(pk=True)
 
     item = fields.ForeignKeyField('main.Item', related_name='reward_packs')
 
-    type = fields.IntEnumField(ItemRewardType)
-
-    luck = fields.FloatField(default=1, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    type = fields.IntEnumField(RewardType, validators=[validate_item_reward_type])
 
     rewards: fields.ReverseRelation["ItemReward"]
 
-class ItemReward(BaseModel):
+class ItemReward(Reward):
     """
     Represents an item reward.
 
@@ -480,23 +487,7 @@ class ItemReward(BaseModel):
     class Meta:
         table = "item_rewards"
     
-    id = fields.IntField(pk=True)
-
     pack = fields.ForeignKeyField("main.ItemRewardPack", related_name="rewards")
-    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
-    regeneration = fields.BooleanField(default=False)
-    durability = fields.BooleanField(default=False)
-    amount = fields.DecimalField(max_digits=10, decimal_places=2, default=1)
-    
-    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
-        from taho.database.utils import get_stuff # avoid circular import
-
-        return await get_stuff(self, force=force)
-    
-    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
-        from taho.database.utils import get_stuff_amount # avoid circular import
-
-        return await get_stuff_amount(self, force=force)
 
 class ItemAccess(BaseModel):
     """Represents an access to a item.
