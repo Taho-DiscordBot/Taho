@@ -170,10 +170,10 @@ ItemUse
 
         The item is given to the user.
 
-ItemRewardType
+RewardType
 ~~~~~~~~~~~~~~~
 
-.. class:: taho.enums.ItemRewardType
+.. class:: taho.enums.RewardType
 
     |int_enum|
 
