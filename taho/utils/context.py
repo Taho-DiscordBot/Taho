@@ -132,3 +132,11 @@ class TahoContext(commands.Context):
 
         return self.user
 
+    async def init_server(self) -> None:
+        """|coro|
+        
+        Initialize the server in the DB
+        if it does not exist.
+        """
+        if not self.guild.id in self.bot.registered_servers:
+            await self.get_server()
