@@ -317,7 +317,7 @@ class Access(Field):
             **kwargs)
         
     async def get_accessible_list(self, interaction: Interaction) -> None:
-        cluster = await super().get_cluster(interaction)
+        cluster = await self.get_cluster(interaction)
 
         # users = await cluster.get_users_by_name(interaction.client)
         # users = [[name, user] for name, user in users.items()]
