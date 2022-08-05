@@ -294,18 +294,12 @@ class Bank(BaseModel):
         # if not default_user:
         default_user = await db_utils.get_default_user(self.cluster_id)
         default_currency = await db_utils.get_default_currency(self.cluster_id)
-        owner_shorcut = db_utils.create_shortcut(ShortcutType.owner, default_user)
-        # if force_create:
+        
         return await BankAccount.create(
             bank=self, 
-            owner_shorcut=owner_shorcut,
+            owner=default_user,
             currency=default_currency,
             )
-        # try:
-        #     await self._get_default_account(default_user=default_user)
-        #     raise AlreadyExists("Default account already exists.")
-        # except DoesNotExist:
-        #     return await BankAccount.create(bank=self, user=default_user)
     
     async def _get_default_account(self, default_user: User=None, force_get: bool=False) -> BankAccount:
         """|coro|
