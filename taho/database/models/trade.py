@@ -205,7 +205,7 @@ class TradeStuff(BaseModel):
             
             Python: :class:`taho.database.models.Trade`
         
-        .. collapse:: stuff
+        .. collapse:: stuff_shortcut
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
@@ -237,4 +237,4 @@ class TradeStuff(BaseModel):
     id = fields.IntField(pk=True)
 
     trade = fields.ForeignKeyField("main.Trade", related_name="stuff")
-    stuff = fields.ForeignKeyField("main.TradeStuffShortcut")
+    stuff_shortcut = fields.ForeignKeyField("main.TradeStuffShortcut")

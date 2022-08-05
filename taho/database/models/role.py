@@ -248,6 +248,7 @@ class ServerRole(BaseModel):
         :class:`int`: Shortcut for :attr:`.discord_role_id`.
         """
         return self.discord_role_id
+
     
     async def get_guild(self, bot: Bot) -> discord.Guild:
         """|coro|
@@ -267,7 +268,6 @@ class ServerRole(BaseModel):
         """
         return bot.get_guild(self.server_id)
         
-
     async def get_role(self, bot: Bot) -> discord.Role:
         """
         Get the :class:`discord.Role` object for this role in the guild.
