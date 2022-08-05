@@ -173,25 +173,31 @@ async def setup_db_test(bot: Bot) -> List[str]:
     guilds: List[discord.Guild] = data["guilds"]
     members: List[int] = data["users"]
     roles: List[List[discord.Role]] = data["roles"]
-    
+
     # Clear data
     for guild in guilds:
         try:
             cluster = await Cluster.from_guild(guild)
-            await cluster.delete()
         except DoesNotExist:
             continue
-    
+        else:
+            await cluster.delete()
+
     # Create new data
     clusters: List[Cluster] = [
         await Cluster.create(name="Cluster A"),
         await Cluster.create(name="Cluster B"),
     ]
+
     servers: List[Server] = [
         await Server.create(cluster=clusters[0], id=guilds[0].id),
         await Server.create(cluster=clusters[0], id=guilds[1].id),
         await Server.create(cluster=clusters[1], id=guilds[2].id),
     ]
+
+    for g in guilds:
+        bot.registered_servers.append(g.id)
+
     users: List[User] = [
         await User.create(cluster=clusters[0], user_id=members[0]),
         await User.create(cluster=clusters[0], user_id=members[1]),
@@ -220,41 +226,30 @@ async def setup_db_test(bot: Bot) -> List[str]:
         await clusters[1].create_role(RoleType.other, *[roles[2][1]]),
     ]
     
-
-    # items_data = [
-    #     {
-    #         "name": "Item 1",
-    #         "emoji": Emoji(bot, "💎"),
-    #         "description": "This is an item",
-    #         "type": ItemType.resource,
-    #     },
-    #     {
-    #         "name": "Item 2",
-    #         "type": ItemType.consumable,
-    #         "durability": 5,
-    #         "cooldown": 5
-    #     },
-    #     {
-    #         "name": "Item 3",
-    #         "type": ItemType.consumable,
-    #         "durability": 5,
-    #     }
-    # ]
-    # items = []
-    # for cluster in clusters:
-    #     for item_data in items_data:
-    #         item = await cluster.create_item(**item_data)
-    #         items.append(item)
-            
-    # items[0].edit(name="Item 1 edited")
-    # items[2].ammo_id = items[0].id
-    # items[2].charger_size = -1
-    # await items[2].save()
-    # items[5].ammo_id = items[3].id
-    # items[5].charger_size = 5
-    # await items[5].save()
-    
-
+    items_data = [
+        {
+            "name": "Item 1",
+            "emoji": Emoji(bot, "💎"),
+            "description": "This is an item",
+            "type": ItemType.resource,
+        },
+        {
+            "name": "Item 2",
+            "type": ItemType.consumable,
+            "durability": 5,
+            "cooldown": 5
+        },
+        {
+            "name": "Item 3",
+            "type": ItemType.consumable,
+            "durability": 5,
+        }
+    ]
+    items = []
+    for cluster in clusters:
+        for item_data in items_data:
+            item = await cluster.create_item(**item_data)
+            items.append(item)
 
 
     return None
