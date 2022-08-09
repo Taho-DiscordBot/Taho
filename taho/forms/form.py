@@ -305,7 +305,7 @@ class FormView(discord.ui.View):
         row=1
     )
     async def respond(self, interaction: discord.Interaction, _) -> None:
-        await self._respond()
+        await self._respond(interaction)
     
     
     @discord.ui.button(
