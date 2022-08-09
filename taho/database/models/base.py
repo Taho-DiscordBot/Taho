@@ -57,8 +57,9 @@ class BaseModel(Model):
     class Meta:
         abstract = True
     
-    def get_fields(self) -> List[dict]:
-        desc = self.describe(serializable=True)
+    @classmethod
+    def get_fields(cls) -> List[dict]:
+        desc = cls.describe(serializable=True)
         return [
             field
             for field in chain(
