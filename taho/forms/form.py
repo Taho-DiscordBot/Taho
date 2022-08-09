@@ -418,24 +418,30 @@ class Form:
         
         self.__stopped: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
         
-    async def send(self, ctx: TahoContext) -> None:
+    async def send(self, ctx: TahoContext = None, interaction: discord.Interaction = None) -> None:
         """|coro|
         
         Send the form to the user.
 
         Parameters
         -----------
-        ctx: :class:`~taho.TahoContext`
+        ctx: Optional[:class:`~taho.TahoContext`]
             The context of the command.
+            Used to send the form.
+        interaction: Optional[:class:`discord.Interaction`]
+            The interaction of the user.
             Used to send the form.
         """
         view = await self.generate_view()
         embed = await self.generate_embed()
-        msg = await ctx.send(embed=embed, view=view)
+        if ctx:
+            msg = await ctx.send(embed=embed, view=view)
 
-        self.message = msg
-
-    
+            self.message = msg
+        elif interaction:
+            await interaction.response.send_message(embed=embed, view=view)
+            self.message = await interaction.original_message()
+            
     async def generate_embed(self, canceled: bool = False, finished: bool = False) -> discord.Embed:
         """|coro|
 
