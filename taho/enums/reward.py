@@ -25,10 +25,39 @@ from enum import IntEnum
 
 __all__ = (
     "RewardType",
+    "get_reward_type_text",
 )
 
 class RewardType(IntEnum):
     passive = 0
     active = 1
     equip = 2
-    none = 3
+
+def get_reward_type_text(reward_type: RewardType) -> str:
+    """
+    Get the text of a reward type.
+
+    Parameters
+    -----------
+    reward_type: :class:`.RewardType`
+        The reward type.
+    
+    Raises
+    -------
+    ValueError
+        If the reward type is invalid.
+    
+    Returns
+    --------
+    :class:`str`
+        The text of the reward type.
+    """
+    from taho.babel import _
+
+    texts = {
+        RewardType.passive: _("Passive (when owned)"),
+        RewardType.active: _("Active (when used)"),
+        RewardType.equip: _("Equip (when equipped to the hotbar)"),
+
+    }
+    return texts[reward_type]
