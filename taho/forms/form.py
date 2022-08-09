@@ -190,7 +190,7 @@ class FormView(discord.ui.View):
         embed = await self.form.generate_embed()
 
         if interaction.response.is_done():
-            # original = await interaction.original_message()
+            # original = await interaction.original_response()
             # await original.edit(content=None, embed=embed, view=self)
             await self.form.message.edit(content=None, embed=embed, view=self)
         else:
@@ -440,7 +440,7 @@ class Form:
             self.message = msg
         elif interaction:
             await interaction.response.send_message(embed=embed, view=view)
-            self.message = await interaction.original_message()
+            self.message = await interaction.original_response()
             
     async def generate_embed(self, canceled: bool = False, finished: bool = False) -> discord.Embed:
         """|coro|
