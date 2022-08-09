@@ -28,7 +28,7 @@ from typing import TYPE_CHECKING, overload
 from taho.emoji import Emoji
 
 if TYPE_CHECKING:
-    from typing import TypeVar, Union
+    from typing import TypeVar, Union, Optional
     T = TypeVar('T')
 
 __all__ = (
@@ -43,7 +43,7 @@ __all__ = (
     "forbidden_value",
 )
 
-async def required(value: T) -> bool:
+async def required(value: T, value_name: Optional[str] = None, absolute: bool = True) -> bool:
     """|coro|
 
     Check if the value is not ``None``.
@@ -52,6 +52,16 @@ async def required(value: T) -> bool:
     -----------
     value:
         The value to check.
+    value_name: Optional[:class:`str`]
+        The name of the value.
+        Used to generate the error message.
+    absolute: :class:`bool`
+        If ``True``, the value must be ``not None``.
+        If ``False``, the value must be ``True`` to the ``not``
+        condition.
+        Example: 
+        - 0 will raise an error if ``absolute`` is ``False`` because ``not 0 == True``.
+        - 0 will not raise an error if ``absolute`` is ``True`` because ```0 is None == False``.
 
     Raises
     -------
@@ -64,10 +74,15 @@ async def required(value: T) -> bool:
         ``True`` if the value is not ``None``.
     """
     
-    if value is None:
-        raise ValidationException(
-            _("The value is required.")
-        )
+    if (absolute and value is None) or (not absolute and not value):
+        if value_name:
+            raise ValidationException(
+                _("The value **%(value_name)s** is required.", value_name=value_name)
+            )
+        else:
+            raise ValidationException(
+                _("The value is required.")
+            )
             
     return True
 
