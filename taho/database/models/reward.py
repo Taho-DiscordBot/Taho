@@ -27,10 +27,11 @@ from .base import BaseModel
 from tortoise import fields
 from tortoise.validators import MinValueValidator, MaxValueValidator
 from taho.enums import RewardType
-from taho.abc import StuffShortcutable
 
 if TYPE_CHECKING:
     from typing import Union, Tuple
+    from taho.abc import StuffShortcutable
+    from taho.utils import AbstractReward, AbstractRewardPack
 
 __all__ = (
     "RewardPack",
@@ -110,6 +111,23 @@ class RewardPack(BaseModel):
     luck = fields.FloatField(default=1, validators=[MinValueValidator(0), MaxValueValidator(1)])
 
     rewards: fields.ReverseRelation["Reward"]
+
+    async def to_abstract(self) -> AbstractRewardPack:
+        """|coro|
+
+        Returns the reward pack as an abstract reward pack.
+
+        Returns
+        --------
+        :class:`~taho.utils.AbstractRewardPack`
+            The abstract reward pack.
+        """
+        return AbstractRewardPack(
+            id=self.id,
+            type=self.type,
+            luck=self.luck,
+            rewards=[await reward.to_abstract() async for reward in self.rewards]
+        )
 
 class Reward(BaseModel):
     """
@@ -249,3 +267,21 @@ class Reward(BaseModel):
             return self._amount
 
         return amount
+    
+    async def to_abstract(self) -> AbstractReward:
+        """|coro|
+
+        Returns the reward as an abstract reward.
+
+        Returns
+        --------
+        :class:`~taho.utils.AbstractReward`
+            The abstract reward.
+        """
+        return AbstractReward(
+            stuff=await self.stuff,
+            regeneration=self.regeneration,
+            durability=self.durability,
+            min_amount=self.min_amount,
+            max_amount=self.max_amount
+        )
