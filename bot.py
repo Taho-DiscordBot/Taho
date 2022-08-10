@@ -31,6 +31,7 @@ import os
 import sys
 import platform
 import logging
+import logging.handlers
 
 if TYPE_CHECKING:
     from typing import Tuple
@@ -49,15 +50,20 @@ logger_tortoise.setLevel(logging.DEBUG)
 logger_tortoise.addHandler(sh)
 
 # Discord.py logger
-logger_discord = logging.getLogger('discord')
-logger_discord.setLevel(logging.DEBUG)
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
 logging.getLogger('discord.http').setLevel(logging.INFO)
 
-handler = logging.FileHandler(filename='logs/discord.log', encoding='utf-8', mode='w')
+handler = logging.handlers.RotatingFileHandler(
+    filename='logs/discord.log',
+    encoding='utf-8',
+    maxBytes=32 * 1024 * 1024,  # 32 MiB
+    backupCount=5,  # Rotate through 5 files
+)
 dt_fmt = '%Y-%m-%d %H:%M:%S'
 formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
 handler.setFormatter(formatter)
-logger_discord.addHandler(handler)
+logger.addHandler(handler)
 
 
 def show_version() -> None:
@@ -131,7 +137,7 @@ def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -
     bot = taho.Bot(intents=intents, config=config)
 
     try:
-        bot.run(config.token)
+        bot.run(config.token, log_handler=None)
     except KeyboardInterrupt:
         pass
     bot.stop_ssh_server()
