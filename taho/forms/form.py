@@ -166,6 +166,10 @@ class FormView(discord.ui.View):
                 value=field.name
             ) for field in self.form.fields if field.must_appear()
         ]
+        if len(self.go_to.options) > 2 and not self.go_to in self.children:
+            self.add_item(self.go_to)
+        elif len(self.go_to.options) <= 2:
+            self.remove_item(self.go_to)
     
     async def refresh(self, interaction: discord.Interaction) -> None:
         """|coro|
@@ -364,6 +368,7 @@ class FormView(discord.ui.View):
         
         embed = await self.form.generate_embed(canceled=True)
 
+
         if interaction:
             await interaction.response.edit_message(embed=embed, view=None)
         elif message:
@@ -418,7 +423,7 @@ class Form:
         
         self.__stopped: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
         
-    async def send(self, ctx: TahoContext = None, interaction: discord.Interaction = None) -> None:
+    async def send(self, ctx: TahoContext = None, interaction: discord.Interaction = None, ephemeral: bool = False) -> None:
         """|coro|
         
         Send the form to the user.
@@ -431,15 +436,18 @@ class Form:
         interaction: Optional[:class:`discord.Interaction`]
             The interaction of the user.
             Used to send the form.
+        ephemeral: :class:`bool`
+            Whether the form should be sent as an ephemeral message.
+            Default to ``False``.
         """
         view = await self.generate_view()
         embed = await self.generate_embed()
         if ctx:
-            msg = await ctx.send(embed=embed, view=view)
+            msg = await ctx.send(embed=embed, view=view, ephemeral=ephemeral)
 
             self.message = msg
         elif interaction:
-            await interaction.response.send_message(embed=embed, view=view)
+            await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
             self.message = await interaction.original_response()
             
     async def generate_embed(self, canceled: bool = False, finished: bool = False) -> discord.Embed:
@@ -551,6 +559,19 @@ class Form:
         """
         if not self.__stopped.done():
             self.__stopped.set_result(cancel)
+        
+    def is_canceled(self) -> Optional[bool]:
+        """
+        Check if the form is canceled.
+
+        Returns
+        --------
+        :class:`bool`
+            Whether the form is canceled or not.
+        """
+        if not self.__stopped.done():
+            return None
+        return self.__stopped.result()
 
 
     def to_dict(self) -> dict:
