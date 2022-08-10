@@ -88,7 +88,7 @@ class Domain(object):
             cache[str(locale), self.domain] = translations
             return translations
     
-    def gettext(self, string:str, **variables):
+    def gettext(self, string:str, locale: Locale=None, **variables):
         """Translates a string with the current locale and passes in the
         given keyword arguments as mboting to a string formatting string.
 
@@ -97,7 +97,20 @@ class Domain(object):
             gettext(u'Hello World!')
             gettext(u'Hello %(name)s!', name='World')
         """
-        t = self.get_translations()
+        t = self.get_translations(locale=locale)
+        s = t.ugettext(string)
+        return s if not variables else s % variables
+    
+    async def discord_gettext(self, string:str, locale: Locale=None, **variables):
+        """Translates a string with the current locale and passes in the
+        given keyword arguments as mboting to a string formatting string.
+
+        ::
+
+            gettext(u'Hello World!')
+            gettext(u'Hello %(name)s!', name='World')
+        """
+        t = self.get_translations(locale=locale)
         s = t.ugettext(string)
         return s if not variables else s % variables
 
@@ -279,6 +292,18 @@ def gettext(string, **variables):
         gettext(u'Hello %(name)s!', name='World')
     """
     return get_domain().gettext(string, **variables)
+
+async def discord_translator_gettext(string, locale: Locale = None, **variables):
+    """Translates a string with the current locale and passes in the
+    given keyword arguments as mboting to a string formatting string.
+
+    ::
+
+        gettext(u'Hello World!')
+        gettext(u'Hello %(name)s!', name='World')
+    """
+    return await get_domain().discord_gettext(string, locale=locale, **variables)
+
 _ = gettext
 
 def ngettext(singular, plural, num, **variables):
