@@ -30,6 +30,7 @@ config.py
 *.code-workspace
 .vscode/
 .env/
+.venv/
 *.mo
 *.test
 logs/
