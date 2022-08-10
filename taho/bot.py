@@ -27,7 +27,7 @@ from discord.ext import commands
 import discord
 from tortoise import Tortoise
 import os
-from .utils import init_ssh_tunnel, TahoContext, register_bot, register_before_invoke
+from .utils import init_ssh_tunnel, TahoContext, register_bot, register_before_invoke, TahoTranslator
 from .database import init_db, models as db_models
 from .babel import Babel
 from .lazy import lazy_convert
@@ -115,6 +115,8 @@ class Bot(commands.AutoShardedBot):
         register_before_invoke(self)
 
         if self.sync_tree or self.config.get("DEBUG", False):
+
+            await self.tree.set_translator(TahoTranslator())
 
             if self.config.get("DEBUG", False):
                 print("DEBUG is enabled, syncing the tree to the test guilds...")
