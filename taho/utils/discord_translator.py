@@ -21,12 +21,31 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .context import *
-from .db import *
-from .ssh_tunnel_forwarder import *
-from .checks import *
-from .utils_ import *
-from .sequence_matcher import *
-from .before_invoke import *
-from .abstract_rewards import *
-from .discord_translator import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from discord.app_commands import Translator
+from taho.babel import discord_translator_gettext
+from babel import Locale
+
+
+if TYPE_CHECKING:
+    from discord.app_commands import locale_str, TranslationContext
+    from discord import Locale as DiscordLocale
+    from typing import Optional
+
+__all__ = (
+    "TahoTranslator",
+)
+
+class TahoTranslator(Translator):
+    async def translate(
+        self, 
+        string: locale_str, 
+        locale: DiscordLocale, 
+        context: TranslationContext
+        ) -> Optional[str]:
+        locale = Locale.parse(locale.value, sep="-")
+        
+        translation = await discord_translator_gettext(string.message, locale=locale)
+        
+        return translation if translation != string.message else None
