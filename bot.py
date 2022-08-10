@@ -134,7 +134,7 @@ def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -
     intents.message_content = True
     intents.members = True
 
-    bot = taho.Bot(intents=intents, config=config)
+    bot = taho.Bot(intents=intents, config=config, sync_tree=args.sync_tree)
 
     try:
         bot.run(config.token, log_handler=None)
@@ -154,6 +154,13 @@ def add_compile_babel_args(subparser: argparse._SubParsersAction[argparse.Argume
 def add_start_args(subparser: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparser.add_parser('start', help='Start the bot')
     parser.set_defaults(func=start)
+
+    parser.add_argument(
+        '--sync_tree', 
+        help='whether to sync the CommandTree on bot start, use it when you change a command, or a translation', 
+        action='store_true',
+        dest='sync_tree',
+        )
 
 
 def parse_args() -> Tuple[argparse.ArgumentParser, argparse.Namespace]:

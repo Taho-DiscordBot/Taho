@@ -52,10 +52,16 @@ def override_json() -> None:
     discord.utils._to_json = _to_json
 
 class Bot(commands.AutoShardedBot):
-    def __init__(self, intents: discord.Intents, config, **kwargs):
+    def __init__(
+        self, 
+        intents: discord.Intents, 
+        config, 
+        sync_tree: bool = False,
+        **kwargs):
         super().__init__(command_prefix=commands.when_mentioned_or('!'), intents=intents, **kwargs)
         self.uptime = discord.utils.utcnow()
         self.config = vars(config)
+        self.sync_tree = sync_tree
         self.root_path = os.getcwd()
         self.ssh_server: SSHTunnelForwarder
         self.registered_servers: List[int] = None
@@ -98,11 +104,7 @@ class Bot(commands.AutoShardedBot):
         print("Database successfully connected")
 
 
-        MY_GUILD = discord.Object(724535633283907639)
-
-        self.tree.copy_global_to(guild=MY_GUILD)
-
-        # await self.tree.sync(guild=MY_GUILD)
+        
 
         self.registered_servers = await db_models.Server.all().values_list("id", flat=True)
 
@@ -111,6 +113,32 @@ class Bot(commands.AutoShardedBot):
 
         register_bot(self)
         register_before_invoke(self)
+
+        if self.sync_tree or self.config.get("DEBUG", False):
+
+            if self.config.get("DEBUG", False):
+                print("DEBUG is enabled, syncing the tree to the test guilds...")
+                guilds = [
+                    discord.Object(guild_id) for guild_id in self.config.get("TEST_GUILDS", [])
+                ]
+
+                for guild in guilds:
+
+                    self.tree.copy_global_to(guild=guild)
+
+                    await self.tree.sync(guild=guild)
+
+                    print(f"Synced the tree to {guild.id}")
+                
+                
+            else:
+                print("Syncing the tree to all guilds...")
+                await self.tree.sync()
+            
+            print("Tree successfully synced")
+
+
+            
 
     async def on_ready(self):
         duration = (discord.utils.utcnow() - self.uptime).total_seconds()
