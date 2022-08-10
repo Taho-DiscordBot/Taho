@@ -95,6 +95,7 @@ def update_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=
         "lazy_gettext",
         "lazy_ngettext",
         "lazy_pgettext",
+        "_d",
 
     )
     command = "pybabel extract -o translations/messages.pot . "
