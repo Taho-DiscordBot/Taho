@@ -295,7 +295,6 @@ class FieldModal(Modal):
         self.field = field
         self.default = default
 
-
     async def on_submit(self, interaction: Interaction) -> None:
         """|coro|
 
@@ -341,7 +340,6 @@ class FieldView(View):
 
         self.field = field
         self.default = default
-
 
     async def on_submit(self, interaction: Interaction) -> None:
         """|coro|

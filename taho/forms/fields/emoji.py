@@ -124,7 +124,7 @@ class Emoji(Field):
                     "`emoji_id`, "
                     "`💵` and"
                     "`:dollar:`\n"
-                    "You can use a \\ before an emoji to get these formats\n"
+                    "You can use a \\ before an emoji to get these formats.\n"
                     "Example: `\\:dollar:` will give you (if you send it) `💵`."
                 )
                 )

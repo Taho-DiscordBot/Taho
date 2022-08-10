@@ -47,5 +47,5 @@ class TahoTranslator(Translator):
         locale = Locale.parse(locale.value, sep="-")
         
         translation = await discord_translator_gettext(string.message, locale=locale)
-        
+
         return translation if translation != string.message else None
