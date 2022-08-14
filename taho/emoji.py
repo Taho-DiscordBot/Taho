@@ -80,7 +80,7 @@ class Emoji:
 
     __slots__ = ('animated', 'name', 'id', 'url')
 
-    def __init__(self, bot: Optional[Bot], emoji: T) -> None:
+    def __init__(self, emoji: T, bot: Optional[Bot] = None) -> None:
         if not bot:
             from taho.utils import get_bot
             bot = get_bot()
