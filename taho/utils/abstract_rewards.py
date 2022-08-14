@@ -221,7 +221,7 @@ class AbstractReward:
         stuff_shortcut: StuffShortcut = None,
         regeneration: bool = False,
         durability: bool = False,
-        min_amount: float = 1,
+        min_amount: float = None,
         max_amount: float = None,
     ) -> None:
         if not stuff and not stuff_shortcut:
