@@ -231,3 +231,23 @@ class Emoji:
             "url": self.url,
             "repr": str(self)
         }
+    
+    def to_db_value(self) -> str:
+        """
+        Get the Emoji as a string.
+        This is used to store the emoji in the database.
+
+        Returns
+        --------
+        :class:`str`
+            The string.
+        """
+        return str(self.id) if self.id else self.name
+    
+    @classmethod
+    def from_discord_emoji(cls, emoji: Union[discord.Emoji, discord.PartialEmoji]) -> Emoji:
+        """
+        Create an Emoji from a :class:`discord.Emoji` object.
+        This is used to get the emoji from Discord.
+        """
+        return cls(None, emoji)
