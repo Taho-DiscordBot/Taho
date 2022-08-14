@@ -64,9 +64,8 @@ class AbstractRewardPack:
         self.luck = luck
         self.rewards = rewards
     
-    def add_reward(self, reward: AbstractReward) -> None:
+    def _add_reward(self, reward: AbstractReward) -> None:
         """
-
         Adds a reward to the reward pack.
 
         Parameters
@@ -76,6 +75,18 @@ class AbstractRewardPack:
         """
         self.rewards.append(reward)
     
+    def add_rewards(self, *rewards: AbstractReward) -> None:
+        """
+        Adds rewards to the reward pack.
+        
+        Parameters
+        -----------
+        rewards: List[:class:`.AbstractReward`]
+            The rewards to add.
+        """
+        for reward in rewards:
+            self._add_reward(reward)
+
     def clear_rewards(self) -> None:
         """
 
@@ -83,7 +94,7 @@ class AbstractRewardPack:
         """
         self.rewards.clear()
     
-    def delete_reward(self, reward: AbstractReward) -> None:
+    def _delete_reward(self, reward: AbstractReward) -> None:
         """
 
         Deletes a reward from the reward pack.
@@ -97,6 +108,18 @@ class AbstractRewardPack:
             self.rewards.remove(reward)
         except ValueError:
             pass
+    
+    def delete_rewards(self, *rewards: AbstractReward) -> None:
+        """
+        Deletes rewards from the reward pack.
+        
+        Parameters
+        -----------
+        rewards: List[:class:`.AbstractReward`]
+            The rewards to delete.
+        """
+        for reward in rewards:
+            self._delete_reward(reward)
 
     async def to_db_pack(self, pack_type: T, reward_type: type, link: BaseModel) -> T:
         """|coro|
