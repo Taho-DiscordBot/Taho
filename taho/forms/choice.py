@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import uuid
 from taho.babel import _
-from discord import SelectOption
+from discord import SelectOption, utils
 
 
 if TYPE_CHECKING:
@@ -65,7 +65,7 @@ class Choice:
         else:
             emoji = None
         return SelectOption(
-                label=self.label,
+                label=utils.remove_markdown(self.label),
                 value=self.discord_value,
                 default=self.selected,
                 description=self.description,
