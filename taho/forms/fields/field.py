@@ -37,6 +37,8 @@ if TYPE_CHECKING:
 
     T = TypeVar('T')
 
+    FIELD = TypeVar('FIELD', bound='Field')
+
 __all__ = (
     "Field", 
     "FieldModal",
@@ -333,7 +335,7 @@ class FieldView(View):
     """
     def __init__(
         self,
-        field: Field,
+        field: FIELD,
         default: Optional[T] = None,
     ) -> None:
         super().__init__()
