@@ -22,11 +22,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from taho.enums import RoleType
 from .base import BaseModel
 from tortoise import fields
 from typing import TYPE_CHECKING
+from taho.enums import RoleType
 from taho.abc import AccessShortcutable, StuffShortcutable
+from taho.exceptions import DoesNotExist
+
 
 if TYPE_CHECKING:
     from taho import Bot
@@ -131,6 +133,33 @@ class Role(BaseModel, StuffShortcutable, AccessShortcutable):
             server = s_role.server
             yield await server.get_role(bot, s_role.discord_role_id)
 
+    async def get_discord_role(self, bot: Bot, server_id: int) -> discord.Role:
+        """|coro|
+
+        Get the Discord role in the server with the given ID.
+        
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        server_id: :class:`int`
+            The server ID.
+        
+        Returns
+        --------
+        Optional[:class:`discord.Role`]
+            The Discord role.
+        
+        Raises
+        -------
+        ~taho.exceptions.DoesNotExist
+            If the role does not exist in the server.
+        """
+        server_role = await self.server_roles.filter(server_id=server_id).first()
+        if not server_role:
+            raise DoesNotExist(f"Role {self.id} does not exist in server {server_id}")
+        return await server_role.get_role(bot)
+
     async def add_roles(self, *roles: discord.Role, return_roles: bool = False) -> Optional[List[ServerRole]]:
         """|coro|
 
@@ -169,6 +198,32 @@ class Role(BaseModel, StuffShortcutable, AccessShortcutable):
             return models
         else:
             await ServerRole.bulk_create(models)
+
+    async def get_display(self, bot: Bot, server_id: int = None) -> str:
+        """|coro|
+
+        Get the display name of the role.
+        
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+        server_id: Optional[:class:`int`]
+            The server ID.
+        
+        Returns
+        --------
+        :class:`str`
+            The display role's display string for the server.
+            If the role exists in the server, it returns a mention,
+            else a name.
+        """
+        try:
+            role = await self.get_discord_role(bot, server_id)
+        except DoesNotExist:
+            return next(role.name async for role in self.get_discord_roles(bot))
+        else:
+            return role.mention
 
 class ServerRole(BaseModel):
     """
