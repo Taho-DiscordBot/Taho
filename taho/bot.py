@@ -154,3 +154,12 @@ class Bot(commands.AutoShardedBot):
     async def on_command_error(self, ctx, exception, /) -> None:
         await ctx.send(f"```{traceback.format_exc()}```")
     
+    async def close(self) -> None:
+        print("Closing database connection...")
+        await Tortoise.close_connections()
+        print("Database connection closed")
+        print("Stopping SSH Tunnel...")
+        self.stop_ssh_server()
+        print("SSH Tunnel stopped")
+        print("Closing bot...")
+        return await super().close()

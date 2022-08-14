@@ -141,8 +141,8 @@ def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -
         bot.run(config.token, log_handler=None)
     except KeyboardInterrupt:
         pass
-    bot.stop_ssh_server()
-    print("The bot has stopped")
+    finally:
+        print("Bot closed")
 
 def add_update_babel_args(subparser: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
     parser = subparser.add_parser('update_babel', help='Extracts messages from source code and updates messages.pot')
