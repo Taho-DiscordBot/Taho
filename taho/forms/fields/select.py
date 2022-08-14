@@ -123,7 +123,7 @@ class SelectView(FieldView):
         if self.min_values == 1 and self.max_values == 1:
             self.field.value = self.field.value[0]
         
-        await super().on_submit(interaction)
+        await super().on_submit(interaction, edit_message=True)
 
 class Select(Field):
     def __init__(
