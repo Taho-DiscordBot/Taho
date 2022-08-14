@@ -229,7 +229,7 @@ async def setup_db_test(bot: Bot) -> List[str]:
     items_data = [
         {
             "name": "Item 1",
-            "emoji": Emoji(bot, "💎"),
+            "emoji": Emoji("💎"),
             "description": "This is an item",
             "type": ItemType.resource,
         },
