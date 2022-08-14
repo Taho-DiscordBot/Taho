@@ -114,7 +114,7 @@ class Bot(commands.AutoShardedBot):
         register_bot(self)
         register_before_invoke(self)
 
-        if self.sync_tree or self.config.get("DEBUG", False):
+        if self.sync_tree:
 
             await self.tree.set_translator(TahoTranslator())
 
