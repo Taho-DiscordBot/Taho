@@ -31,6 +31,7 @@ from .utils import init_ssh_tunnel, TahoContext, register_bot, register_before_i
 from .database import init_db, models as db_models
 from .babel import Babel
 from .lazy import lazy_convert
+import traceback
 
 import json
 
@@ -150,5 +151,6 @@ class Bot(commands.AutoShardedBot):
     async def get_context(self, message, *, cls=None):
         return await super().get_context(message, cls=TahoContext)
     
-    async def on_command_error(self, context, exception, /) -> None:
-        raise exception
+    async def on_command_error(self, ctx, exception, /) -> None:
+        await ctx.send(f"```{traceback.format_exc()}```")
+    
