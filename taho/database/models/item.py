@@ -572,4 +572,4 @@ class ItemAccess(BaseModel):
 
     item = fields.ForeignKeyField("main.Item", related_name="accesses")
     have_access = fields.BooleanField()
-    stuff_shortcut = fields.ForeignKeyField("main.AccessShortcut")
+    access_shortcut = fields.ForeignKeyField("main.AccessShortcut")
