@@ -406,6 +406,7 @@ class Form:
         self.description = description
 
         self.message: discord.Message = None
+        self.guild: discord.Guild = None
 
         if not self.description:
             self.description = _(
@@ -440,6 +441,8 @@ class Form:
             Whether the form should be sent as an ephemeral message.
             Default to ``False``.
         """
+        self.guild = ctx.guild if ctx else interaction.guild
+
         view = await self.generate_view()
         embed = await self.generate_embed()
         if ctx:
