@@ -238,11 +238,8 @@ class Field:
         :class:`bool`
             Whether the field must appear in the form.
         """
-        for validator in self.appear_validators:
-            if not validator(self.form.to_dict()):
-                return False
-
-        return True
+        form_dict = self.form.to_dict()
+        return all(validator(form_dict) for validator in self.appear_validators)
     
     def is_completed(self) -> bool:
         """
