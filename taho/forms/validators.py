@@ -274,7 +274,7 @@ async def is_emoji(value: str) -> bool:
     if value is None:
         return True
 
-    emoji = Emoji(None, value)
+    emoji = Emoji(value)
 
     if not bool(emoji):
         raise ValidationException(

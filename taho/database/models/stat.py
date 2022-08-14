@@ -174,4 +174,4 @@ class Stat(BaseModel, StuffShortcutable):
             The stat's emoji.
         """
         from taho import Emoji
-        return Emoji(bot, self.emoji)
+        return Emoji(self.emoji, bot=bot)

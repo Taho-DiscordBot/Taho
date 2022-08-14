@@ -171,7 +171,7 @@ class Bank(BaseModel):
             The bank's emoji.
         """
         from taho.utils import Emoji
-        return Emoji(bot, self.emoji)
+        return Emoji(self.emoji, bot=bot)
         
     async def get_info(self, key: str) -> Union[str, int, float, None]:
         """|coro|

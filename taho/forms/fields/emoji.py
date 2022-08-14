@@ -81,7 +81,7 @@ class EmojiModal(FieldModal):
             self.stop()
             return
         
-        self.field.value = _Emoji(None, self.field.value)
+        self.field.value = _Emoji(self.field.value)
 
         self.field.default = self.field.value
 
