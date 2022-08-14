@@ -153,6 +153,7 @@ class Bot(commands.AutoShardedBot):
     
     async def on_command_error(self, ctx, exception, /) -> None:
         await ctx.send(f"```{traceback.format_exc()}```")
+        raise exception
     
     async def close(self) -> None:
         print("Closing database connection...")
