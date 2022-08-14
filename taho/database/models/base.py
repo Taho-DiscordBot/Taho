@@ -27,6 +27,7 @@ from typing import TYPE_CHECKING
 from tortoise.models import Model
 from taho.abc import Shortcutable
 from taho.enums import ShortcutType
+from taho.emoji import Emoji
 import asyncio
 
 if TYPE_CHECKING:
@@ -87,6 +88,9 @@ class BaseModel(Model):
         for key in kwargs:
             if not hasattr(self, key):
                 setattr(self, key, kwargs[key])
+        
+        if hasattr(self, "emoji") and self.emoji and not isinstance(self.emoji, Emoji):
+            self.emoji = Emoji(self.emoji)
     
     async def save(
         self,
@@ -95,6 +99,10 @@ class BaseModel(Model):
         force_create: bool = False,
         force_update: bool = False,
     ) -> None:
+
+        if hasattr(self, "emoji") and self.emoji:
+            emoji = self.emoji
+            self.emoji = self.emoji.to_db_value()
 
         from ..utils import create_shortcut
 
@@ -171,6 +179,9 @@ class BaseModel(Model):
             force_create=force_create,
             force_update=force_update,
         )
+
+        if hasattr(self, "emoji") and self.emoji:
+            self.emoji = emoji
     
     @classmethod
     def _init_from_db(cls: Type[MODEL], **kwargs: Any) -> MODEL:
@@ -199,6 +210,9 @@ class BaseModel(Model):
                     # Register the coroutine.
                     setattr(model, short_name, _Shortcut(model, field_name))
         
+
+        if hasattr(model, "emoji") and model.emoji:
+            model.emoji = Emoji(model.emoji)
         # Example:
         # The model which is initialized from the database
         # has a field called "owner_shortcut".
