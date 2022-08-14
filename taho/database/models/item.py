@@ -258,7 +258,18 @@ class Item(BaseModel, StuffShortcutable):
         """
         from taho.database.models import Cluster, Currency, ItemStat, Role
 
+    async def get_display(self) -> str:
+        """
+        |coro|
         
+        Returns the item's display.
+        
+        Returns
+        -------
+        :class:`str`
+            The item's display.
+        """           
+        return f"{self.emoji} {self.name}" if self.emoji else self.name
 
 
         # cluster = await Cluster.get_or_none(id=data['cluster'])
