@@ -28,5 +28,5 @@ from .checks import *
 from .utils_ import *
 from .sequence_matcher import *
 from .before_invoke import *
-from .abstract_rewards import *
+from .abstract import *
 from .discord_translator import *

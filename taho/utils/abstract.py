@@ -29,8 +29,8 @@ from taho.database.models import Item, Stat, Role
 
 if TYPE_CHECKING:
     from typing import Optional, List, TypeVar, Dict, Union
-    from taho.database.models import BaseModel, StuffShortcut
-    from taho.abc import StuffShortcutable
+    from taho.database.models import BaseModel, StuffShortcut, AccessShortcut
+    from taho.abc import StuffShortcutable, AccessShortcutable
     from taho.bot import Bot
 
     T = TypeVar("T")
@@ -45,11 +45,11 @@ class AbstractRewardPack:
     """
     Represents an abstract reward pack.
 
-    Used to fill the :class:`~taho.forms.fields.Reward` field.
+    Used to fill the :class:`~taho.forms.fields.AbstractReward` field.
 
     Attributes
     -----------
-    type: :class:`.RewardType`
+    type: :class:`.AbstractRewardType`
         The type of reward pack.
     luck: float
         The luck of the reward pack.
@@ -96,10 +96,9 @@ class AbstractRewardPack:
         """
         self.rewards.clear()
     
-    def _delete_reward(self, reward: AbstractReward) -> None:
+    def _remove_reward(self, reward: AbstractReward) -> None:
         """
-
-        Deletes a reward from the reward pack.
+        Remove a reward from the reward pack.
 
         Parameters
         -----------
@@ -111,9 +110,9 @@ class AbstractRewardPack:
         except ValueError:
             pass
     
-    def delete_rewards(self, *rewards: AbstractReward) -> None:
+    def remove_rewards(self, *rewards: AbstractReward) -> None:
         """
-        Deletes rewards from the reward pack.
+        Remove rewards from the reward pack.
         
         Parameters
         -----------
@@ -121,7 +120,7 @@ class AbstractRewardPack:
             The rewards to delete.
         """
         for reward in rewards:
-            self._delete_reward(reward)
+            self._remove_reward(reward)
 
     async def to_db_pack(self, pack_type: T, reward_type: type, link: BaseModel) -> T:
         """|coro|
@@ -129,7 +128,7 @@ class AbstractRewardPack:
         Converts this abstract reward pack to a reward pack
         of another type, in the DB.
 
-        Example: Convert a :class:`.RewardPack` to an 
+        Example: Convert a :class:`.AbstractRewardPack` to an 
         :class:`~taho.database.models.ItemRewardPack`.
 
         Parameters
@@ -144,13 +143,12 @@ class AbstractRewardPack:
         
         Returns
         --------
-        
             The converted reward pack.
         
         Examples
         ---------
 
-        You want to convert a :class:`.RewardPack` to an
+        You want to convert a :class:`.AbstractRewardPack` to an
         :class:`~taho.database.models.ItemRewardPack`.
 
         .. code-block:: python3
@@ -182,21 +180,21 @@ class AbstractRewardPack:
 
         return new_pack
 
-    def get_name(self) -> str:
+    def get_name(self, short: bool = False) -> str:
         name = _(
             "%(luck)s %%", 
             luck=self.luck
             )
-        if self.type:
+        if self.type is not None:
             name += " - "
-            name += get_reward_type_text(self.type)
+            name += get_reward_type_text(self.type, short=short)
         return name
 
 class AbstractReward:
     """
     Represents an abstract reward.
 
-    Used to fill the :class:`~taho.forms.fields.Reward` field.
+    Used to fill the :class:`~taho.forms.fields.AbstractReward` field.
 
     Attributes
     -----------
@@ -260,7 +258,7 @@ class AbstractReward:
         Converts this abstract reward to a reward
         of another type, in the DB.
 
-        Example: Convert a :class:`.Reward` to an 
+        Example: Convert a :class:`.AbstractReward` to an 
         :class:`~taho.database.models.ItemReward`.
 
         Parameters
@@ -276,7 +274,7 @@ class AbstractReward:
         Examples
         ---------
 
-        You want to convert a :class:`.Reward` to an
+        You want to convert a :class:`.AbstractReward` to an
         :class:`~taho.database.models.ItemReward`.
 
         .. code-block:: python3
@@ -329,7 +327,7 @@ class AbstractReward:
 
             if self.min_amount is not None and self.max_amount is not None:
                 self._display = _(
-                    "%(min_amount)s-%(max_amount)s **%(stuff_name)s** %(additional_info)s",
+                    "%(min_amount)s/%(max_amount)s **%(stuff_name)s** %(additional_info)s",
                     min_amount=self.min_amount,
                     max_amount=self.max_amount,
                     stuff_name=stuff_name,
@@ -344,5 +342,4 @@ class AbstractReward:
                 )
             
         return self._display
-        
 
