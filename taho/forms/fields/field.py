@@ -343,7 +343,7 @@ class FieldView(View):
         self.field = field
         self.default = default
 
-    async def on_submit(self, interaction: Interaction) -> None:
+    async def on_submit(self, interaction: Interaction, edit_message: bool = False) -> None:
         """|coro|
 
         Called when the user submit the view.
@@ -364,10 +364,14 @@ class FieldView(View):
                     value=self.field.display_value
                 ),
                 "ephemeral": True,
-                "allowed_mentions": AllowedMentions.none()
+                "allowed_mentions": AllowedMentions.none(),
+                "view": None
             }
             if interaction.response.is_done():
                 await interaction.followup.send(**params)
+            elif edit_message:
+                params.pop("ephemeral", None)
+                await interaction.response.edit_message(**params)
             else:
                 await interaction.response.send_message(**params)
 
