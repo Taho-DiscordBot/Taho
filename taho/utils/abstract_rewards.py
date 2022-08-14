@@ -25,11 +25,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.enums import RewardType, get_reward_type_text
 from taho.babel import _
+from taho.database.models import Item, Stat, Role
 
 if TYPE_CHECKING:
     from typing import Optional, List, TypeVar, Dict, Union
     from taho.database.models import BaseModel, StuffShortcut
     from taho.abc import StuffShortcutable
+    from taho.bot import Bot
 
     T = TypeVar("T")
     U = TypeVar("U")
@@ -291,4 +293,56 @@ class AbstractReward:
         await reward.save()
 
         return reward
+
+    async def get_display(self, bot: Bot = None, guild_id: int = None) -> str:
+        """|coro|
+
+        Returns the display of the reward.
+        """
+        if hasattr(self, "_display"):
+            return self._display
+
+        if not bot:
+            from .utils_ import get_bot
+            bot = get_bot()
+
+        stuff = self.stuff or await self.stuff_shortcut.get()
+
+        if isinstance(stuff, Role):
+            self._display = _(
+                "**%(role)s**",
+                role=await stuff.get_display(bot, server_id=guild_id)
+            )
+        else:
+            stuff_name = await stuff.get_display()
+
+            if isinstance(stuff, Item):
+                if self.durability:
+                    additional_info = _("*(durability)*")
+                else:
+                    additional_info = _("*(quantity)*")
+            elif isinstance(stuff, Stat):
+                if self.regeneration:
+                    additional_info = _("*(regeneration)*")
+                else:
+                    additional_info = _("*(maximum)*")
+
+            if self.min_amount is not None and self.max_amount is not None:
+                self._display = _(
+                    "%(min_amount)s-%(max_amount)s **%(stuff_name)s** %(additional_info)s",
+                    min_amount=self.min_amount,
+                    max_amount=self.max_amount,
+                    stuff_name=stuff_name,
+                    additional_info=additional_info
+                )
+            elif self.min_amount is not None:
+                self._display = _(
+                    "%(min_amount)s **%(stuff_name)s** %(additional_info)s",
+                    min_amount=self.min_amount,
+                    stuff_name=stuff_name,
+                    additional_info=additional_info
+                )
+            
+        return self._display
+        
 
