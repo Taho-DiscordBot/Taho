@@ -33,7 +33,7 @@ class RewardType(IntEnum):
     active = 1
     equip = 2
 
-def get_reward_type_text(reward_type: RewardType) -> str:
+def get_reward_type_text(reward_type: RewardType, short: bool = False) -> str:
     """
     Get the text of a reward type.
 
@@ -41,6 +41,8 @@ def get_reward_type_text(reward_type: RewardType) -> str:
     -----------
     reward_type: :class:`.RewardType`
         The reward type.
+    short: :class:`bool`
+        Whether to use short or long text.
     
     Raises
     -------
@@ -55,9 +57,18 @@ def get_reward_type_text(reward_type: RewardType) -> str:
     from taho.babel import _
 
     texts = {
-        RewardType.passive: _("Passive (when owned)"),
-        RewardType.active: _("Active (when used)"),
-        RewardType.equip: _("Equip (when equipped to the hotbar)"),
+        RewardType.passive: {
+            "long": _("Passive (when owned)"),
+            "short": _("Passive")
+        },
+        RewardType.active: {
+            "long": _("Active (when used)"),
+            "short": _("Active")
+        },
+        RewardType.equip: {
+            "long": _("Equip (when equipped to the hotbar)"),
+            "short": _("Equip")
+        },
 
     }
-    return texts[reward_type]
+    return texts[reward_type]["short" if short else "long"]
