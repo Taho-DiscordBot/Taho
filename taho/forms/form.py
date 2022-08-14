@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import asyncio
 import discord
+import datetime
 from taho.babel import _
 
 if TYPE_CHECKING:
@@ -400,7 +401,6 @@ class Form:
             A title with `*` indicates a required field.
     """
     def __init__(self, title: str, fields: List[Field], description: Optional[str] = None) -> None:
-        
         self.title = title
         self.fields = fields
         self.description = description
@@ -478,6 +478,13 @@ class Form:
             title=self.title,
             description=self.description,
             color=color
+        )
+
+        embed.set_footer(
+            text=_(
+                "This form as no timeout, but due to Discord limitations on ephemeral "
+                "messages, it may start to bug after 15 mins.",
+            )
         )
 
         for field in self.fields:
@@ -585,8 +592,6 @@ class Form:
         --------
         :class:`dict`
             The form as a dictionary.
-
-
         """
         return {
             field.name: field.value for field in self.fields
