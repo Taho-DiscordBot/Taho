@@ -25,7 +25,10 @@ import asyncio
 import pytest
 import discord
 from discord.ext.commands import Bot
-from . import config as _config
+try:
+    from . import config as _config
+except:
+    _config = None # Github Workflow
 from taho.utils.ssh_tunnel_forwarder import init_ssh_tunnel
 from taho.database import init_db
 from taho.database.models import *

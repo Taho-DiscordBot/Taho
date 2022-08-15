@@ -25,7 +25,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import discord
 import taho
-import config
 import argparse
 import os
 import sys
@@ -137,6 +136,8 @@ def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -
     intents = discord.Intents.default()
     intents.message_content = True
     intents.members = True
+
+    import config
 
     bot = taho.Bot(intents=intents, config=config, sync_tree=args.sync_tree)
 
