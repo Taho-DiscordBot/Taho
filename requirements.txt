@@ -1,4 +1,5 @@
 git+https://github.com/Rapptz/discord.py.git#egg=discord.py
+git+https://github.com/Taho-DiscordBot/Taho-Permissions.git#egg=permissions
 tortoise-orm[asyncpg]
 Babel
 emojis
