@@ -8,6 +8,504 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2022-08-15 16:16+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.10.3\n"
+
+#: taho/database/models/cluster.py:579
+msgid "Cash"
+msgstr ""
+
+#: taho/enums/reward.py:61
+msgid "Passive (when owned)"
+msgstr ""
+
+#: taho/enums/reward.py:62
+msgid "Passive"
+msgstr ""
+
+#: taho/enums/reward.py:65
+msgid "Active (when used)"
+msgstr ""
+
+#: taho/enums/reward.py:66
+msgid "Active"
+msgstr ""
+
+#: taho/enums/reward.py:69
+msgid "Equip (when equipped to the hotbar)"
+msgstr ""
+
+#: taho/enums/reward.py:70
+msgid "Equip"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:320 taho/forms/fields/reward_pack.py:562
+#: taho/forms/fields/reward_pack.py:661 taho/forms/form.py:44
+msgid "Cancel"
+msgstr ""
+
+#: taho/forms/form.py:45
+msgid "Respond"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:77 taho/forms/form.py:46
+msgid "Finish"
+msgstr ""
+
+#: taho/forms/form.py:48
+msgid "Go to"
+msgstr ""
+
+#: taho/forms/form.py:51
+msgid "Previous"
+msgstr ""
+
+#: taho/forms/form.py:52
+msgid "Next"
+msgstr ""
+
+#: taho/forms/form.py:412
+msgid ""
+"Please fill out the form below.\n"
+"You can use the buttons below to navigate the form.\n"
+"A title with `*` indicates a required field.\n"
+msgstr ""
+
+#: taho/forms/form.py:484
+msgid ""
+"This form as no timeout, but due to Discord limitations on ephemeral "
+"messages, it may start to bug after 15 mins."
+msgstr ""
+
+#: taho/forms/validators.py:80
+#, python-format
+msgid "The value **%(value_name)s** is required."
+msgstr ""
+
+#: taho/forms/validators.py:84
+msgid "The value is required."
+msgstr ""
+
+#: taho/forms/validators.py:125
+#, python-format
+msgid "The value must be at least %(min_length)s characters long."
+msgstr ""
+
+#: taho/forms/validators.py:169
+#, python-format
+msgid "The value must be at most %(max_length)s characters long."
+msgstr ""
+
+#: taho/forms/validators.py:206
+msgid "The value must be a number."
+msgstr ""
+
+#: taho/forms/validators.py:239 taho/forms/validators.py:251
+msgid "The value must be an integer."
+msgstr ""
+
+#: taho/forms/validators.py:281
+msgid "The value must be a valid emoji."
+msgstr ""
+
+#: taho/forms/validators.py:314
+#, python-format
+msgid "The value must be at least %(min_value)s."
+msgstr ""
+
+#: taho/forms/validators.py:350
+#, python-format
+msgid "The value must be at most %(max_value)s."
+msgstr ""
+
+#: taho/forms/validators.py:387
+#, python-format
+msgid "The value %(value)s is forbidden."
+msgstr ""
+
+#: taho/forms/fields/access.py:76
+msgid "Add or remove roles from the list"
+msgstr ""
+
+#: taho/forms/fields/access.py:79
+msgid "Add roles to the list"
+msgstr ""
+
+#: taho/forms/fields/access.py:83
+msgid "Remove roles from the list"
+msgstr ""
+
+#: taho/forms/fields/access.py:88
+msgid "The selected roles will have access or not?"
+msgstr ""
+
+#: taho/forms/fields/access.py:91
+msgid "The roles have access"
+msgstr ""
+
+#: taho/forms/fields/access.py:95
+msgid "The roles don't have access"
+msgstr ""
+
+#: taho/forms/fields/access.py:101
+msgid "Select roles to add or remove"
+msgstr ""
+
+#: taho/forms/fields/access.py:175
+msgid "This role have access"
+msgstr ""
+
+#: taho/forms/fields/access.py:177
+msgid "This role don't have access"
+msgstr ""
+
+#: taho/forms/fields/access.py:196
+msgid ""
+"The access is a list of roles that can/cannot use what you are creating.\n"
+"\n"
+msgstr ""
+
+#: taho/forms/fields/access.py:201
+msgid ""
+"**No roles are configured.**\n"
+"\n"
+msgstr ""
+
+#: taho/forms/fields/access.py:208
+#, python-format
+msgid ""
+"The roles with access are: **%(role_list)s**\n"
+"\n"
+msgstr ""
+
+#: taho/forms/fields/access.py:216
+#, python-format
+msgid ""
+"The roles without access are: **%(role_list)s**\n"
+"\n"
+msgstr ""
+
+#: taho/forms/fields/access.py:220
+msgid ""
+"You can add roles to the access list by selecting the **Add roles to the "
+"list** option, then selecting the type of access, and the roles you want."
+msgstr ""
+
+#: taho/forms/fields/access.py:292
+msgid "The access list has been updated."
+msgstr ""
+
+#: taho/forms/fields/access.py:353 taho/forms/fields/emoji.py:156
+#: taho/forms/fields/field.py:114 taho/forms/fields/number.py:118
+#: taho/forms/fields/reward.py:226 taho/forms/fields/select.py:195
+#: taho/forms/fields/text.py:118
+msgid "*Unanswered*"
+msgstr ""
+
+#: taho/forms/fields/access.py:364
+#, python-format
+msgid "✅: **%(role_list)s**\n"
+msgstr ""
+
+#: taho/forms/fields/access.py:372
+#, python-format
+msgid "❌: **%(role_list)s**\n"
+msgstr ""
+
+#: taho/forms/fields/emoji.py:59 taho/forms/fields/emoji.py:136
+#: taho/forms/fields/number.py:53 taho/forms/fields/number.py:104
+#: taho/forms/fields/text.py:51 taho/forms/fields/text.py:102
+msgid "Enter a value"
+msgstr ""
+
+#: taho/forms/fields/emoji.py:116
+msgid ""
+"Due to a Discord restriction, you are not able to select an emoji "
+"directly in the Modal.\n"
+"Please copy the emoji, click on **Respond**, and paste it in the modal.\n"
+"The emoji must be in one of the following formats:\n"
+"`<:emoji:emoji_id>`, `<a:emoji:emoji_id>`, `emoji_id`, `💵` and`:dollar:`\n"
+"You can use a \\ before an emoji to get these formats.\n"
+"Example: `\\:dollar:` will give you (if you send it) `💵`."
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:53
+#: taho/forms/fields/empty_reward_pack.py:174
+msgid "Create a reward pack"
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:71
+msgid "Choose when the rewards will be given"
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:78
+msgid "Pack loot chance"
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:79
+msgid "A percentage between 0 and 100. Max two decimals are allowed."
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:101
+msgid "Reward Type"
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:150
+#, python-format
+msgid "New reward pack **%(pack_name)s** successfully created."
+msgstr ""
+
+#: taho/forms/fields/empty_reward_pack.py:182
+msgid "Click on **Respond** to create a new reward pack"
+msgstr ""
+
+#: taho/forms/fields/field.py:313 taho/forms/fields/field.py:359
+#, python-format
+msgid "Successfully set value to: %(value)s"
+msgstr ""
+
+#: taho/forms/fields/item.py:83
+msgid "No items available."
+msgstr ""
+
+#: taho/forms/fields/number.py:120
+msgid "Infinite"
+msgstr ""
+
+#: taho/forms/fields/reward.py:199
+msgid "Rewards"
+msgstr ""
+
+#: taho/forms/fields/reward.py:200
+msgid ""
+"You can create packs of rewards. A pack is a list of rewards with the "
+"same loot chance and condition.\n"
+"**You can define negative quantities to create a cost.**\n"
+"You can create several packs with the same loot chance and condition."
+msgstr ""
+
+#: taho/forms/fields/reward.py:234
+#, python-format
+msgid "**%(pack_name)s:**"
+msgstr ""
+
+#: taho/forms/fields/reward.py:239
+#, python-format
+msgid "• %(reward_display)s"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:61
+msgid "What do you want to do?"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:64
+msgid "Add a reward"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:68
+msgid "Remove a reward"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:72
+msgid "Delete the pack"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:148
+msgid "Reward amount"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:151
+msgid "Minimum amount"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:152
+msgid "Minimum amount, can be negative."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:158
+msgid "Maximum amount"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:159
+msgid "Maximum amount, can be negative. Keep empty for fix amount."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:195
+msgid "Minimum amount can't be greater than maximum amount."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:227
+#, python-format
+msgid "Reward amount set to %(min_amount)s/%(max_amount)s."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:236
+#, python-format
+msgid "Reward amount set to %(amount)s."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:284
+msgid "Item (or currency)"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:285
+msgid "RP Role"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:286
+msgid "Stat"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:290
+msgid "What type of reward do you want to add?"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:301
+msgid "What to you want to add?"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:307
+msgid "Define quantity"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:313 taho/forms/fields/reward_pack.py:556
+#: taho/forms/fields/reward_pack.py:656
+msgid "Confirm"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:330
+msgid "Quantity"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:334
+msgid "Durability"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:340
+msgid "Maximum"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:344
+msgid "Regeneration"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:376
+msgid "There are no rewards available to add (role, item or stat)."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:407
+msgid "Pick an item in the list."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:408
+msgid "Pick a role in the list."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:409
+msgid "Pick a stat in the list."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:581
+msgid ""
+"Select the rewards you want to remove in the list below.\n"
+"\n"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:613
+msgid "Select rewards to remove in the list"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:674
+msgid "__**Are you sure you want to delete this pack?**__"
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:686
+msgid "The pack has been deleted."
+msgstr ""
+
+#: taho/forms/fields/reward_pack.py:726
+msgid "*No rewards*"
+msgstr ""
+
+#: taho/forms/fields/select.py:77
+msgid "Select a value"
+msgstr ""
+
+#: taho/forms/fields/select.py:94
+msgid "Submit"
+msgstr ""
+
+#: taho/forms/fields/select.py:155
+#, python-format
+msgid "Select between %(min_values)s and %(max_values)s values."
+msgstr ""
+
+#: taho/forms/fields/select.py:167
+msgid "No choices available."
+msgstr ""
+
+#: taho/utils/abstract.py:184
+#, python-format
+msgid "%(luck)s %%"
+msgstr ""
+
+#: taho/utils/abstract.py:314
+#, python-format
+msgid "**%(role)s**"
+msgstr ""
+
+#: taho/utils/abstract.py:321
+msgid "*(durability)*"
+msgstr ""
+
+#: taho/utils/abstract.py:323
+msgid "*(quantity)*"
+msgstr ""
+
+#: taho/utils/abstract.py:326
+msgid "*(regeneration)*"
+msgstr ""
+
+#: taho/utils/abstract.py:328
+msgid "*(maximum)*"
+msgstr ""
+
+#: taho/utils/abstract.py:331
+#, python-format
+msgid "%(min_amount)s/%(max_amount)s **%(stuff_name)s** %(additional_info)s"
+msgstr ""
+
+#: taho/utils/abstract.py:339
+#, python-format
+msgid "%(min_amount)s **%(stuff_name)s** %(additional_info)s"
+msgstr ""
+
+#: taho/utils/abstract.py:439
+#, python-format
+msgid "✅ %(entity)s"
+msgstr ""
+
+#: taho/utils/abstract.py:441
+#, python-format
+msgid "❌ %(entity)s"
+msgstr ""
+
+# Translations template for PROJECT.
+# Copyright (C) 2022 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2022.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-08-15 16:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
