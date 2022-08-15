@@ -32,7 +32,7 @@ jobs:
       - name: Git Auto Commit gettext
         uses: stefanzweifel/git-auto-commit-action@v4.14.1
         with:
-          file_pattern: *.pot
+          file_pattern: '*.pot'
           commit_message: Update gettext translations
 
 
