@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-gettext:
+  build-gettext-and-crowdin:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,19 +34,13 @@ jobs:
         with:
           file_pattern: '*.pot'
           commit_message: Update gettext translations
-
-
-  crowdin:
-    needs: build-and-gettext
-    runs-on: ubuntu-latest
-    
-    steps:
+      
       - name: crowdin action
         uses: crowdin/github-action@1.4.12
         with:
           upload_translations: true
           download_translations: false
-          config: "crowdin.yml"
+          config: ".crowdin.yml"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
