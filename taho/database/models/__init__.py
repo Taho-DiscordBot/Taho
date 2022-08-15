@@ -41,3 +41,4 @@ from .shop import *
 from .trade import *
 from .sheet import *
 from .reward import *
+from .access_rule import *
