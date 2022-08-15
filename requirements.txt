@@ -3,3 +3,4 @@ git+https://github.com/Taho-DiscordBot/Taho-Permissions.git#egg=taho-permissions
 tortoise-orm[asyncpg]
 Babel
 emojis
+sshtunnel
