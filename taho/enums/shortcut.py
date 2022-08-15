@@ -40,5 +40,5 @@ class ShortcutableType(IntEnum):
 class ShortcutType(Enum):
     owner = "OwnerShortcut"
     stuff = "StuffShortcut"
-    access = "AccessShortcut"
+    access = "AccessRuleShortcut"
     trade_stuff = "TradeStuffShortcut"

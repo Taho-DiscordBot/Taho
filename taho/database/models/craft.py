@@ -36,7 +36,7 @@ __all__ = (
     "CraftRewardPack",
     "CraftReward",
     "CraftHistory",
-    "CraftAccess",
+    "CraftAccessRule",
 )
 
 class Craft(BaseModel):
@@ -146,7 +146,7 @@ class Craft(BaseModel):
     per = fields.IntField()
     success = fields.DecimalField(max_digits=32, decimal_places=2, null=True)
 
-    accesses: fields.ReverseRelation["CraftAccess"]
+    accesses: fields.ReverseRelation["CraftAccessRule"]
     reward_packs: fields.ReverseRelation["CraftRewardPack"]
 
     async def get_rewards(self) -> Dict[float, List[CraftReward]]:
@@ -457,7 +457,7 @@ class CraftHistory(BaseModel):
     user = fields.ForeignKeyField("main.User", related_name="craft_history")
     done_at = fields.DatetimeField(auto_now_add=True)
 
-class CraftAccess(BaseModel):
+class CraftAccessRule(BaseModel):
     """Represents an access to a craft.
 
     .. container:: operations
@@ -503,7 +503,7 @@ class CraftAccess(BaseModel):
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.AccessShortcut`
+                - :attr:`related_model` :class:`~taho.database.models.AccessRuleShortcut`
             
             Python: :class:`~taho.database.models.StuffShortcut`
         
@@ -517,7 +517,7 @@ class CraftAccess(BaseModel):
         The craft linked to this access.
     have_access: :class:`bool`
         Whether the user/role has access to the craft.
-    access_shortcut: :class:`~taho.database.models.AccessShortcut`
+    access_shortcut: :class:`~taho.database.models.AccessRuleShortcut`
         |coro_attr|
         
         The shortcut to the entity which has access to the craft.
@@ -529,4 +529,4 @@ class CraftAccess(BaseModel):
 
     craft = fields.ForeignKeyField("main.Craft", related_name="accesses")
     have_access = fields.BooleanField()
-    stuff_shortcut = fields.ForeignKeyField("main.AccessShortcut")
+    stuff_shortcut = fields.ForeignKeyField("main.AccessRuleShortcut")

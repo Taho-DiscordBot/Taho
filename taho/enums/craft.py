@@ -24,10 +24,10 @@ DEALINGS IN THE SOFTWARE.
 from enum import IntEnum
 
 __all__ = (
-    "CraftAccessType",
+    "CraftAccessRuleType",
 )
 
 
-class CraftAccessType(IntEnum):
+class CraftAccessRuleType(IntEnum):
     user = 0
     role = 1

@@ -33,7 +33,7 @@ if TYPE_CHECKING:
         Shortcutable, 
         StuffShortcutable, 
         OwnerShortcutable,
-        AccessShortcutable,
+        AccessRuleShortcutable,
         TradeStuffShortcutable
     )
 
@@ -41,7 +41,7 @@ __all__ = (
     "Shortcut",
     "OwnerShortcut",
     "StuffShortcut",
-    "AccessShortcut",
+    "AccessRuleShortcut",
     "TradeStuffShortcut",
 )
 
@@ -133,9 +133,9 @@ class StuffShortcut(Shortcut):
         """
         return await super().get()
 
-class AccessShortcut(Shortcut):
+class AccessRuleShortcut(Shortcut):
     """Represents a shortcut to a
-    :class:`~taho.abc.AccessShortcutable` model. 
+    :class:`~taho.abc.AccessRuleShortcutable` model. 
     
     See :ref:`Shortcuts <shortcut>` for more information.
     """
@@ -150,14 +150,14 @@ class AccessShortcut(Shortcut):
         ShortcutableType.role: "role",
     }
 
-    async def get(self) -> AccessShortcutable:
+    async def get(self) -> AccessRuleShortcutable:
         """|coro|
 
         Returns the shortcut's model.
 
         Returns
         --------
-        :class:`~taho.abc.AccessShortcutable`
+        :class:`~taho.abc.AccessRuleShortcutable`
             The shortcut's model.
         """
         return await super().get()

@@ -26,7 +26,7 @@ from .base import BaseModel
 from tortoise import fields
 from typing import TYPE_CHECKING
 from taho.enums import RoleType
-from taho.abc import AccessShortcutable, StuffShortcutable
+from taho.abc import AccessRuleShortcutable, StuffShortcutable
 from taho.exceptions import DoesNotExist
 
 
@@ -40,7 +40,7 @@ __all__ = (
     "ServerRole"
 )
 
-class Role(BaseModel, StuffShortcutable, AccessShortcutable):
+class Role(BaseModel, StuffShortcutable, AccessRuleShortcutable):
     """|shortcutable|
     
     Represents a RP Role of a :class:`~taho.database.models.Cluster`.

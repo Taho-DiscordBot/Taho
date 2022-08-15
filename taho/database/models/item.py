@@ -38,7 +38,7 @@ __all__ = (
     "Item",
     "ItemRewardPack",
     "ItemReward",
-    "ItemAccess",
+    "ItemAccessRule",
 )
 
 class Item(BaseModel, StuffShortcutable):
@@ -178,7 +178,7 @@ class Item(BaseModel, StuffShortcutable):
 
     currency = fields.ForeignKeyField('main.Currency', null=True)
 
-    accesses: fields.ReverseRelation["ItemAccess"]
+    accesses: fields.ReverseRelation["ItemAccessRule"]
     reward_packs: fields.ReverseRelation["ItemRewardPack"]
     
     def __str__(self) -> str:
@@ -500,7 +500,7 @@ class ItemReward(Reward):
     
     pack = fields.ForeignKeyField("main.ItemRewardPack", related_name="rewards")
 
-class ItemAccess(BaseModel):
+class ItemAccessRule(BaseModel):
     """Represents an access to a item.
 
     .. container:: operations
@@ -546,7 +546,7 @@ class ItemAccess(BaseModel):
 
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
-                - :attr:`related_model` :class:`~taho.database.models.AccessShortcut`
+                - :attr:`related_model` :class:`~taho.database.models.AccessRuleShortcut`
             
             Python: :class:`~taho.database.models.StuffShortcut`
         
@@ -560,7 +560,7 @@ class ItemAccess(BaseModel):
         The item linked to this access.
     have_access: :class:`bool`
         Whether the user/role has access to the item.
-    access_shortcut: :class:`~taho.database.models.AccessShortcut`
+    access_shortcut: :class:`~taho.database.models.AccessRuleShortcut`
         |coro_attr|
         
         The shortcut to the entity which has access to the item.
@@ -572,4 +572,4 @@ class ItemAccess(BaseModel):
 
     item = fields.ForeignKeyField("main.Item", related_name="accesses")
     have_access = fields.BooleanField()
-    access_shortcut = fields.ForeignKeyField("main.AccessShortcut")
+    access_shortcut = fields.ForeignKeyField("main.AccessRuleShortcut")

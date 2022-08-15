@@ -38,11 +38,11 @@ if TYPE_CHECKING:
     T = TypeVar("T")
 
 __all__ = (
-    "AccessView",
-    "Access",
+    "AccessRuleView",
+    "AccessRule",
 )
 
-class AccessView(FieldView):
+class AccessRuleView(FieldView):
     def __init__(
         self, 
         field: Field, 
@@ -296,7 +296,7 @@ class AccessView(FieldView):
         await super().on_submit(interaction)
 
 
-class Access(Field):
+class AccessRule(Field):
     def __init__(
         self, 
         name: str, 
@@ -331,7 +331,7 @@ class Access(Field):
         if not hasattr(self, "accessible_list"):
             await self.get_accessible_list(interaction)
 
-        view = AccessView(
+        view = AccessRuleView(
                 field=self,
                 accessible_list=self.accessible_list,
                 default=self.default

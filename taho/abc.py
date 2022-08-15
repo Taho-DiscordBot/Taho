@@ -52,9 +52,9 @@ class OwnerShortcutable:
     - :class:`~taho.database.models.User`
     """
 
-class AccessShortcutable(Shortcutable):
+class AccessRuleShortcutable(Shortcutable):
     """An ABC that brings together all the models that can be pointed 
-    by a :class:`~taho.database.models.AccessShortcut`.
+    by a :class:`~taho.database.models.AccessRuleShortcut`.
 
     See :ref:`Shortcuts <shortcut>` for more information.
 

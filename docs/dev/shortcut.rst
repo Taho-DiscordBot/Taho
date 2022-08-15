@@ -30,10 +30,10 @@ OwnerShortcut
     It points to everythings that can be able to 
     own something.
 
-AccessShortcut
+AccessRuleShortcut
 --------------- 
 
-    A shortcut to :class:`~taho.abc.AccessShortcutable`
+    A shortcut to :class:`~taho.abc.AccessRuleShortcutable`
     models.
     Used to define access to something.
     It points to everythings that can have access 

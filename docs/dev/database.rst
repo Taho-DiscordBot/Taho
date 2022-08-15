@@ -241,9 +241,9 @@ CraftReward
     :members:
     :exclude-members: Meta
 
-CraftAccess
+CraftAccessRule
 ~~~~~~~~~~~~
-.. autoclass:: CraftAccess()
+.. autoclass:: CraftAccessRule()
     :members:
     :exclude-members: Meta
 

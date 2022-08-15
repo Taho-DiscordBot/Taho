@@ -28,10 +28,10 @@ OwnerShortcutable
 .. autoclass:: OwnerShortcutable()
     :members:
 
-AccessShortcutable
+AccessRuleShortcutable
 ~~~~~~~~~~~~~~~~~~~
 
-.. autoclass:: AccessShortcutable()
+.. autoclass:: AccessRuleShortcutable()
     :members:
 
 TradeStuffShortcutable
@@ -413,10 +413,10 @@ ShortcutableType
 
         This shortcut goes to a :class:`~taho.database.models.CurrencyAmount`.
 
-CraftAccessType
+CraftAccessRuleType
 ~~~~~~~~~~~~~~~~
 
-.. class:: taho.enums.CraftAccessType
+.. class:: taho.enums.CraftAccessRuleType
 
     |int_enum|
 

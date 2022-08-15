@@ -31,13 +31,21 @@ from taho.emoji import Emoji
 import asyncio
 
 if TYPE_CHECKING:
-    from typing import Optional, Iterable, List, Any, Type
+    from typing import Optional, Iterable, List, Any, Type, TypeVar
     from tortoise import BaseDBAsyncClient
-    from tortoise.models import MODEL
 
-__all__ = (
-    "BaseModel",
-)
+    MODEL = TypeVar('MODEL', bound="BaseModel")
+
+    __all__ = (
+        "BaseModel",
+        "MODEL",
+    )
+
+else:
+
+    __all__ = (
+        "BaseModel",
+    )
 
 # This class is used to avoid reusing the same coroutine
 # multiple times (which results in a RuntimeError).

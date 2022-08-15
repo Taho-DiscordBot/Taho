@@ -30,7 +30,7 @@ from tortoise import exceptions as t_exceptions
 from taho.exceptions import QuantityException, NPCException
 from taho.enums import ItemUse, ItemType, ItemReason, RoleAddedBy
 from .npc import NPC
-from taho.abc import AccessShortcutable, OwnerShortcutable
+from taho.abc import AccessRuleShortcutable, OwnerShortcutable
 from permissions import Permissions
 
 if TYPE_CHECKING:
@@ -50,7 +50,7 @@ __all__ = (
     "UserPermission",
 )
 
-class User(BaseModel, OwnerShortcutable, AccessShortcutable):
+class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
     """|shortcutable|
     
     Represents a user of a cluster.
