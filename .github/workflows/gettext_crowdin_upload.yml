@@ -28,6 +28,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+      - name: test1
+        run: |
+          ls ${GITHUB_WORKSPACE}
+          ls ${GITHUB_REPOSITORY}
+          
       - name: Run gettext extract
         run: |
           python ${GITHUB_WORKSPACE}/bot.py update_babel
