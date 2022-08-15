@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-gettext:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,17 +25,12 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install -U -r requirements.txt
 
-  gettext:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Run gettext extract
         run: |
           python ./bot.py update_babel
-  
+
   crowdin:
-    needs: gettext
+    needs: build-and-gettext
     runs-on: ubuntu-latest
     
     steps:
