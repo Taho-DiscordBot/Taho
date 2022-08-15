@@ -31,12 +31,11 @@ jobs:
 
       - name: test1
         run: |
-          ls ${GITHUB_WORKSPACE}
-          ls ${GITHUB_REPOSITORY}
-          
+          ls
+
       - name: Run gettext extract
         run: |
-          python ${GITHUB_WORKSPACE}/bot.py update_babel
+          python ./bot.py update_babel
   
   crowdin:
     needs: gettext
