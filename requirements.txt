@@ -4,3 +4,4 @@ tortoise-orm[asyncpg]
 Babel
 emojis
 sshtunnel
+unidecode
