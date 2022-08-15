@@ -30,40 +30,11 @@ import argparse
 import os
 import sys
 import platform
-import logging
-import logging.handlers
 
 if TYPE_CHECKING:
     from typing import Tuple
 
-# Tortoise logger
-fmt = logging.Formatter(
-    fmt="%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-sh = logging.FileHandler(filename='logs/tortoise.log', encoding='utf-8', mode='w')
-sh.setLevel(logging.DEBUG)
-sh.setFormatter(fmt)
 
-logger_tortoise = logging.getLogger("tortoise")
-logger_tortoise.setLevel(logging.DEBUG)
-logger_tortoise.addHandler(sh)
-
-# Discord.py logger
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-logging.getLogger('discord.http').setLevel(logging.INFO)
-
-handler = logging.handlers.RotatingFileHandler(
-    filename='logs/discord.log',
-    encoding='utf-8',
-    maxBytes=5 * 1024 * 1024,  # 32 MiB
-    backupCount=5,  # Rotate through 5 files
-)
-dt_fmt = '%Y-%m-%d %H:%M:%S'
-formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 def show_version() -> None:
@@ -127,6 +98,38 @@ def compile_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace
     
 
 def start(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -> None:
+    import logging
+    import logging.handlers
+
+    # Tortoise logger
+    fmt = logging.Formatter(
+        fmt="%(asctime)s - %(name)s:%(lineno)d - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+    sh = logging.FileHandler(filename='logs/tortoise.log', encoding='utf-8', mode='w')
+    sh.setLevel(logging.DEBUG)
+    sh.setFormatter(fmt)
+
+    logger_tortoise = logging.getLogger("tortoise")
+    logger_tortoise.setLevel(logging.DEBUG)
+    logger_tortoise.addHandler(sh)
+
+    # Discord.py logger
+    logger = logging.getLogger('discord')
+    logger.setLevel(logging.DEBUG)
+    logging.getLogger('discord.http').setLevel(logging.INFO)
+
+    handler = logging.handlers.RotatingFileHandler(
+        filename='logs/discord.log',
+        encoding='utf-8',
+        maxBytes=5 * 1024 * 1024,  # 32 MiB
+        backupCount=5,  # Rotate through 5 files
+    )
+    dt_fmt = '%Y-%m-%d %H:%M:%S'
+    formatter = logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', dt_fmt, style='{')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
     print("Starting bot...")
 
     compile_babel()
