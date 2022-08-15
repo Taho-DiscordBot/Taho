@@ -27,11 +27,12 @@ from .base import BaseModel
 from tortoise import fields
 from tortoise.validators import MinValueValidator, MaxValueValidator
 from taho.enums import RewardType
+from taho.utils import AbstractReward, AbstractRewardPack
+
 
 if TYPE_CHECKING:
     from typing import Union, Tuple
     from taho.abc import StuffShortcutable
-    from taho.utils import AbstractReward, AbstractRewardPack
 
 __all__ = (
     "RewardPack",
@@ -123,7 +124,6 @@ class RewardPack(BaseModel):
             The abstract reward pack.
         """
         return AbstractRewardPack(
-            id=self.id,
             type=self.type,
             luck=self.luck,
             rewards=[await reward.to_abstract() async for reward in self.rewards]
