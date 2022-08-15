@@ -15,7 +15,6 @@ TEST_GUILDS = [] # Enter guild ids here
 BABEL_DOMAIN = "messages"
 BABEL_DEFAULT_LOCALE = "en"
 BABEL_DEFAULT_TIMEZONE = "UTC"
-BABEL_TRANSLATION_DIRECTORIES = "translations"
 
 # The DB has to be hosted by PostgreSQL
 DB_USERNAME = ""

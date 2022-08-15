@@ -230,10 +230,7 @@ class Babel(object):
     
     @property
     def translation_directories(self) -> Generator[str]:
-        directories = self.bot.config.get(
-            'BABEL_TRANSLATION_DIRECTORIES',
-            'translations'
-        ).split(';')
+        directories = "translations"
 
         for path in directories:
             if os.path.isabs(path):
