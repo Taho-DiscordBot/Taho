@@ -12,6 +12,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.9
         uses: actions/setup-python@v4
@@ -28,11 +30,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      - name: test1
-        run: |
-          ls
-
       - name: Run gettext extract
         run: |
           python ./bot.py update_babel
