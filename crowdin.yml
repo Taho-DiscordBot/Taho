@@ -1,0 +1,8 @@
+# -*- coding: utf-8 -*-
+
+project_id: CROWDIN_PROJECT_ID
+api_token_env: CROWDIN_PERSONAL_TOKEN
+
+files:
+  - source: /translations/messages.pot
+    translation: /translations/%two_letters_code%/LC_MESSAGES/messages.po
