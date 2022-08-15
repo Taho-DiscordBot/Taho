@@ -31,9 +31,9 @@ jobs:
       
       - name: Git Auto Commit gettext
         uses: stefanzweifel/git-auto-commit-action@v4.14.1
-        with:
-          file_pattern: '*.pot'
-          commit_message: [auto] Update gettext translations
+          with:
+            file_pattern: '*.pot'
+            commit_message: [auto] Update gettext translations
       
       - name: crowdin action
         uses: crowdin/github-action@1.4.12
