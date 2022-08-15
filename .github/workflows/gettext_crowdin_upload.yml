@@ -1,0 +1,49 @@
+name: Gettext (Babel) & Crowdin upload
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -U -r requirements.txt
+
+  gettext:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run gettext extract
+        run: |
+          python bot.py update_babel
+  
+  crowdin:
+    needs: gettext
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: crowdin action
+        uses: crowdin/github-action@1.4.12
+        with:
+          upload_translations: true
+          download_translations: false
+          config: "crowdin.yml"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CROWDIN_PROJECT_ID: ${{ secrets.CROWDIN_PROJECT_ID }}
+          CROWDIN_PERSONAL_TOKEN: ${{ secrets.CROWDIN_API_KEY }}
