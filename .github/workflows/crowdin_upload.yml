@@ -1,4 +1,4 @@
-name: Crowdin Action
+name: Crowdin Upload
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
       uses: crowdin/github-action@1.4.12
       with:
         upload_translations: true
-        download_translations: true
+        download_translations: false
         config: "crowdin.yml"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
