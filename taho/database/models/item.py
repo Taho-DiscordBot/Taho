@@ -29,6 +29,7 @@ from tortoise.exceptions import ValidationError
 from taho.enums import ItemType, RewardType
 from taho.abc import StuffShortcutable
 from .reward import RewardPack, Reward
+from .access_rule import AccessRule
 
 if TYPE_CHECKING:
     from typing import Any, Iterable, Optional, Dict, List
@@ -500,7 +501,7 @@ class ItemReward(Reward):
     
     pack = fields.ForeignKeyField("main.ItemRewardPack", related_name="rewards")
 
-class ItemAccessRule(BaseModel):
+class ItemAccessRule(AccessRule):
     """Represents an access to a item.
 
     .. container:: operations
@@ -571,5 +572,3 @@ class ItemAccessRule(BaseModel):
     id = fields.IntField(pk=True)
 
     item = fields.ForeignKeyField("main.Item", related_name="accesses")
-    have_access = fields.BooleanField()
-    access_shortcut = fields.ForeignKeyField("main.AccessRuleShortcut")
