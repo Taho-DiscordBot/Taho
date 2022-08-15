@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
-from taho.utils import AbstractAccessRule
+from taho.utils.abstract import AbstractAccessRule
 
 
 __all__ = (

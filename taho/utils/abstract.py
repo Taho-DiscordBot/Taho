@@ -25,7 +25,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.enums import RewardType, get_reward_type_text
 from taho.babel import _
-from taho.database.models import Item, Stat, Role
 
 if TYPE_CHECKING:
     from typing import Optional, List, TypeVar, Dict, Union, Type
@@ -305,6 +304,8 @@ class AbstractReward:
             from .utils_ import get_bot
             bot = get_bot()
 
+        from taho.database.models import Item, Stat, Role
+
         stuff = self.stuff or await self.stuff_shortcut.get()
 
         if isinstance(stuff, Role):
@@ -426,6 +427,8 @@ class AbstractAccessRule:
         if not bot:
             from .utils_ import get_bot
             bot = get_bot()
+
+        from taho.database.models import Role
 
         access = self.access or await self.access_shortcut.get()
 
