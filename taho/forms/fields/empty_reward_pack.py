@@ -127,6 +127,7 @@ class EmptyRewardPackModal(FieldModal):
         pack = AbstractRewardPack(
             type=value["reward_type"],
             luck=value["luck"],
+            rewards=[]
         )
 
         new_field = RewardPack(
