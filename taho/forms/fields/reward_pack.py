@@ -22,10 +22,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from pickle import FALSE
 import traceback
 from typing import TYPE_CHECKING
-from discord import Interaction, ui, SelectOption, ButtonStyle, utils as d_utils, TextStyle
+from discord import Interaction, ui, SelectOption, ButtonStyle, TextStyle
 from taho.babel import _
 from taho.utils.utils_ import split_list
 from taho.utils.abstract import AbstractReward
@@ -34,7 +33,7 @@ from taho.database.models import Item
 from taho.exceptions import ValidationException
 from .field import Field, FieldView
 from ..choice import Choice
-from ..validators import is_number, is_int
+from ..validators import is_number
 
 if TYPE_CHECKING:
     from typing import Union, List, Callable, Optional, Dict, Any, Literal
