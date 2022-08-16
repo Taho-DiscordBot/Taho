@@ -144,7 +144,7 @@ class AmountModal(ui.Modal):
     def __init__(
         self,
     ) -> None:
-        super().__init__(title=_("Reward amount"))
+        super().__init__(title=_("Reward amount"), timeout=None)
 
         self.min_amount = ui.TextInput(
             label=_("Minimum amount"),
@@ -246,7 +246,7 @@ class _BaseRewardPackView(ui.View):
         self, 
         base_view: RewardPackView,
     ) -> None:
-        super().__init__()
+        super().__init__(timeout=None)
         self.base_view = base_view
     
     async def get_content(self) -> str:

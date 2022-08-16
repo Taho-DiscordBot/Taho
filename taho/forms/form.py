@@ -36,7 +36,7 @@ if TYPE_CHECKING:
 
 class FormView(discord.ui.View):
     def __init__(self, form: Form):
-        super().__init__()
+        super().__init__(timeout=None)
 
         self.form = form
 

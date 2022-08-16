@@ -289,7 +289,7 @@ class FieldModal(Modal):
         *, title: str,
         default: Optional[T] = None,
     ) -> None:
-        super().__init__(title=title)
+        super().__init__(title=title, timeout=None)
 
         self.field = field
         self.default = default
@@ -335,7 +335,7 @@ class FieldView(View):
         field: FIELD,
         default: Optional[T] = None,
     ) -> None:
-        super().__init__()
+        super().__init__(timeout=None)
 
         self.field = field
         self.default = default

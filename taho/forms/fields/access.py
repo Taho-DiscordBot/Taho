@@ -146,7 +146,7 @@ class _BaseAccessRuleView(ui.View):
         self, 
         base_view: AccessRuleView,
     ) -> None:
-        super().__init__()
+        super().__init__(timeout=None)
         self.base_view = base_view
     
     async def get_content(self) -> str:
