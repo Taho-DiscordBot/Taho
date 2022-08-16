@@ -107,7 +107,7 @@ class Field:
         self.default = default
 
         self.is_current = False
-        self.value = None
+        self.value: Optional[T] = self.default
         self.form: Form = None
 
 
