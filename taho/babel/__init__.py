@@ -261,7 +261,7 @@ class Babel(object):
 
         # If not other translations are found, add the default locale.
         if not result:
-            result.append(Locale.parse(self._default_locale))
+            result.append(Locale.parse(self.default_locale))
 
         return result
 
