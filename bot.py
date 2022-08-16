@@ -57,19 +57,22 @@ def core(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
         parser.print_help()
 
 def update_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=None) -> None:
-    with open("translations/messages.pot", "r") as f:
+    len_messages = 0
+    with open("translations/messages.pot", "r+", encoding="utf-8") as f:
         lines = f.readlines()
         len_messages = len(lines)
         for i, line in enumerate(lines):
             if line.startswith('"POT-Creation-Date:'):
                 before_creation_date = i, line
                 break
-
-    def skip_post_creation():
-        with open("translations/messages.pot", "r+") as f:
+    
+    def skip_post_creation(before_creation_date):
+        with open("translations/messages.pot", "r+", encoding="utf-8") as f:
             lines = f.readlines()
-            if len(lines) > len_messages:
+            if len(lines) != len_messages:
                 return
+            f.seek(0)
+            f.truncate()
             new_file = lines
             new_file[before_creation_date[0]] = before_creation_date[1]
             f.writelines(new_file)
@@ -83,7 +86,6 @@ def update_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=
         "lazy_ngettext",
         "lazy_pgettext",
         "_d",
-
     )
     
     command = "pybabel extract -o translations/messages.pot . "
@@ -98,7 +100,8 @@ def update_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=
         print("Failed to update translations")
         print("Make sure you have babel installed, and you activated the virtual environment")
     else:
-        skip_post_creation()
+        print("Skipping POT-Creation-Date update (if no change in messages.pot)... ")
+        skip_post_creation(before_creation_date)
         print("==============================")
         print("Updated translations")
 
