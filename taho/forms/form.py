@@ -25,7 +25,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import asyncio
 import discord
-import datetime
 from taho.babel import _
 
 if TYPE_CHECKING:
