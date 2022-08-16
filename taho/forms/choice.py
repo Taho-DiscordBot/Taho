@@ -26,11 +26,10 @@ from typing import TYPE_CHECKING
 import uuid
 from taho.babel import _
 from discord import SelectOption, utils
-
+from taho.emoji import Emoji
 
 if TYPE_CHECKING:
     from typing import Optional, TypeVar
-    from taho import Emoji
 
     T = TypeVar("T")
 
@@ -61,6 +60,8 @@ class Choice:
     
     def to_select_option(self) -> SelectOption:
         if self.emoji:
+            if not isinstance(self.emoji, Emoji):
+                self.emoji = Emoji(self.emoji)
             emoji = self.emoji.to_partial()
         else:
             emoji = None
