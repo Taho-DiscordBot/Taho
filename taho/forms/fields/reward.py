@@ -88,7 +88,7 @@ class Reward(Field):
         reward_types: Optional[Union[List[RewardType], RewardTypes]] = None,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
-        default: Optional[T] = None,
+        default: List[AbstractRewardPack] = [],
         **kwargs
         ) -> None:
         super().__init__(
@@ -104,7 +104,7 @@ class Reward(Field):
         self.original_reward_types = reward_types
         self.reward_types: List[RewardType] = None
 
-        self.value: Optional[List[AbstractRewardPack]] = None
+        self.value: List[AbstractRewardPack] = default
     
     async def get_rewardable_list(self, interaction: Interaction) -> None:
         
