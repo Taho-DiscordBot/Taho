@@ -201,7 +201,7 @@ class Item(BaseModel, StuffShortcutable):
     reward_packs: fields.ReverseRelation["ItemRewardPack"]
     
     def __str__(self) -> str:
-        return self.name
+        return self.get_display()
 
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
@@ -277,10 +277,8 @@ class Item(BaseModel, StuffShortcutable):
         """
         from taho.database.models import Cluster, Currency, ItemStat, Role
 
-    async def get_display(self) -> str:
+    def get_display(self) -> str:
         """
-        |coro|
-        
         Returns the item's display.
         
         Returns

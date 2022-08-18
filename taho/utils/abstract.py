@@ -314,7 +314,9 @@ class AbstractReward:
                 role=await stuff.get_display(bot, server_id=guild_id)
             )
         else:
-            stuff_name = await stuff.get_display()
+            stuff_name = stuff.get_display()
+            if not isinstance(stuff_name, str):
+                stuff_name = await stuff_name
 
             if isinstance(stuff, Item):
                 if self.durability:
