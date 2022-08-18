@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import uuid
+from enum import Enum
 
 if TYPE_CHECKING:
     from typing import Union, List, TypeVar
@@ -37,6 +38,8 @@ __all__ = (
     "register_bot",
     "get_bot",
     "split_list",
+    "_get_display",
+    "get_enum_text",
     "RandomHash",
 )
 bot: Bot = None
@@ -109,6 +112,24 @@ def split_list(to_split: List[T], split_at: int) -> List[List[T]]:
         The split list.
     """
     return [to_split[i:i+split_at] for i in range(0, len(to_split), split_at)]
+
+def _get_display(value: T) -> str:
+    if isinstance(value, Enum):
+        return get_enum_text(value)
+    else:
+        return str(value)
+
+def get_enum_text(enum: Enum) -> str:
+    from taho.enums import (
+        ItemType, get_item_type_text,
+        RewardType, get_reward_type_text,
+    )
+    if isinstance(enum, ItemType):
+        return get_item_type_text(enum)
+    elif isinstance(enum, RewardType):
+        return get_reward_type_text(enum)
+    
+    
 
 class RandomHash:
     """
