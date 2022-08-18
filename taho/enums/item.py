@@ -27,6 +27,7 @@ __all__ = (
     "ItemType",
     "ItemReason",
     "ItemUse",
+    "get_item_type_text",
 )
 class ItemType(IntEnum):
     resource = 0
@@ -43,3 +44,31 @@ class ItemUse(IntEnum):
     equip = 2
     unequip = 3
     give = 4
+
+def get_item_type_text(item_type: ItemType) -> str:
+    """
+    Get the text of a, item type.
+
+    Parameters
+    -----------
+    item_type: :class:`.ItemType`
+        The item type.
+    
+    Raises
+    -------
+    ValueError
+        If the item type is invalid.
+    
+    Returns
+    --------
+    :class:`str`
+        The text of the item type.
+    """
+    from taho.babel import _
+
+    texts = {
+        ItemType.resource: _("Resource"),
+        ItemType.consumable: _("Consumable"),
+        ItemType.currency: _("Currency"),
+    }
+    return texts[item_type]
