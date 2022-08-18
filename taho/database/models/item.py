@@ -290,6 +290,33 @@ class Item(BaseModel, StuffShortcutable):
         """           
         return f"{self.emoji} {self.name}" if self.emoji else self.name
 
+    async def to_dict(self) -> Dict[str, Any]:
+        """
+        |coro|
+        
+        Returns the item's dictionary.
+        
+        Returns
+        -------
+        :class:`dict`
+            The item's dictionary.
+        """
+        return {
+            "id": self.id,
+            "cluster_id": self.cluster_id,
+            "name": self.name,
+            "emoji": self.emoji,
+            "description": self.description,
+            "type": self.type,
+            "durability": self.durability,
+            "cooldown": self.cooldown,
+            "access_rules": [
+                await rule.to_abstract() async for rule in self.access_rules.all()
+            ],
+            "reward_packs": [
+                await pack.to_abstract() async for pack in self.reward_packs.all()
+            ],
+        }
 
         # cluster = await Cluster.get_or_none(id=data['cluster'])
         # currency = await Currency.get_or_none(id=data['currency']) if 'currency' in data else None
