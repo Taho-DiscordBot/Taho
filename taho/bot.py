@@ -152,7 +152,12 @@ class Bot(commands.AutoShardedBot):
         return await super().get_context(message, cls=TahoContext)
     
     async def on_command_error(self, ctx, exception, /) -> None:
-        await ctx.send(f"```{traceback.format_exc()}```")
+        etype = type(exception)
+        trace = exception.__traceback__
+        lines = traceback.format_exception(etype, exception, trace)
+        traceback_text = ''.join(lines)
+
+        await ctx.send(f"```{traceback_text}```")
         raise exception
     
     async def close(self) -> None:
