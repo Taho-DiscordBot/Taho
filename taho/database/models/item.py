@@ -140,7 +140,7 @@ class Item(BaseModel, StuffShortcutable):
 
                 - :attr:`related_model` :class:`~taho.database.models.Currency`
                 - :attr:`related_name` ``item``
-                - :attr:`default` ``None``
+                - :attr:`null` ``True``
             
             Python: Optional[:class:`~taho.database.models.Currency`]
 
@@ -195,7 +195,7 @@ class Item(BaseModel, StuffShortcutable):
     durability: Optional[int] = fields.IntField(null=True)
     cooldown = fields.IntField(null=True) #TODO typing in fields
 
-    currency = fields.OneToOneField('main.Currency', related_name="item", default=None)
+    currency = fields.OneToOneField('main.Currency', related_name="item", null=True)
 
     access_rules: fields.ReverseRelation["ItemAccessRule"]
     reward_packs: fields.ReverseRelation["ItemRewardPack"]

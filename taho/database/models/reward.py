@@ -107,7 +107,7 @@ class RewardPack(BaseModel):
     
     id = fields.IntField(pk=True)
 
-    type = fields.IntEnumField(RewardType, default=None)
+    type = fields.IntEnumField(RewardType, null=True)
 
     luck = fields.FloatField(default=1, validators=[MinValueValidator(0), MaxValueValidator(1)])
 
@@ -210,7 +210,7 @@ class Reward(BaseModel):
 
                 - :attr:`max_digits` ``10``
                 - :attr:`decimal_places` ``2``
-                - :attr:`default` ``None``
+                - :attr:`null` ``True``
             
             Python: :class:`float`
 
@@ -249,7 +249,7 @@ class Reward(BaseModel):
     regeneration = fields.BooleanField(default=False)
     durability = fields.BooleanField(default=False)
     min_amount = fields.DecimalField(max_digits=10, decimal_places=2, default=1)
-    max_amount = fields.DecimalField(max_digits=10, decimal_places=2, default=None)
+    max_amount = fields.DecimalField(max_digits=10, decimal_places=2, null=True)
     
     async def get_stuff(self, force: bool = False) -> StuffShortcutable:
         from taho.database.utils import get_stuff # avoid circular import
