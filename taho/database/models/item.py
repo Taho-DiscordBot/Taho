@@ -547,21 +547,21 @@ class ItemReward(Reward):
     pack = fields.ForeignKeyField("main.ItemRewardPack", related_name="rewards")
 
 class ItemAccessRule(AccessRule):
-    """Represents an access to a item.
+    """Represents an access rule to a item.
 
     .. container:: operations
 
         .. describe:: x == y
 
-            Checks if two item accesses are equal.
+            Checks if two rules are equal.
 
         .. describe:: x != y
 
-            Checks if two item accesses are not equal.
+            Checks if two rules are not equal.
         
         .. describe:: hash(x)
 
-            Returns the item access's hash.
+            Returns the rule's hash.
         
     .. container:: fields
 
@@ -578,7 +578,7 @@ class ItemAccessRule(AccessRule):
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
 
                 - :attr:`related_model` :class:`~taho.database.models.Item`
-                - :attr:`related_name` ``accesses``
+                - :attr:`related_name` ``access_rules``
             
             Python: :class:`~taho.database.models.Item`
         
@@ -612,8 +612,8 @@ class ItemAccessRule(AccessRule):
         The shortcut to the entity which has access to the item.
     """
     class Meta:
-        table = "item_access"
+        table = "item_access_rules"
     
     id = fields.IntField(pk=True)
 
-    item = fields.ForeignKeyField("main.Item", related_name="accesses")
+    item = fields.ForeignKeyField("main.Item", related_name="access_rules")
