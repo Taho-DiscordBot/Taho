@@ -32,12 +32,13 @@ from taho.exceptions import DoesNotExist, AlreadyExists
 from taho.database import utils as db_utils
 from taho.enums import InfoType
 from taho.babel import _
+import asyncio
 
 if TYPE_CHECKING:
     from taho import Bot, Emoji
     from typing import Any, List, Optional, Union, Dict, AsyncGenerator
     from taho.enums import RoleType, ItemType
-    from taho.bot import Bot
+    from taho.utils.abstract import AbstractAccessRule, AbstractRewardPack
     from .server import Server
     from .user import User
     from .bank import Bank
@@ -666,6 +667,8 @@ class Cluster(BaseModel):
         *,
         emoji: Optional[Emoji] = ...,
         description: Optional[str] = ...,
+        access_rules: Optional[List[AbstractAccessRule]] = ...,
+        rewards: Optional[List[AbstractRewardPack]] = ...
         ) -> Item:
         ...
     
@@ -678,20 +681,8 @@ class Cluster(BaseModel):
         description: Optional[str] = ...,
         durability: Optional[int] = ...,
         cooldown: Optional[int] = ...,
-        ) -> Item:
-        ...
-    
-    @overload
-    async def create_item(self,
-        name: str,
-        type: ItemType,
-        *,
-        emoji: Optional[Emoji] = ...,
-        description: Optional[str] = ...,
-        durability: Optional[int] = ...,
-        cooldown: Optional[int] = ...,
-        ammo: Optional[Item] = ...,
-        charger_size: Optional[int] = ...,
+        access_rules: Optional[List[AbstractAccessRule]] = ...,
+        rewards: Optional[List[AbstractRewardPack]] = ...
         ) -> Item:
         ...
     
@@ -702,53 +693,45 @@ class Cluster(BaseModel):
 
         Parameters
         -----------
-        name: str
+        name: :class:`str`
             The name of the item.
         type: :class:`~taho.enums.ItemType`
             The type of the item.
         emoji: Optional[:class:`~taho.Emoji`]
             The emoji of the item.
-        description: Optional[str]
+        description: Optional[:class:`str`]
             The description of the item.
-        durability: Optional[int]
+        durability: Optional[:class:`int`]
             The durability of the item.
             Only if ``type`` is :attr:`~taho.enums.ItemType.consumable`
-        cooldown: Optional[int]
+        cooldown: Optional[:class:`int`]
             The cooldown between two item use.
             Only if ``type`` is :attr:`~taho.enums.ItemType.consumable`
+        access_rules: Optional[List[:class:`~taho.utils.AbstractAccessRule`]]
+            The access rules of the item.
+        rewards: Optional[List[:class:`~taho.utils.AbstractRewardPack`]]
+            The rewards of the item.
 
         Raises
         -------
         ~taho.exceptions.AlreadyExists
             An item with the same name already exists.
-        TypeError
-            If you specified ``ammo`` but ``charger_size`` is not defined
-            or if you specified ``charger_size`` but ``ammo`` is not defined.
         ValueError
             If ``cooldown`` is negative (<=0).
-            If ``durability`` is negative (<=-1).
-            If ``charger_size`` is negative (<=-1).
+            If ``durability`` is negative (<=-1) or equal to 0.
         """
-        from .item import Item # avoid circular import
-        if options.get("ammo") and not options.get("charger_size"):
-            raise TypeError("You must specify the charger size if you specify the ammo.")
-        if options.get("charger_size") and not options.get("ammo"):
-            raise TypeError("You must specify the ammo if you specify the charger size.")
-        if options.get("ammo"):
-            options["ammo"] = options["ammo"].id
-        if options.get("charger_size", 1) <= -1:
-            raise ValueError("The charger size must be positive.")
+        from .item import Item, ItemAccessRule, ItemReward, ItemRewardPack # avoid circular import
 
-        charger_size = options.get("charger_size", 1)
-        if charger_size <= -1 or charger_size == 0:
-            raise ValueError("The charger size must be positive or equal to -1 (infinite).")
+        # Check validity of the options cooldown and durability
         if options.get("cooldown", 1) <= 0:
             raise ValueError("The cooldown must be positive.")
         dura = options.get("durability", 1)
         if dura <= -1 or dura == 0:
             raise ValueError("The durability must be positive or equal to -1 (infinite).")
+        
         try:
-            return await Item.create(
+            # Create the item
+            item = await Item.create(
                 cluster=self, 
                 name=name, 
                 type=type,
@@ -756,6 +739,32 @@ class Cluster(BaseModel):
                 )
         except t_exceptions.IntegrityError:
             raise AlreadyExists("An item with the same name already exists.")
+        else:
+            # Get the access rules and rewards
+            access_rules = options.get("access_rules", [])
+            reward_packs = options.get("reward_packs", [])
+
+            queries = []
+
+            # Register coroutines to create the access rules and rewards
+            if access_rules:
+                for rule in access_rules:
+                    queries.append(rule.to_db_access(
+                        ItemAccessRule,
+                        item
+                        ))
+            if reward_packs:
+                for pack in reward_packs:
+                    queries.append(pack.to_db_pack(
+                        ItemRewardPack,
+                        ItemReward,
+                        item
+                        ))
+            
+            # Execute the coroutines
+            await asyncio.gather(*queries)
+
+            return item
 
     async def create_bank(self, name: str) -> Bank:
         """|coro|
