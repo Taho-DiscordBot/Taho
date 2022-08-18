@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-17 12:44+0000\n"
+"POT-Creation-Date: 2022-08-18 14:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: taho/database/models/cluster.py:580
-msgid "Cash"
+#: taho/enums/item.py:70
+msgid "Resource"
+msgstr ""
+
+#: taho/enums/item.py:71
+msgid "Consumable"
+msgstr ""
+
+#: taho/enums/item.py:72
+msgid "Currency"
 msgstr ""
 
 #: taho/enums/reward.py:61
@@ -72,14 +80,15 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: taho/forms/form.py:411
+#: taho/forms/form.py:412
 msgid ""
 "Please fill out the form below.\n"
 "You can use the buttons below to navigate the form.\n"
-"A title with `*` indicates a required field.\n"
+"A title with `*` indicates a required field, one with `x` indicates that "
+"it cannot be defined.\n"
 msgstr ""
 
-#: taho/forms/form.py:483
+#: taho/forms/form.py:485
 msgid ""
 "This form as no timeout, but due to Discord limitations on ephemeral "
 "messages, it may start to bug after 15 mins."
@@ -194,24 +203,24 @@ msgstr ""
 msgid "Select rules to remove in the list"
 msgstr ""
 
-#: taho/forms/fields/access.py:486
+#: taho/forms/fields/access.py:488
 msgid "There are no roles configured, so you can't create an access rule."
 msgstr ""
 
-#: taho/forms/fields/access.py:507 taho/forms/fields/emoji.py:156
-#: taho/forms/fields/field.py:114 taho/forms/fields/number.py:118
-#: taho/forms/fields/reward.py:226 taho/forms/fields/select.py:195
-#: taho/forms/fields/text.py:118
+#: taho/forms/fields/access.py:509 taho/forms/fields/emoji.py:158
+#: taho/forms/fields/field.py:129 taho/forms/fields/number.py:120
+#: taho/forms/fields/reward.py:230 taho/forms/fields/select.py:198
+#: taho/forms/fields/text.py:120
 msgid "*Unanswered*"
 msgstr ""
 
-#: taho/forms/fields/emoji.py:59 taho/forms/fields/emoji.py:136
-#: taho/forms/fields/number.py:53 taho/forms/fields/number.py:104
-#: taho/forms/fields/text.py:51 taho/forms/fields/text.py:102
+#: taho/forms/fields/emoji.py:59 taho/forms/fields/emoji.py:138
+#: taho/forms/fields/number.py:53 taho/forms/fields/number.py:106
+#: taho/forms/fields/text.py:51 taho/forms/fields/text.py:104
 msgid "Enter a value"
 msgstr ""
 
-#: taho/forms/fields/emoji.py:116
+#: taho/forms/fields/emoji.py:118
 msgid ""
 "Due to a Discord restriction, you are not able to select an emoji "
 "directly in the Modal.\n"
@@ -252,7 +261,7 @@ msgstr ""
 msgid "Click on **Respond** to create a new reward pack"
 msgstr ""
 
-#: taho/forms/fields/field.py:317 taho/forms/fields/field.py:363
+#: taho/forms/fields/field.py:347 taho/forms/fields/field.py:393
 #, python-format
 msgid "Successfully set value to: %(value)s"
 msgstr ""
@@ -261,15 +270,15 @@ msgstr ""
 msgid "No items available."
 msgstr ""
 
-#: taho/forms/fields/number.py:120
+#: taho/forms/fields/number.py:122
 msgid "Infinite"
 msgstr ""
 
-#: taho/forms/fields/reward.py:199
+#: taho/forms/fields/reward.py:203
 msgid "Rewards"
 msgstr ""
 
-#: taho/forms/fields/reward.py:200
+#: taho/forms/fields/reward.py:204
 msgid ""
 "You can create packs of rewards. A pack is a list of rewards with the "
 "same loot chance and condition.\n"
@@ -277,12 +286,12 @@ msgid ""
 "You can create several packs with the same loot chance and condition."
 msgstr ""
 
-#: taho/forms/fields/reward.py:234
+#: taho/forms/fields/reward.py:238
 #, python-format
 msgid "**%(pack_name)s:**"
 msgstr ""
 
-#: taho/forms/fields/reward.py:239
+#: taho/forms/fields/reward.py:243
 #, python-format
 msgid "• %(reward_display)s"
 msgstr ""
@@ -419,12 +428,12 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: taho/forms/fields/select.py:155
+#: taho/forms/fields/select.py:157
 #, python-format
 msgid "Select between %(min_values)s and %(max_values)s values."
 msgstr ""
 
-#: taho/forms/fields/select.py:167
+#: taho/forms/fields/select.py:169
 msgid "No choices available."
 msgstr ""
 
@@ -438,38 +447,38 @@ msgstr ""
 msgid "**%(role)s**"
 msgstr ""
 
-#: taho/utils/abstract.py:321
+#: taho/utils/abstract.py:323
 msgid "*(durability)*"
 msgstr ""
 
-#: taho/utils/abstract.py:323
+#: taho/utils/abstract.py:325
 msgid "*(quantity)*"
 msgstr ""
 
-#: taho/utils/abstract.py:326
+#: taho/utils/abstract.py:328
 msgid "*(regeneration)*"
 msgstr ""
 
-#: taho/utils/abstract.py:328
+#: taho/utils/abstract.py:330
 msgid "*(maximum)*"
 msgstr ""
 
-#: taho/utils/abstract.py:331
+#: taho/utils/abstract.py:333
 #, python-format
 msgid "%(min_amount)s/%(max_amount)s **%(stuff_name)s** %(additional_info)s"
 msgstr ""
 
-#: taho/utils/abstract.py:339
+#: taho/utils/abstract.py:341
 #, python-format
 msgid "%(min_amount)s **%(stuff_name)s** %(additional_info)s"
 msgstr ""
 
-#: taho/utils/abstract.py:439
+#: taho/utils/abstract.py:441
 #, python-format
 msgid "✅ %(entity)s"
 msgstr ""
 
-#: taho/utils/abstract.py:441
+#: taho/utils/abstract.py:443
 #, python-format
 msgid "❌ %(entity)s"
 msgstr ""
