@@ -30,6 +30,7 @@ from taho.emoji import Emoji
 
 if TYPE_CHECKING:
     from typing import Optional, TypeVar
+    from discord.types.components import SelectOption as SelectOptionPayload
 
     T = TypeVar("T")
 
@@ -72,3 +73,6 @@ class Choice:
                 description=self.description,
                 emoji=emoji,
             )
+    
+    def to_dict(self) -> SelectOptionPayload:
+        return self.to_select_option().to_dict()
