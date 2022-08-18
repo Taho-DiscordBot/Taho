@@ -308,6 +308,8 @@ class Item(BaseModel, StuffShortcutable):
             "type": self.type,
             "durability": self.durability,
             "cooldown": self.cooldown,
+            "currency_id": self.currency_id,
+            "currency": await self.currency if self.currency_id else None,
             "access_rules": [
                 await rule.to_abstract() async for rule in self.access_rules.all()
             ],
