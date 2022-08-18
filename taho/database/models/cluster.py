@@ -559,27 +559,6 @@ class Cluster(BaseModel):
             The default currency of the cluster.
         """
         return await db_utils.get_default_currency(self.id)
-        
-
-    async def get_default_bank(self) -> Bank:
-        """|coro|
-
-        Get (or create if not stored) the default User of the cluster.
-        This user will be used to store a bunch of things with a User field
-        but not directly related to a user in this specific case.
-        Example: A bank's default account is stored with this user.
-        
-        Returns
-        --------
-        :class:`~taho.database.models.User`
-            The default user of the cluster.
-        """
-        from .bank import Bank # Avoid circular import
-        bank = await Bank.get_or_create(
-            cluster=self, 
-            name=_("Cash"), 
-        )
-        return bank[0]
 
     
     @classmethod
