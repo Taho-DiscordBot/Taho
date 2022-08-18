@@ -189,7 +189,7 @@ class Field:
                 await validator(self.value)
             except ValidationException as e:
                 self.value = None
-                self.value_display = str(e)
+                self.display_value = str(e)
                 params = {
                     "content": str(e),
                     "ephemeral": True,
