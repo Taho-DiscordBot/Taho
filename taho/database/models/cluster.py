@@ -30,14 +30,14 @@ from tortoise.signals import post_save
 from .role import Role
 from taho.exceptions import DoesNotExist, AlreadyExists
 from taho.database import utils as db_utils
-from taho.enums import InfoType
+from taho.enums import InfoType, ItemType
 from taho.babel import _
 import asyncio
 
 if TYPE_CHECKING:
     from taho import Bot, Emoji
     from typing import Any, List, Optional, Union, Dict, AsyncGenerator
-    from taho.enums import RoleType, ItemType
+    from taho.enums import RoleType
     from taho.utils.abstract import AbstractAccessRule, AbstractRewardPack
     from .server import Server
     from .user import User
@@ -642,8 +642,8 @@ class Cluster(BaseModel):
     @overload
     async def create_item(self,
         name: str,
-        type: ItemType,
         *,
+        type: ItemType = ItemType.resource,
         emoji: Optional[Emoji] = ...,
         description: Optional[str] = ...,
         access_rules: Optional[List[AbstractAccessRule]] = ...,
@@ -654,8 +654,21 @@ class Cluster(BaseModel):
     @overload
     async def create_item(self,
         name: str,
-        type: ItemType,
         *,
+        type: ItemType = ItemType.currency,
+        currency: Optional[Union[Currency, int]] = ...,
+        emoji: Optional[Emoji] = ...,
+        description: Optional[str] = ...,
+        access_rules: Optional[List[AbstractAccessRule]] = ...,
+        rewards: Optional[List[AbstractRewardPack]] = ...
+        ) -> Item:
+        ...
+    
+    @overload
+    async def create_item(self,
+        name: str,
+        *,
+        type: ItemType = ItemType.resource,
         emoji: Optional[Emoji] = ...,
         description: Optional[str] = ...,
         durability: Optional[int] = ...,
@@ -698,6 +711,8 @@ class Cluster(BaseModel):
         ValueError
             If ``cooldown`` is negative (<=0).
             If ``durability`` is negative (<=-1) or equal to 0.
+            If ``type`` is :attr:`~taho.enums.ItemType.currency` and
+            ``currency`` is not defined.
         """
         from .item import Item, ItemAccessRule, ItemReward, ItemRewardPack # avoid circular import
 
@@ -707,6 +722,18 @@ class Cluster(BaseModel):
         dura = options.get("durability", 1)
         if dura <= -1 or dura == 0:
             raise ValueError("The durability must be positive or equal to -1 (infinite).")
+        
+        if type == ItemType.currency and options.get("currency", None) is None:
+            raise ValueError("The currency must be defined.")
+        
+        currency = options.pop("currency", None)
+
+        from .currency import Currency # avoid circular import
+
+        if isinstance(currency, Currency):
+            options["currency_id"] = currency.id
+        elif isinstance(currency, int):
+            options["currency_id"] = currency
         
         try:
             # Create the item
