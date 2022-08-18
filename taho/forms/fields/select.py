@@ -28,7 +28,7 @@ from discord.ui import Select as _Select, Button
 from taho.babel import _
 from .field import Field, FieldView
 from ..validators import min_length, max_length
-from taho.utils import split_list
+from taho.utils import split_list, _get_display
 
 if TYPE_CHECKING:
     from typing import Optional, List, Callable, TypeVar
@@ -191,19 +191,16 @@ class Select(Field):
         )
         await view.wait()
 
+
     
     async def display(self) -> str:
         if self.value is None:
             self.display_value = _("*Unanswered*")
         else:
-            response_map = {
-                c.value: c.label for c in self.choices
-            }
-
-            if self.min_values == 1 and self.max_values == 1:
-                self.display_value = response_map[self.value]
-            else:
+            if isinstance(self.value, list):
                 self.display_value = ", ".join(
-                    response_map[v] for v in self.value
+                    [_get_display(value) for value in self.value]
                 )
+            else:
+                self.display_value = _get_display(self.value)
         return self.display_value
