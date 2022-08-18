@@ -90,6 +90,15 @@ class Currency(BaseModel, StuffShortcutable):
             
             Python: :class:`str`
         
+        .. collapse:: emoji
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
         .. collapse:: rate
 
             Tortoise: :class:`tortoise.fields.DecimalField`
@@ -125,6 +134,8 @@ class Currency(BaseModel, StuffShortcutable):
     code: :class:`str`
         The currency's code.
         ex: 'EUR'
+    emoji: Optional[:class:`~taho.emoji.Emoji`]
+        The currency's emoji.
     rate: :class:`float`
         The currency's rate.
         It is used to convert one currency to another.
@@ -145,11 +156,27 @@ class Currency(BaseModel, StuffShortcutable):
     name = fields.CharField(max_length=255)
     symbol = fields.CharField(max_length=255)
     code = fields.CharField(max_length=255, null=True)
+    emoji = fields.CharField(max_length=255, null=True)
     rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
     is_default = fields.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.name
+        return self.get_display()
+    
+    def get_display(self) -> str:
+        """
+        Returns the currency's display.
+        
+        Returns
+        -------
+        :class:`str`
+            The item's display.
+        """
+        if self.code:
+            return f"{self.emoji} {self.code}" if self.emoji else self.code
+        else:
+            return f"{self.emoji} {self.name}" if self.emoji else self.name
+
     
     async def convert(self, currency: Currency, amount: float) -> float:
         """|coro|
