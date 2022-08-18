@@ -79,6 +79,7 @@ class Text(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        set_validators: List[Callable[[str], bool]] = [],
         default: Optional[str] = None,
         max_length: Optional[int] = None,
         min_length: Optional[int] = 3,
@@ -90,6 +91,7 @@ class Text(Field):
             required, 
             validators, 
             appear_validators, 
+            set_validators,
             default,
             **kwargs)
         

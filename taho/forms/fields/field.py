@@ -63,6 +63,7 @@ class Field:
         in ``validators``.
     validators: List[:class:`callable`]
         The list of validators of the field.
+        If all these validators succeed, the field is valid.
         A validator must meet the following format:
 
         .. code-block:: python3
@@ -73,6 +74,18 @@ class Field:
         :module:`taho.forms.validators`.
     appear_validators: List[:class:`callable`]
         The list of validators of the field.
+        If all these validators succeed, the field can be displayed in the form.
+        A validator must meet the following format:
+
+        .. code-block:: python3
+
+            lambda f: ...
+        
+        In the code, ``f`` is the form's dictionary
+        from :class:`~taho.forms.Form.to_dict`.
+    set_validators: List[:class:`callable`]
+        The list of validators of the field.
+        If all these validators succeed, the field can be set in the form.
         A validator must meet the following format:
 
         .. code-block:: python3
@@ -96,6 +109,7 @@ class Field:
         required: bool = False,
         validators: List[Callable[[str], bool]] = [],
         appear_validators: List[Callable[[str], bool]] = [],
+        set_validators: List[Callable[[str], bool]] = [],
         default: Optional[T] = None,
         **kwargs
     ) -> None:
@@ -104,6 +118,7 @@ class Field:
         self.required = required
         self.validators = validators
         self.appear_validators = appear_validators
+        self.set_validators = set_validators
         self.default = default
 
         self.is_current = False
@@ -241,6 +256,21 @@ class Field:
         form_dict = self.form.to_dict()
         return all(validator(form_dict) for validator in self.appear_validators)
     
+    def can_be_set(self) -> bool:
+        """|coro|
+
+        Check if the field can be set.
+
+        This function calls the ``set_validators`` of the field.
+
+        Returns
+        --------
+        :class:`bool`
+            Whether the field can be set.
+        """
+        form_dict = self.form.to_dict()
+        return all(validator(form_dict) for validator in self.set_validators)
+
     def is_completed(self) -> bool:
         """
         Check if the field is finished.

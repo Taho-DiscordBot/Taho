@@ -95,6 +95,7 @@ class Emoji(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        set_validators: List[Callable[[str], bool]] = [],
         default: Optional[_Emoji] = None,
         **kwargs
     ) -> None:
@@ -104,6 +105,7 @@ class Emoji(Field):
             required, 
             validators, 
             appear_validators, 
+            set_validators,
             default,
             **kwargs)
         

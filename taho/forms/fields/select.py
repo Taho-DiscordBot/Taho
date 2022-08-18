@@ -134,6 +134,7 @@ class Select(Field):
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        set_validators: List[Callable[[str], bool]] = [],
         default: Optional[T] = None,
         choices: List[Choice] = None,
         min_values : Optional[int] = 1,
@@ -146,6 +147,7 @@ class Select(Field):
             required, 
             validators, 
             appear_validators, 
+            set_validators,
             default,
             **kwargs)
         

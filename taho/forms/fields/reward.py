@@ -61,6 +61,7 @@ class Reward(Field):
         reward_types: Optional[List[RewardType]] = ...,
         validators: List[Callable[[str], bool]] = ..., 
         appear_validators: List[Callable[[str], bool]] = ..., 
+        set_validators: List[Callable[[str], bool]] = ...,
         default: Optional[T] = None,
         **kwargs
         ) -> None:
@@ -75,6 +76,7 @@ class Reward(Field):
         reward_types: Optional[RewardTypes] = ...,
         validators: List[Callable[[str], bool]] = ..., 
         appear_validators: List[Callable[[str], bool]] = ..., 
+        set_validators: List[Callable[[str], bool]] = ...,
         default: Optional[T] = None,
         **kwargs
         ) -> None:
@@ -88,6 +90,7 @@ class Reward(Field):
         reward_types: Optional[Union[List[RewardType], RewardTypes]] = None,
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        set_validators: List[Callable[[str], bool]] = [],
         default: List[AbstractRewardPack] = [],
         **kwargs
         ) -> None:
@@ -97,6 +100,7 @@ class Reward(Field):
             required, 
             validators, 
             appear_validators, 
+            set_validators,
             default, 
             **kwargs)
         

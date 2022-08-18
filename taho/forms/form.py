@@ -97,7 +97,7 @@ class FormView(discord.ui.View):
         # If they must appear, if so, return as the next field
         for i, field in enumerate(self.form.fields[current_index + 1:]):
             # i is the index of the field after the current one (minus 1)
-            if field.must_appear():
+            if field.must_appear() and field.can_be_set():
                 return field, current_index + i + 1
 
         return None, None
@@ -129,7 +129,7 @@ class FormView(discord.ui.View):
         # If they must appear, if so, return as the previous field
         for i, field in enumerate(reversed(self.form.fields[:current_index])):
             # i is the index of the field before the current one (plus 1)
-            if field.must_appear():
+            if field.must_appear() and field.can_be_set():
                 return field, current_index - i - 1
 
         return None, None
@@ -164,7 +164,7 @@ class FormView(discord.ui.View):
             discord.SelectOption(
                 label=field.label,
                 value=field.name
-            ) for field in self.form.fields if field.must_appear()
+            ) for field in self.form.fields if field.must_appear() and field.can_be_set()
         ]
         if len(self.go_to.options) > 2 and not self.go_to in self.children:
             self.add_item(self.go_to)
@@ -397,7 +397,8 @@ class Form:
 
             Please fill out the form below.
             You can use the buttons below to navigate the form.
-            A title with `*` indicates a required field.
+            A title with `*` indicates a required field, 
+            one with `x` indicates that it cannot be defined.
     """
     def __init__(self, title: str, fields: List[Field], description: Optional[str] = None) -> None:
         self.title = title
@@ -411,7 +412,8 @@ class Form:
             self.description = _(
                 "Please fill out the form below.\n"
                 "You can use the buttons below to navigate the form.\n"
-                "A title with `*` indicates a required field.\n"
+                "A title with `*` indicates a required field, "
+                "one with `x` indicates that it cannot be defined.\n"
                 )
 
         # The current field of the form
@@ -494,7 +496,10 @@ class Form:
                 continue
             
             name = f"▶️ __**{field.label}**__" if field.is_current else field.label
-            if field.required:
+
+            if not field.can_be_set():
+                name += " `x`"
+            elif field.required:
                 name += " `*`"
 
             embed.add_field(

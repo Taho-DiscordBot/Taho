@@ -87,7 +87,8 @@ class Number(Field):
         label: str, 
         required: bool = False,
         validators: List[Callable[[str], bool]] = [], 
-        appear_validators: List[Callable[[str], bool]] = [], 
+        appear_validators: List[Callable[[str], bool]] = [],
+        set_validators: List[Callable[[str], bool]] = [], 
         **kwargs
     ) -> None:
         super().__init__(
@@ -96,6 +97,7 @@ class Number(Field):
             required, 
             validators, 
             appear_validators, 
+            set_validators,
             **kwargs)
         
     async def ask(self, interaction: Interaction) -> Optional[bool]:

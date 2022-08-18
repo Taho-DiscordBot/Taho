@@ -454,6 +454,7 @@ class AccessRule(Field):
         required: bool = False, 
         validators: List[Callable[[str], bool]] = [], 
         appear_validators: List[Callable[[str], bool]] = [], 
+        set_validators: List[Callable[[str], bool]] = [],
         default: Optional[List[AbstractAccessRule]] = None, 
         **kwargs) -> None:
         super().__init__(
@@ -462,6 +463,7 @@ class AccessRule(Field):
             required, 
             validators, 
             appear_validators, 
+            set_validators,
             default, 
             **kwargs
         )
