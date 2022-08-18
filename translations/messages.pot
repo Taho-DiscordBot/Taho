@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: taho/database/models/cluster.py:579
+#: taho/database/models/cluster.py:580
 msgid "Cash"
 msgstr ""
 
@@ -252,7 +252,7 @@ msgstr ""
 msgid "Click on **Respond** to create a new reward pack"
 msgstr ""
 
-#: taho/forms/fields/field.py:313 taho/forms/fields/field.py:359
+#: taho/forms/fields/field.py:317 taho/forms/fields/field.py:363
 #, python-format
 msgid "Successfully set value to: %(value)s"
 msgstr ""
@@ -407,7 +407,7 @@ msgstr ""
 msgid "The pack has been deleted."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:725
+#: taho/forms/fields/reward_pack.py:726
 msgid "*No rewards*"
 msgstr ""
 
