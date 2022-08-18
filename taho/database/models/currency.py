@@ -22,10 +22,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
+from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from taho.abc import StuffShortcutable, TradeStuffShortcutable
 from taho.currency_amount import CurrencyAmount as _CurrencyAmount
+
+if TYPE_CHECKING:
+    from .item import Item
 
 
 __all__ = (
@@ -146,6 +150,11 @@ class Currency(BaseModel, StuffShortcutable):
             as this will cause a division by zero.
     is_default: :class:`bool`
         Whether the currency is the default one.
+    item: Optional[:class:`~taho.database.models.Item`]
+        |coro_attr|
+
+        The currency's item.
+        Used to be the Cash of this currency.
     """
     class Meta:
         table = "currencies"
@@ -159,6 +168,8 @@ class Currency(BaseModel, StuffShortcutable):
     emoji = fields.CharField(max_length=255, null=True)
     rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
     is_default = fields.BooleanField(default=False)
+
+    item: fields.OneToOneNullableRelation["Item"]
 
     def __str__(self) -> str:
         return self.get_display()
