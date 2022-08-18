@@ -271,6 +271,10 @@ class Field:
         """
         raise NotImplementedError()
 
+    async def set_value(self, value: T) -> None:
+        self.value = value
+        await self.display()
+
 class FieldModal(Modal):
     """The default modal for any field.
     

@@ -717,7 +717,8 @@ class RewardPack(Field):
             ephemeral=True
         )
         await view.wait()
-        self.value = self.pack
+        
+        await self.set_value(self.pack)
         
     
     async def display(self) -> str:
