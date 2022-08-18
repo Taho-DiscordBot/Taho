@@ -820,17 +820,22 @@ async def cluster_post_save(_, instance: Cluster, created: bool, *args, **kwargs
 
         # Create the default Currency
         from .currency import Currency # avoid circular import
-        await Currency.create(
+        currency = await Currency.create(
             cluster=instance, 
             name="Dollar",
             symbol="$",
             code="USD",
+            emoji="💵",
             is_default=True
             )
-
-        # Create the default bank
-        await instance.get_default_bank()
-
+        
+        await instance.create_item(
+            name="Dollar",
+            type=ItemType.currency,
+            emoji="💵",
+            description=f"A cash item for the Currency {currency.name}",
+            currency=currency
+            )
 
 class ClusterInfo(BaseModel):
     """
