@@ -400,7 +400,7 @@ class RewardPackViewAdd(_BaseRewardPackView):
         choices_list = split_list(choices_list, 25)
 
         if len(choices_list) > 2:
-            return #todo here
+            return #todo choices_list too long
         
         select_stuff_texts = {
             "item": _("Pick an item in the list."),
@@ -605,7 +605,7 @@ class RewardPackViewRemove(_BaseRewardPackView):
         choice_lists = split_list(self.choices, 25)
 
         if len(choice_lists) > 4:
-            return #todo here
+            return #todo choices_list too long
 
         selects_stuff = [
             ui.Select(

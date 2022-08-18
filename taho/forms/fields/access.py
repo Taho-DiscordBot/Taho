@@ -274,7 +274,7 @@ class AccessRuleViewAdd(_BaseAccessRuleView):
         choices_list = split_list(choices_list, 25)
 
         if len(choices_list) > 3:
-            return #todo here
+            return #todo choices_list too long
         
 
         selects_entity = [
@@ -408,7 +408,7 @@ class AccessRuleViewRemove(_BaseAccessRuleView):
         choice_lists = split_list(self.choices, 25)
 
         if len(choice_lists) > 4:
-            return #todo here
+            return #todo choices_list too long
 
         selects_entity = [
             ui.Select(
