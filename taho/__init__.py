@@ -29,6 +29,7 @@ from . import database
 from .currency_amount import *
 from .emoji import *
 from . import abc
+from . import enums
 from .lazy import *
 from . import forms
 from . import babel
