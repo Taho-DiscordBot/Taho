@@ -134,11 +134,24 @@ class Item(BaseModel, StuffShortcutable):
             
             Python: Optional[:class:`int`]
         
+        ..collapse:: currency
+
+            Tortoise: :class:`tortoise.fields.OneToOneField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Currency`
+                - :attr:`related_name` ``item``
+                - :attr:`default` ``None``
+            
+            Python: Optional[:class:`~taho.database.models.Currency`]
+
+        
     Attributes
     -----------
     id: :class:`int`
         The item's ID.
     cluster: :class:`~taho.database.models.Cluster`
+        |coro_attr|
+
         The item's cluster.
     name: :class:`str`
         The item's name.
@@ -152,14 +165,19 @@ class Item(BaseModel, StuffShortcutable):
         The item's durability.
     cooldown: Optional[:class:`int`]
         The item's cooldown.
-    stats: List[:class:`~taho.database.models.ItemStat`]
+    currency: Optional[:class:`~taho.database.models.Currency`]
         |coro_attr|
 
-        The item's stats.
-    roles: List[:class:`~taho.database.models.Role`]
+        If the item's type is :attr:`~taho.enums.ItemType.currency`, 
+        this is the currency linked to the item.
+    access_rules: List[:class:`~taho.database.models.ItemAccessRule`]
         |coro_attr|
 
-        The item's roles.
+        The item's access rules.
+    rewards: List[:class:`~taho.database.models.ItemReward`]
+        |coro_attr|
+
+        The item's rewards.
     
     """
     class Meta:
@@ -177,9 +195,9 @@ class Item(BaseModel, StuffShortcutable):
     durability: Optional[int] = fields.IntField(null=True)
     cooldown = fields.IntField(null=True) #TODO typing in fields
 
-    currency = fields.ForeignKeyField('main.Currency', null=True)
+    currency = fields.OneToOneField('main.Currency', related_name="item", default=None)
 
-    accesses: fields.ReverseRelation["ItemAccessRule"]
+    access_rules: fields.ReverseRelation["ItemAccessRule"]
     reward_packs: fields.ReverseRelation["ItemRewardPack"]
     
     def __str__(self) -> str:
