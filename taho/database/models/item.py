@@ -415,9 +415,14 @@ class Item(BaseModel, StuffShortcutable):
         force_create: bool = False,
         force_update: bool = False,
     ) -> None:
-        if self.type == ItemType.resource:
+        if self.type in (ItemType.resource, ItemType.currency):
             self.durability = None
             self.cooldown = None
+        
+        if self.type != ItemType.currency:
+            self.currency = None
+            self.currency_id = None
+        
         await super().save(
             using_db=using_db, 
             update_fields=update_fields, 
