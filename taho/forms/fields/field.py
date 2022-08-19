@@ -27,7 +27,7 @@ from taho.babel import _
 from taho.exceptions import ValidationException
 from discord.ui import Modal, View
 from discord import AllowedMentions
-from taho.database import utils as db_utils
+from taho.database import db_utils
 
 if TYPE_CHECKING:
     from typing import List, Callable, Optional, TypeVar

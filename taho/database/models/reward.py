@@ -252,12 +252,12 @@ class Reward(BaseModel):
     max_amount = fields.DecimalField(max_digits=10, decimal_places=2, null=True)
     
     async def get_stuff(self, force: bool = False) -> StuffShortcutable:
-        from taho.database.utils import get_stuff # avoid circular import
+        from taho.database.db_utils import get_stuff # avoid circular import
 
         return await get_stuff(self, force=force)
     
     async def get_stuff_amount(self, force: bool = False) -> Tuple[Union[int, float]]:
-        from taho.database.utils import get_stuff_amount # avoid circular import
+        from taho.database.db_utils import get_stuff_amount # avoid circular import
 
         amount = await get_stuff_amount(self, force=force)
 

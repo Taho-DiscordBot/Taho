@@ -25,7 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord.ext import commands
 from babel import Locale
-from taho.database import utils as db_utils
+from taho.database import db_utils
 
 if TYPE_CHECKING:
     from taho.database.models import (

@@ -29,7 +29,7 @@ from tortoise import exceptions as t_exceptions
 from tortoise.signals import post_save
 from .role import Role
 from taho.exceptions import DoesNotExist, AlreadyExists
-from taho.database import utils as db_utils
+from taho.database import db_utils
 from taho.enums import InfoType, ItemType
 from taho.babel import _
 import asyncio

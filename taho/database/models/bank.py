@@ -30,7 +30,7 @@ from tortoise import fields
 from tortoise.signals import post_save
 from taho.exceptions import AlreadyExists, DoesNotExist, QuantityException
 from taho.enums import InfoType, ShortcutType
-from taho.database import utils as db_utils
+from taho.database import db_utils
 from taho.abc import OwnerShortcutable
 
 import sys

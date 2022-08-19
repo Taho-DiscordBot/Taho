@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from taho.babel import _
 from taho.database.models import Item as _Item
 from taho.enums import ItemType
-from taho.database import utils as db_utils
+from taho.database import db_utils
 from .select import Select
 
 if TYPE_CHECKING:

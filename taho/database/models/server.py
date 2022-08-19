@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from tortoise import exceptions as t_exceptions
-from ..utils import convert_to_type, get_type
+from ..db_utils import convert_to_type, get_type
 from taho.enums import InfoType
 from taho.exceptions import DoesNotExist
 

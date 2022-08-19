@@ -55,7 +55,7 @@ class _Shortcut:
         self.field_name = field_name
     
     def __await__(self):
-        from taho.database.utils import get_shortcut
+        from taho.database.db_utils import get_shortcut
 
         # The get_shortcut function is a coroutine,
         # it will cache the shortcut model to avoid 
@@ -112,7 +112,7 @@ class BaseModel(Model):
             emoji = self.emoji
             self.emoji = self.emoji.to_db_value()
 
-        from ..utils import create_shortcut
+        from ..db_utils import create_shortcut
 
         # Here, the goal is to set the shortcuts fields of 
         # the model, from the properties of the model.

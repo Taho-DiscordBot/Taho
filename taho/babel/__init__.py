@@ -36,8 +36,23 @@ from .speaklater import LazyString
 
 if TYPE_CHECKING:
     from typing import Dict, Tuple, Generator
-    from taho.utils import TahoContext
     from taho import Bot
+
+__all__ = (
+    "Domain",
+    "Babel",
+    "get_domain",
+    "gettext",
+    "discord_translator_gettext",
+    "_",
+    "ngettext",
+    "pgettext",
+    "npgettext",
+    "lazy_gettext",
+    "lazy_pgettext",
+    "lazy_ngettext",
+
+)
 
 domain = "messages"
 
@@ -186,7 +201,6 @@ class Domain(object):
         """
         return LazyString(self.pgettext, context, string, **variables)
 
-
 class Babel(object):
     def __init__(self, bot: Bot, default_locale: str="en") -> None:
         self.cache = {}
@@ -274,10 +288,8 @@ class Babel(object):
     def get_domain(self) -> Domain:
         return self.domain
 
-
 def get_domain() -> Domain:
     return Babel.default_instance.get_domain()
-
 
 def gettext(string, **variables):
     """Translates a string with the current locale and passes in the
@@ -317,7 +329,6 @@ def ngettext(singular, plural, num, **variables):
     """
     return get_domain().ngettext(singular, plural, num, **variables)
 
-
 def pgettext(context, string, **variables):
     """Like :func:`gettext` but with a context.
 
@@ -325,14 +336,12 @@ def pgettext(context, string, **variables):
     """
     return get_domain().pgettext(context, string, **variables)
 
-
 def npgettext(context, singular, plural, num, **variables):
     """Like :func:`ngettext` but with a context.
 
     .. versionadded:: 0.7
     """
     return get_domain().npgettext(context, singular, plural, num, **variables)
-
 
 def lazy_gettext(string, **variables):
     """Like :func:`gettext` but the string returned is lazy which means
@@ -348,7 +357,6 @@ def lazy_gettext(string, **variables):
     """
     return get_domain().lazy_gettext(string, **variables)
 
-
 def lazy_pgettext(context, string, **variables):
     """Like :func:`pgettext` but the string returned is lazy which means
     it will be translated when it is used as an actual string.
@@ -356,7 +364,6 @@ def lazy_pgettext(context, string, **variables):
     .. versionadded:: 0.7
     """
     return get_domain().lazy_pgettext(context, string, **variables)
-
 
 def lazy_ngettext(singular, plural, num, **variables):
     """Like :func:`ngettext` but the string returned is lazy which means

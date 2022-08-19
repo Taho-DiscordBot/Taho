@@ -375,12 +375,12 @@ class CraftReward(BaseModel):
     amount = fields.DecimalField(max_digits=10, decimal_places=2, default=1)
     
     async def get_stuff(self, force: bool = False) -> StuffShortcutable:
-        from taho.database.utils import get_stuff # avoid circular import
+        from taho.database.db_utils import get_stuff # avoid circular import
 
         return await get_stuff(self, force=force)
     
     async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
-        from taho.database.utils import get_stuff_amount # avoid circular import
+        from taho.database.db_utils import get_stuff_amount # avoid circular import
 
         return await get_stuff_amount(self, force=force)
 
