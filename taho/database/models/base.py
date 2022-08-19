@@ -109,6 +109,8 @@ class BaseModel(Model):
     ) -> None:
 
         if hasattr(self, "emoji") and self.emoji:
+            if not isinstance(self.emoji, Emoji):
+                self.emoji = Emoji(self.emoji)
             emoji = self.emoji
             self.emoji = self.emoji.to_db_value()
 
