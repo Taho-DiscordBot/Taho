@@ -323,18 +323,25 @@ class Item(BaseModel, StuffShortcutable):
         
         return display
 
-    async def to_dict(self) -> Dict[str, Any]:
+    async def to_dict(self, to_edit: bool = False) -> Dict[str, Any]:
         """
         |coro|
         
         Returns the item's dictionary.
+
+        Parameters
+        -----------
+        to_edit: :class:`bool`
+            Whether to return the item's edit dictionary.
+            This will remove several keys from the dictionary.
         
         Returns
         -------
         :class:`dict`
             The item's dictionary.
         """
-        return {
+
+        item_dict = {
             "id": self.id,
             "cluster_id": self.cluster_id,
             "name": self.name,
@@ -353,10 +360,12 @@ class Item(BaseModel, StuffShortcutable):
             ],
         }
 
-        # cluster = await Cluster.get_or_none(id=data['cluster'])
-        # currency = await Currency.get_or_none(id=data['currency']) if 'currency' in data else None
-        # stats = [await ItemStat.from_json(x) for x in data['stats']] if 'stats' in data else []
-        # roles = [await Role.from_json(x) for x in data['roles']] if 'roles' in data else []
+        if to_edit:
+            item_dict.pop("cluster_id", None)
+            item_dict.pop("currency", None)
+
+        return item_dict
+
 
         # return cls(
         #     id=data['id'],
