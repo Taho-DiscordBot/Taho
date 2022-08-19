@@ -277,16 +277,51 @@ class Item(BaseModel, StuffShortcutable):
         """
         from taho.database.models import Cluster, Currency, ItemStat, Role
 
-    def get_display(self) -> str:
+    def get_display(self, long: bool = False) -> str:
         """
         Returns the item's display.
+
+        Parameters
+        -----------
+        long: :class:`bool`
+            Whether to return a long display.
         
         Returns
         -------
         :class:`str`
             The item's display.
-        """           
-        return f"{self.emoji} {self.name}" if self.emoji else self.name
+        """
+        from taho.babel import _
+        babel_vars = {
+        }
+        babel_vars["item_display"] = f"{self.emoji} {self.name}" if self.emoji else self.name
+
+        if long: 
+            from taho.enums import get_item_type_text
+
+            babel_vars["type"] = get_item_type_text(self.type)
+            if self.dura:
+                dura_display = _("Infinite") if self.dura == -1 else str(self.dura)
+                babel_vars["durability"] = dura_display
+
+            if self.dura:
+                display = _(
+                    "**%(item_display)s** - %(type)s (durability: *%(durability)s*)",
+                    **babel_vars
+                )
+            else:
+                display = _(
+                    "**%(item_display)s** - %(type)s",
+                    **babel_vars
+                )
+        else:
+
+            display = _(
+                "**%(item_display)s**",
+                **babel_vars
+            )
+        
+        return display
 
     async def to_dict(self) -> Dict[str, Any]:
         """
