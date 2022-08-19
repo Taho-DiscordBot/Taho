@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
+import asyncio
 from tortoise import fields
 from tortoise.exceptions import ValidationError
 from taho.enums import ItemType, RewardType
