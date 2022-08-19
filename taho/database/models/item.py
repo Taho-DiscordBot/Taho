@@ -366,20 +366,47 @@ class Item(BaseModel, StuffShortcutable):
 
         return item_dict
 
+    async def edit(self, **options) -> None:
+        """|coro|
 
-        # return cls(
-        #     id=data['id'],
-        #     cluster=cluster,
-        #     name=data['name'],
-        #     emoji=data['emoji'],
-        #     description=data['description'],
-        #     type=ItemType(data['type']),
-        #     durability=data['durability'],
-        #     cooldown=data['cooldown'],
-        #     currency=currency,
-        #     stats=stats,
-        #     roles=roles,
-        # )
+        Edits the item.
+
+        Parameters
+        -----------
+        options: :class:`dict`
+            The fields to edit.
+            The keys are the field names.
+        """
+        edit_dict = {}
+        queries = []
+        for option, value in options.items():
+            if option == "access_rules":
+                queries.append(self.access_rules.all().delete())
+                if value:
+                    for rule in value:
+                        queries.append(rule.to_db_access(
+                            ItemAccessRule,
+                            self
+                        ))
+            
+            elif option == "reward_packs":
+                queries.append(self.reward_packs.all().delete())
+                if value:
+                    for pack in value:
+                        queries.append(pack.to_db_pack(
+                            ItemRewardPack,
+                            ItemReward,
+                            self
+                        ))
+
+            else:
+                edit_dict[option] = value
+        
+        self.update_from_dict(edit_dict)
+
+        await self.save()
+        await asyncio.gather(*queries)
+
 
     async def save(
         self,
