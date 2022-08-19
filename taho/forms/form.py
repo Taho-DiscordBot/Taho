@@ -399,11 +399,23 @@ class Form:
             You can use the buttons below to navigate the form.
             A title with `*` indicates a required field, 
             one with `x` indicates that it cannot be defined.
+    is_info: :class:`bool`
+        Whether the form is an info form.
+        If it is, the form will not be editable.
+
+        Default to: ``False``
     """
-    def __init__(self, title: str, fields: List[Field], description: Optional[str] = None) -> None:
+    def __init__(
+        self, 
+        title: str, 
+        fields: List[Field], 
+        description: Optional[str] = None,
+        is_info: bool = False,
+        ) -> None:
         self.title = title
         self.fields = fields
         self.description = description
+        self.is_info = is_info
 
         self.message: discord.Message = None
         self.guild: discord.Guild = None
@@ -418,14 +430,21 @@ class Form:
 
         # The current field of the form
         # is the first in the list to start
-        self.fields[0].is_current = True
+        if not self.is_info:
+            self.fields[0].is_current = True
 
         for field in self.fields:
             field.form = self
         
         self.__stopped: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
         
-    async def send(self, ctx: TahoContext = None, interaction: discord.Interaction = None, ephemeral: bool = False) -> None:
+    async def send(
+        self, 
+        ctx: TahoContext = None, 
+        interaction: discord.Interaction = None, 
+        ephemeral: bool = False,
+        is_info: Optional[bool] = None
+        ) -> None:
         """|coro|
         
         Send the form to the user.
@@ -441,10 +460,18 @@ class Form:
         ephemeral: :class:`bool`
             Whether the form should be sent as an ephemeral message.
             Default to ``False``.
+        is_info: Optional[:class:`bool`]
+            Whether the form is an info form.
+            If it is, the form will not be editable.
+
+            Default to ``Noe``.
         """
         self.guild = ctx.guild if ctx else interaction.guild
-
-        view = await self.generate_view()
+        self.is_info = is_info if is_info is not None else self.is_info
+        if self.is_info:
+            view = None
+        else:
+            view = await self.generate_view()
         embed = await self.generate_embed()
         if ctx:
             msg = await ctx.send(embed=embed, view=view, ephemeral=ephemeral)
@@ -477,16 +504,17 @@ class Form:
 
         embed = discord.Embed(
             title=self.title,
-            description=self.description,
+            description=self.description if not self.is_info else None,
             color=color
         )
 
-        embed.set_footer(
-            text=_(
-                "This form as no timeout, but due to Discord limitations on ephemeral "
-                "messages, it may start to bug after 15 mins.",
+        if not self.is_info:
+            embed.set_footer(
+                text=_(
+                    "This form as no timeout, but due to Discord limitations on ephemeral "
+                    "messages, it may start to bug after 15 mins.",
+                )
             )
-        )
 
         for field in self.fields:
             if canceled or finished:
@@ -495,9 +523,11 @@ class Form:
             if not field.must_appear():
                 continue
             
-            name = f"▶️ __**{field.label}**__" if field.is_current else field.label
+            name = f"▶️ __**{field.label}**__" if field.is_current and not self.is_info else field.label
 
-            if not field.can_be_set():
+            if self.is_info:
+                name = name
+            elif not field.can_be_set():
                 name += " `x`"
             elif field.required:
                 name += " `*`"
