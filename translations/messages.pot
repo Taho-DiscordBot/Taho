@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-18 14:48+0000\n"
+"POT-Creation-Date: 2022-08-20 10:05+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,16 +17,177 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: taho/enums/item.py:70
+#: cogs/item.py:44 cogs/item.py:317 cogs/item.py:333
+msgid "Create an item"
+msgstr ""
+
+#: cogs/item.py:45 cogs/item.py:334
+msgid "Delete an existing item"
+msgstr ""
+
+#: cogs/item.py:46 cogs/item.py:335
+msgid "Edit an existing item"
+msgstr ""
+
+#: cogs/item.py:47 cogs/item.py:336
+msgid "List all items"
+msgstr ""
+
+#: cogs/item.py:51 cogs/item.py:340
+msgid "Select an action"
+msgstr ""
+
+#: cogs/item.py:92
+msgid "Select an item"
+msgstr ""
+
+#: cogs/item.py:110
+msgid "Please select only one item."
+msgstr ""
+
+#: cogs/item.py:183
+msgid "Name"
+msgstr ""
+
+#: cogs/item.py:184
+msgid "The name of the item"
+msgstr ""
+
+#: cogs/item.py:197
+msgid "Emoji"
+msgstr ""
+
+#: cogs/item.py:198
+msgid "The emoji of the item"
+msgstr ""
+
+#: cogs/item.py:203
+msgid "Description"
+msgstr ""
+
+#: cogs/item.py:204
+msgid "The description of the item"
+msgstr ""
+
+#: cogs/item.py:213
+msgid "Type"
+msgstr ""
+
+#: cogs/item.py:217 taho/enums/item.py:70
 msgid "Resource"
 msgstr ""
 
-#: taho/enums/item.py:71
+#: cogs/item.py:219
+msgid "Resources are the basic items."
+msgstr ""
+
+#: cogs/item.py:222 taho/enums/item.py:71
 msgid "Consumable"
 msgstr ""
 
-#: taho/enums/item.py:72
+#: cogs/item.py:224
+msgid "Consumables have durability and can be used."
+msgstr ""
+
+#: cogs/item.py:227 cogs/item.py:247 taho/enums/item.py:72
 msgid "Currency"
+msgstr ""
+
+#: cogs/item.py:229
+msgid "Currency items are used as Cash for a specific Currency."
+msgstr ""
+
+#: cogs/item.py:259 taho/forms/fields/reward_pack.py:333
+msgid "Durability"
+msgstr ""
+
+#: cogs/item.py:273
+msgid "Cooldown"
+msgstr ""
+
+#: cogs/item.py:285
+msgid "Access rules"
+msgstr ""
+
+#: cogs/item.py:290 taho/forms/fields/reward.py:203
+msgid "Rewards"
+msgstr ""
+
+#: cogs/item.py:311
+#, python-format
+msgid "Edit %(item_name)s"
+msgstr ""
+
+#: cogs/item.py:327
+msgid "item"
+msgstr ""
+
+#: cogs/item.py:328
+msgid "Manage items"
+msgstr ""
+
+#: cogs/item.py:343
+msgid "action"
+msgstr ""
+
+#: cogs/item.py:376
+#, python-format
+msgid "You have successfully created the item **%(item_display)s**."
+msgstr ""
+
+#: cogs/item.py:386
+msgid "There are no items to edit."
+msgstr ""
+
+#: cogs/item.py:416
+#, python-format
+msgid "You have successfully edited the item **%(item_display)s**."
+msgstr ""
+
+#: cogs/item.py:426
+msgid "There are no items to delete."
+msgstr ""
+
+#: cogs/item.py:450
+#, python-format
+msgid "Are you sure you want to delete the item **%(item)s**?"
+msgstr ""
+
+#: cogs/item.py:468
+#, python-format
+msgid "You have successfully deleted the item **%(item)s**."
+msgstr ""
+
+#: cogs/item.py:479
+msgid "There are no items to list."
+msgstr ""
+
+#: cogs/item.py:488
+#, python-format
+msgid ""
+"Here is a list of all items, select an item in the selects below to get "
+"more information about it.\n"
+"\n"
+"%(items)s"
+msgstr ""
+
+#: taho/database/models/item.py:305 taho/forms/fields/number.py:122
+msgid "Infinite"
+msgstr ""
+
+#: taho/database/models/item.py:309
+#, python-format
+msgid "**%(item_display)s** - %(type)s (durability: *%(durability)s*)"
+msgstr ""
+
+#: taho/database/models/item.py:314
+#, python-format
+msgid "**%(item_display)s** - %(type)s"
+msgstr ""
+
+#: taho/database/models/item.py:320
+#, python-format
+msgid "**%(item_display)s**"
 msgstr ""
 
 #: taho/enums/reward.py:61
@@ -56,6 +217,7 @@ msgstr ""
 #: taho/forms/fields/access.py:208 taho/forms/fields/access.py:352
 #: taho/forms/fields/reward_pack.py:319 taho/forms/fields/reward_pack.py:561
 #: taho/forms/fields/reward_pack.py:660 taho/forms/form.py:43
+#: taho/views/confirmation.py:51
 msgid "Cancel"
 msgstr ""
 
@@ -80,7 +242,7 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: taho/forms/form.py:412
+#: taho/forms/form.py:424
 msgid ""
 "Please fill out the form below.\n"
 "You can use the buttons below to navigate the form.\n"
@@ -88,7 +250,7 @@ msgid ""
 "it cannot be defined.\n"
 msgstr ""
 
-#: taho/forms/form.py:485
+#: taho/forms/form.py:513
 msgid ""
 "This form as no timeout, but due to Discord limitations on ephemeral "
 "messages, it may start to bug after 15 mins."
@@ -181,7 +343,7 @@ msgstr ""
 
 #: taho/forms/fields/access.py:201 taho/forms/fields/access.py:346
 #: taho/forms/fields/reward_pack.py:312 taho/forms/fields/reward_pack.py:555
-#: taho/forms/fields/reward_pack.py:655
+#: taho/forms/fields/reward_pack.py:655 taho/views/confirmation.py:43
 msgid "Confirm"
 msgstr ""
 
@@ -268,14 +430,6 @@ msgstr ""
 
 #: taho/forms/fields/item.py:83
 msgid "No items available."
-msgstr ""
-
-#: taho/forms/fields/number.py:122
-msgid "Infinite"
-msgstr ""
-
-#: taho/forms/fields/reward.py:203
-msgid "Rewards"
 msgstr ""
 
 #: taho/forms/fields/reward.py:204
@@ -368,10 +522,6 @@ msgstr ""
 
 #: taho/forms/fields/reward_pack.py:329
 msgid "Quantity"
-msgstr ""
-
-#: taho/forms/fields/reward_pack.py:333
-msgid "Durability"
 msgstr ""
 
 #: taho/forms/fields/reward_pack.py:339
@@ -481,5 +631,9 @@ msgstr ""
 #: taho/utils/abstract.py:443
 #, python-format
 msgid "❌ %(entity)s"
+msgstr ""
+
+#: taho/views/confirmation.py:69 taho/views/confirmation.py:73
+msgid "Cancelled."
 msgstr ""
 
