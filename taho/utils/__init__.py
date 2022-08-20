@@ -22,7 +22,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from .context import *
-from .db import *
 from .ssh_tunnel_forwarder import *
 from .checks import *
 from .utils_ import *
