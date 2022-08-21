@@ -45,8 +45,8 @@ class ItemActionChoiceView(BaseView):
 
         actions = {
             "create": _("Create an item"),
-            "delete": _("Delete an existing item"),
             "edit": _("Edit an existing item"),
+            "delete": _("Delete an existing item"),
             "list": _("List all items"),
         }
 
@@ -336,8 +336,8 @@ class ItemCog(commands.Cog):
     @app_commands.choices(
         action=[
             Choice(name=_d("Create an item"), value="create"),
-            Choice(name=_d("Delete an existing item"), value="delete"),
             Choice(name=_d("Edit an existing item"), value="edit"),
+            Choice(name=_d("Delete an existing item"), value="delete"),
             Choice(name=_d("List all items"), value="list")
         ]
     )
