@@ -30,6 +30,7 @@ from .forms import *
 from .utils import *
 from .views import *
 from . import abc
+from .base_view import *
 from .bot import *
 from .currency_amount import *
 from .emoji import *
