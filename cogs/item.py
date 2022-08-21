@@ -27,16 +27,19 @@ import discord
 from discord.ext import commands
 from discord import app_commands, SelectOption
 from discord.app_commands import Choice, locale_str as _d
-from discord.ui import View, Select
-from taho import forms, utils, _, views, ngettext, ItemType, RewardType
+from discord.ui import Select
+from taho import forms, utils, _, views, ngettext, ItemType, RewardType, BaseView
 from taho.database import Item
 
 if TYPE_CHECKING:
-    from typing import List, Literal
+    from typing import List, Literal, Optional
     from taho import Bot, TahoContext
+    from discord.abc import Snowflake
 
-class ItemActionChoiceView(View):
-    def __init__(self):
+class ItemActionChoiceView(BaseView):
+    def __init__(self, user: Optional[Snowflake] = None, *args, **kwargs):
+        super().__init__(user, *args, **kwargs)
+
         self.value: Literal["create", "delete", "edit", "list"] = None
         super().__init__()
 
@@ -64,8 +67,10 @@ class ItemActionChoiceView(View):
         await interaction.response.defer(ephemeral=True)
         self.stop()
 
-class ItemChoiceView(View):
-    def __init__(self, items: List[Item], multiple: bool = False):
+class ItemChoiceView(BaseView):
+    def __init__(self, items: List[Item], user: Optional[Snowflake] = None, multiple: bool = False):
+        super().__init__(user)
+
         self.value: Item = None
         self.multiple = multiple
         super().__init__()
@@ -388,12 +393,10 @@ class ItemCog(commands.Cog):
                 )
                 return
             
-            view = ItemChoiceView(items)
-            msg = await ctx.send(view=view, ephemeral=True)
+            view = ItemChoiceView(items, user=ctx.author)
+            await ctx.send(view=view)
 
-            await view.wait()
-
-            await msg.delete(delay=0)
+            await view.wait(delete_after=True)
             item = view.value
 
             if not item:
@@ -428,12 +431,10 @@ class ItemCog(commands.Cog):
                 )
                 return
             
-            view = ItemChoiceView(items, multiple=True)
-            msg = await ctx.send(view=view, ephemeral=True)
+            view = ItemChoiceView(items, user=ctx.author, multiple=True)
+            await ctx.send(view=view)
 
-            await view.wait()
-
-            await msg.delete(delay=0)
+            await view.wait(delete_after=True)
             items = view.value
 
             if not items:
@@ -442,7 +443,7 @@ class ItemCog(commands.Cog):
             items_display = ", ".join(str(item) for item in items) if len(items) > 1\
                 else str(items[0])
             
-            confirmation = views.ConfirmationView()
+            confirmation = views.ConfirmationView(user=ctx.author)
             msg = await ctx.send(
                 ngettext(
                     "Are you sure you want to delete the item **%(item)s**?",
@@ -487,7 +488,7 @@ class ItemCog(commands.Cog):
                 "%(items)s",
                 items="\n".join(item.get_display(long=True) for item in items)
             )
-            view = ItemChoiceView(items)
+            view = ItemChoiceView(items, user=ctx.author)
             msg = await ctx.send(content=content, view=view, ephemeral=True)
 
             await view.wait()

@@ -31,6 +31,7 @@ from taho.utils.abstract import AbstractReward
 from taho.enums import ItemType, RegenerationType
 from taho.database.models import Item
 from taho.exceptions import ValidationException
+from taho.base_view import BaseView
 from .field import Field, FieldView
 from ..choice import Choice
 from ..validators import is_number
@@ -241,13 +242,15 @@ class AmountModal(ui.Modal):
         
         self.stop()
 
-class _BaseRewardPackView(ui.View):
+class _BaseRewardPackView(BaseView):
     def __init__(
         self, 
         base_view: RewardPackView,
     ) -> None:
         super().__init__(timeout=None)
         self.base_view = base_view
+
+        self.user = self.base_view.user
     
     async def get_content(self) -> str:
         return await self.base_view.get_content()

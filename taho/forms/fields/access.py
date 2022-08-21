@@ -31,6 +31,7 @@ from taho.database.models import Item
 from .field import Field, FieldView
 from ..choice import Choice
 from taho.utils.abstract import AbstractAccessRule
+from taho.base_view import BaseView
 
 if TYPE_CHECKING:
     from typing import List, Callable, Optional, Dict, Any
@@ -141,13 +142,15 @@ class AccessRuleView(FieldView):
             view=self,
         )
 
-class _BaseAccessRuleView(ui.View):
+class _BaseAccessRuleView(BaseView):
     def __init__(
         self, 
         base_view: AccessRuleView,
     ) -> None:
         super().__init__(timeout=None)
         self.base_view = base_view
+
+        self.user = self.base_view.user
     
     async def get_content(self) -> str:
         return await self.base_view.get_content()

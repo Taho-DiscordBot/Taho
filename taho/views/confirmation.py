@@ -25,17 +25,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from discord import ui, ButtonStyle
 from taho.babel import _
+from taho.base_view import BaseView
 
 if TYPE_CHECKING:
-    from discord import Interaction
+    from discord import Interaction, abc
 
 __all__ = (
     "ConfirmationView",
 )
 
-class ConfirmationView(ui.View):
-    def __init__(self):
-        super().__init__()
+class ConfirmationView(BaseView):
+    def __init__(self, user: abc.Snowflake = None, *args, **kwargs):
+        super().__init__(user, *args, **kwargs)
 
         self.value: bool = False
 

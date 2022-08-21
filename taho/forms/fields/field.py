@@ -25,13 +25,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.babel import _
 from taho.exceptions import ValidationException
-from discord.ui import Modal, View
+from discord.ui import Modal
 from discord import AllowedMentions
 from taho.database import db_utils
+from taho.base_view import BaseView
 
 if TYPE_CHECKING:
     from typing import List, Callable, Optional, TypeVar
     from discord import Interaction
+    from discord.abc import Snowflake
     from taho.forms import Form
     from taho.database.models import Cluster
 
@@ -128,6 +130,8 @@ class Field:
 
         self.display_value = _("*Unanswered*")
         self.kwargs = kwargs
+
+        self.user: Optional[Snowflake] = None
     
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__} {self.name} {self.is_current}>"
@@ -354,7 +358,7 @@ class FieldModal(Modal):
 
         self.stop() 
 
-class FieldView(View):
+class FieldView(BaseView):
     """The default view for any field.
     
     Attributes
@@ -373,6 +377,8 @@ class FieldView(View):
 
         self.field = field
         self.default = default
+
+        self.user = self.field.user
 
     async def on_submit(self, interaction: Interaction, edit_message: bool = False) -> None:
         """|coro|

@@ -26,19 +26,22 @@ from typing import TYPE_CHECKING
 import asyncio
 import discord
 from taho.babel import _
+from taho.base_view import BaseView
 
 if TYPE_CHECKING:
     from typing import List, Optional, Tuple
     from .fields import Field
     from taho import TahoContext
-    import discord
+    from discord.abc import Snowflake
 
 
-class FormView(discord.ui.View):
+class FormView(BaseView):
     def __init__(self, form: Form):
         super().__init__(timeout=None)
 
         self.form = form
+
+        self.user = self.form.user
 
         self.cancel.label = _("Cancel")
         self.respond.label = _("Respond")
@@ -419,6 +422,7 @@ class Form:
 
         self.message: discord.Message = None
         self.guild: discord.Guild = None
+        self.user: Optional[Snowflake] = None
 
         if not self.description:
             self.description = _(
@@ -467,6 +471,8 @@ class Form:
             Default to ``Noe``.
         """
         self.guild = ctx.guild if ctx else interaction.guild
+        self.user = ctx.author if ctx else interaction.user
+
         self.is_info = is_info if is_info is not None else self.is_info
         if self.is_info:
             view = None
