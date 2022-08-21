@@ -351,11 +351,9 @@ class ItemCog(commands.Cog):
     )
     async def item(self, ctx: TahoContext, action: Choice[str] = None):
         if not action:
-            view = ItemActionChoiceView()
-            msg = await ctx.send(view=view, ephemeral=True)
-            await view.wait()
-            await msg.delete(delay=0)
-
+            view = ItemActionChoiceView(user=ctx.author)
+            await ctx.send(view=view)
+            await view.wait(delete_after=True)
 
             if view.value is None:
                 return
