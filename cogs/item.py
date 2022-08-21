@@ -181,6 +181,8 @@ class ItemCog(commands.Cog):
             fields_default = await item.to_dict()
         elif item_dict:
             fields_default = item_dict
+        else:
+            fields_default = None
 
         fields: List[forms.Field] = [
             forms.Text(
@@ -451,8 +453,7 @@ class ItemCog(commands.Cog):
                     num=len(items),
                     item=items_display
                 ),
-                view=confirmation,
-                ephemeral=True
+                view=confirmation
                 )
 
             await confirmation.wait()
@@ -489,7 +490,7 @@ class ItemCog(commands.Cog):
                 items="\n".join(item.get_display(long=True) for item in items)
             )
             view = ItemChoiceView(items, user=ctx.author)
-            msg = await ctx.send(content=content, view=view, ephemeral=True)
+            msg = await ctx.send(content=content, view=view)
 
             await view.wait()
 
