@@ -102,6 +102,14 @@ class Bank(BaseModel):
 
             Python: optional[:class:`str`]
         
+        .. collapse:: description
+
+            Tortoise: :class:`tortoise.fields.TextField`
+
+                - :attr:`null` True
+            
+            Python: optional[:class:`str`]
+        
         .. collapse:: owner_shortcut
         
             Tortoise: :class:`tortoise.fields.ForeignKeyField`
@@ -128,6 +136,8 @@ class Bank(BaseModel):
         The bank's name.
     emoji: Optional[:class:`str`]
         The bank's emoji.
+    description: Optional[:class:`str`]
+        The bank's description.
     owner_shortcut: Optional[:class:`~taho.database.OwnerShortcut`]
         The bank's owner (user, ...).
         If ``None``, the bank is owned by the bot
@@ -144,6 +154,7 @@ class Bank(BaseModel):
     owner_shortcut = fields.ForeignKeyField("main.OwnerShortcut", null=True)
     name = fields.CharField(max_length=255)
     emoji = fields.CharField(max_length=255, null=True)
+    description = fields.TextField(null=True)
 
     infos: fields.ReverseRelation["BankInfo"]
     accounts: fields.ReverseRelation["BankAccount"]
@@ -155,24 +166,6 @@ class Bank(BaseModel):
         async for account in self.accounts:
             yield account
     
-    def get_emoji(self, bot: Bot) -> Emoji:
-        """
-        Get the bank's emoji as a :class:`~taho.Emoji` object.
-
-        Parameters
-        ----------
-        bot: :class:`~taho.Bot`
-            The bot instance.
-            Used to get the emoji from Discord.
-        
-        Returns
-        --------
-        :class:`~taho.Emoji`
-            The bank's emoji.
-        """
-        from taho.utils import Emoji
-        return Emoji(self.emoji, bot=bot)
-        
     async def get_info(self, key: str) -> Union[str, int, float, None]:
         """|coro|
 
