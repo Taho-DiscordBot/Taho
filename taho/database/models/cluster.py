@@ -28,9 +28,10 @@ from tortoise import fields
 from tortoise import exceptions as t_exceptions
 from tortoise.signals import post_save
 from .role import Role
+from .info import Info
 from taho.exceptions import DoesNotExist, AlreadyExists
 from taho.database import db_utils
-from taho.enums import InfoType, ItemType
+from taho.enums import ItemType
 from taho.babel import _
 import asyncio
 
@@ -38,7 +39,7 @@ if TYPE_CHECKING:
     from taho import Bot, Emoji
     from typing import Any, List, Optional, Union, Dict, AsyncGenerator
     from taho.enums import RoleType
-    from taho.utils.abstract import AbstractAccessRule, AbstractRewardPack
+    from taho.abstract import AbstractAccessRule, AbstractRewardPack
     from .server import Server
     from .user import User
     from .bank import Bank
@@ -837,7 +838,7 @@ async def cluster_post_save(_, instance: Cluster, created: bool, *args, **kwargs
             currency=currency
             )
 
-class ClusterInfo(BaseModel):
+class ClusterInfo(Info):
     """
     Represents a cluster's info.
 
@@ -920,21 +921,4 @@ class ClusterInfo(BaseModel):
     class Meta:
         table = "cluster_infos"
     
-    id = fields.IntField(pk=True)
-
     cluster = fields.ForeignKeyField("main.Cluster", related_name="infos")
-    key = fields.CharField(max_length=255)
-    type = fields.IntEnumField(InfoType)
-    value = fields.CharField(max_length=255)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, ClusterInfo):
-            return self.py_value == other.py_value
-        return other == self.py_value
-    
-    def __str__(self) -> str:
-        return self.value
-    
-    @property
-    def py_value(self) -> Union[None, bool, int, float, str]:
-        return db_utils.convert_to_type(self.value, self.type)

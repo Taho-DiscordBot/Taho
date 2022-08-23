@@ -29,9 +29,10 @@ from .base import BaseModel
 from tortoise import fields
 from tortoise.signals import post_save
 from taho.exceptions import AlreadyExists, DoesNotExist, QuantityException
-from taho.enums import InfoType, ShortcutType
+from taho.enums import ShortcutType
 from taho.database import db_utils
 from taho.abc import OwnerShortcutable
+from .info import Info
 
 import sys
 
@@ -39,7 +40,6 @@ if TYPE_CHECKING:
     from typing import AsyncGenerator, Optional, Tuple, Union, List
     from .user import User
     from .currency import Currency
-    from taho import Emoji, Bot
     from taho import CurrencyAmount
 
 
@@ -362,7 +362,7 @@ async def bank_post_save(_, instance: Bank, created: bool, *args, **kwargs) -> N
         except AlreadyExists:
             pass
 
-class BankInfo(BaseModel):
+class BankInfo(Info):
     """
     Represents an info about a bank.
 
@@ -439,21 +439,7 @@ class BankInfo(BaseModel):
     class Meta:
         table = "bank_infos"
 
-    id = fields.IntField(pk=True)
-
     bank = fields.ForeignKeyField("main.Bank", related_name="infos")
-    key = fields.CharField(max_length=255)
-    type = fields.IntEnumField(InfoType)
-    value = fields.CharField(max_length=255)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, BankInfo):
-            return self.py_value == other.py_value
-        return other == self.py_value
-
-    @property
-    def py_value(self) -> Union[None, bool, int, float, str]:
-        return db_utils.convert_to_type(self.value, self.type)
 
 @overload
 async def create_transaction_operation(

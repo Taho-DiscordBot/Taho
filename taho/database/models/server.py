@@ -26,8 +26,8 @@ from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from tortoise import exceptions as t_exceptions
-from ..db_utils import convert_to_type, get_type
-from taho.enums import InfoType
+from ..db_utils import get_type
+from .info import Info
 from taho.exceptions import DoesNotExist
 
 if TYPE_CHECKING:
@@ -347,7 +347,7 @@ class Server(BaseModel):
             await ServerRole.bulk_create(to_register)
 
 
-class ServerInfo(BaseModel):
+class ServerInfo(Info):
     """
     Represents a server's info.
 
@@ -430,21 +430,4 @@ class ServerInfo(BaseModel):
     class Meta:
         table = "server_infos"
 
-    id = fields.IntField(pk=True)
-
     server = fields.ForeignKeyField("main.Server", related_name="infos")
-    key = fields.CharField(max_length=255)
-    type = fields.IntEnumField(InfoType)
-    value = fields.CharField(max_length=255)
-
-    def __eq__(self, other: object) -> bool:
-        if isinstance(other, ServerInfo):
-            return self.py_value == other.py_value
-        return other == self.py_value
-    
-    def __str__(self) -> str:
-        return self.value
-    
-    @property
-    def py_value(self) -> Union[None, bool, int, float, str]:
-        return convert_to_type(self.value, self.type)
