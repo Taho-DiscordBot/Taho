@@ -30,7 +30,7 @@ from taho.utils.utils_ import split_list
 from taho.database.models import Item
 from .field import Field, FieldView
 from ..choice import Choice
-from taho.utils.abstract import AbstractAccessRule
+from taho.abstract import AbstractAccessRule
 from taho.base_view import BaseView
 
 if TYPE_CHECKING:

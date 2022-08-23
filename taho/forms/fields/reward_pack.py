@@ -27,7 +27,7 @@ from typing import TYPE_CHECKING
 from discord import Interaction, ui, SelectOption, ButtonStyle, TextStyle
 from taho.babel import _
 from taho.utils.utils_ import split_list
-from taho.utils.abstract import AbstractReward
+from taho.abstract import AbstractReward
 from taho.enums import ItemType, RegenerationType
 from taho.database.models import Item
 from taho.exceptions import ValidationException
@@ -38,7 +38,7 @@ from ..validators import is_number
 
 if TYPE_CHECKING:
     from typing import Union, List, Callable, Optional, Dict, Any, Literal
-    from taho.utils.abstract import AbstractRewardPack
+    from taho.abstract import AbstractRewardPack
 
     from taho.emoji import Emoji
     from taho.database.models import Role, Stat

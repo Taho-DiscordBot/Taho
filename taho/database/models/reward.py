@@ -27,7 +27,7 @@ from .base import BaseModel
 from tortoise import fields
 from tortoise.validators import MinValueValidator, MaxValueValidator
 from taho.enums import RewardType
-from taho.utils.abstract import AbstractReward, AbstractRewardPack
+from taho.abstract import AbstractReward, AbstractRewardPack
 
 
 if TYPE_CHECKING:

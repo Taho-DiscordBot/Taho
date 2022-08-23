@@ -30,7 +30,7 @@ from .reward_pack import RewardPack
 from ..choice import Choice
 from ..validators import *
 from taho.enums import get_reward_type_text
-from taho.utils.abstract import AbstractRewardPack
+from taho.abstract import AbstractRewardPack
 
 
 if TYPE_CHECKING:

@@ -22,10 +22,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
-from taho.utils.abstract import AbstractAccessRule
+from taho.abstract import AbstractAccessRule
 
 
 __all__ = (
