@@ -20,12 +20,37 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
-
-This code is based on the work of the flask_babel project:
-https://pypi.org/project/Flask-Babel/
-And the Py18n project:
-https://pypi.org/project/Py18n/
 """
-from .babel import *
-from .speaklater import *
-from .info_text import *
+from __future__ import annotations
+from .babel import gettext
+
+
+def _(text: str) -> str:
+    return text
+
+async def get_info_text(key: str) -> str:
+    """|coro|
+    
+    Get the text corresponding to an info
+    (from a bank, a cluster/server...).
+    This text in translated using :meth:`~taho.babel.gettext`.
+
+    Parameters
+    -----------
+    key: :class:`str`
+        The key of the info.
+
+    Raises
+    -------
+    IndexError
+        The key is unknown, or doesn't have any text.
+
+    Returns
+    --------
+    :class:`str`
+        The text of the info.
+    """
+    texts = {
+
+    }
+    return gettext(texts[key])
