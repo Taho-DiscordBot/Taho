@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-20 10:05+0000\n"
+"POT-Creation-Date: 2022-08-21 09:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,138 +17,138 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: cogs/item.py:44 cogs/item.py:317 cogs/item.py:333
+#: cogs/item.py:47 cogs/item.py:324 cogs/item.py:340
 msgid "Create an item"
 msgstr ""
 
-#: cogs/item.py:45 cogs/item.py:334
-msgid "Delete an existing item"
-msgstr ""
-
-#: cogs/item.py:46 cogs/item.py:335
+#: cogs/item.py:48 cogs/item.py:341
 msgid "Edit an existing item"
 msgstr ""
 
-#: cogs/item.py:47 cogs/item.py:336
+#: cogs/item.py:49 cogs/item.py:342
+msgid "Delete an existing item"
+msgstr ""
+
+#: cogs/item.py:50 cogs/item.py:343
 msgid "List all items"
 msgstr ""
 
-#: cogs/item.py:51 cogs/item.py:340
+#: cogs/item.py:54 cogs/item.py:347
 msgid "Select an action"
 msgstr ""
 
-#: cogs/item.py:92
+#: cogs/item.py:97
 msgid "Select an item"
 msgstr ""
 
-#: cogs/item.py:110
+#: cogs/item.py:115
 msgid "Please select only one item."
 msgstr ""
 
-#: cogs/item.py:183
+#: cogs/item.py:190
 msgid "Name"
 msgstr ""
 
-#: cogs/item.py:184
+#: cogs/item.py:191
 msgid "The name of the item"
 msgstr ""
 
-#: cogs/item.py:197
+#: cogs/item.py:204
 msgid "Emoji"
 msgstr ""
 
-#: cogs/item.py:198
+#: cogs/item.py:205
 msgid "The emoji of the item"
 msgstr ""
 
-#: cogs/item.py:203
+#: cogs/item.py:210
 msgid "Description"
 msgstr ""
 
-#: cogs/item.py:204
+#: cogs/item.py:211
 msgid "The description of the item"
 msgstr ""
 
-#: cogs/item.py:213
+#: cogs/item.py:220
 msgid "Type"
 msgstr ""
 
-#: cogs/item.py:217 taho/enums/item.py:70
+#: cogs/item.py:224 taho/enums/item.py:70
 msgid "Resource"
 msgstr ""
 
-#: cogs/item.py:219
+#: cogs/item.py:226
 msgid "Resources are the basic items."
 msgstr ""
 
-#: cogs/item.py:222 taho/enums/item.py:71
+#: cogs/item.py:229 taho/enums/item.py:71
 msgid "Consumable"
 msgstr ""
 
-#: cogs/item.py:224
+#: cogs/item.py:231
 msgid "Consumables have durability and can be used."
 msgstr ""
 
-#: cogs/item.py:227 cogs/item.py:247 taho/enums/item.py:72
+#: cogs/item.py:234 cogs/item.py:254 taho/enums/item.py:72
 msgid "Currency"
 msgstr ""
 
-#: cogs/item.py:229
+#: cogs/item.py:236
 msgid "Currency items are used as Cash for a specific Currency."
 msgstr ""
 
-#: cogs/item.py:259 taho/forms/fields/reward_pack.py:333
+#: cogs/item.py:266 taho/forms/fields/reward_pack.py:336
 msgid "Durability"
 msgstr ""
 
-#: cogs/item.py:273
+#: cogs/item.py:280
 msgid "Cooldown"
 msgstr ""
 
-#: cogs/item.py:285
+#: cogs/item.py:292
 msgid "Access rules"
 msgstr ""
 
-#: cogs/item.py:290 taho/forms/fields/reward.py:203
+#: cogs/item.py:297 taho/forms/fields/reward.py:203
 msgid "Rewards"
 msgstr ""
 
-#: cogs/item.py:311
+#: cogs/item.py:318
 #, python-format
 msgid "Edit %(item_name)s"
 msgstr ""
 
-#: cogs/item.py:327
+#: cogs/item.py:334
 msgid "item"
 msgstr ""
 
-#: cogs/item.py:328
+#: cogs/item.py:335
 msgid "Manage items"
 msgstr ""
 
-#: cogs/item.py:343
+#: cogs/item.py:350
 msgid "action"
 msgstr ""
 
-#: cogs/item.py:376
+#: cogs/item.py:381
 #, python-format
 msgid "You have successfully created the item **%(item_display)s**."
 msgstr ""
 
-#: cogs/item.py:386
+#: cogs/item.py:391
 msgid "There are no items to edit."
 msgstr ""
 
-#: cogs/item.py:416
+#: cogs/item.py:419
 #, python-format
 msgid "You have successfully edited the item **%(item_display)s**."
 msgstr ""
 
-#: cogs/item.py:426
+#: cogs/item.py:429
 msgid "There are no items to delete."
 msgstr ""
 
-#: cogs/item.py:450
+#: cogs/item.py:451
 #, python-format
 msgid "Are you sure you want to delete the item **%(item)s**?"
 msgstr ""
@@ -169,6 +169,10 @@ msgid ""
 "more information about it.\n"
 "\n"
 "%(items)s"
+msgstr ""
+
+#: taho/base_view.py:56
+msgid "You are not allowed to use this view."
 msgstr ""
 
 #: taho/database/models/item.py:305 taho/forms/fields/number.py:122
@@ -214,35 +218,35 @@ msgstr ""
 msgid "Equip"
 msgstr ""
 
-#: taho/forms/fields/access.py:208 taho/forms/fields/access.py:352
-#: taho/forms/fields/reward_pack.py:319 taho/forms/fields/reward_pack.py:561
-#: taho/forms/fields/reward_pack.py:660 taho/forms/form.py:43
-#: taho/views/confirmation.py:51
+#: taho/forms/fields/access.py:211 taho/forms/fields/access.py:355
+#: taho/forms/fields/reward_pack.py:322 taho/forms/fields/reward_pack.py:564
+#: taho/forms/fields/reward_pack.py:663 taho/forms/form.py:46
+#: taho/views/confirmation.py:52
 msgid "Cancel"
 msgstr ""
 
-#: taho/forms/form.py:44
+#: taho/forms/form.py:47
 msgid "Respond"
 msgstr ""
 
-#: taho/forms/fields/access.py:67 taho/forms/fields/reward_pack.py:76
-#: taho/forms/form.py:45
+#: taho/forms/fields/access.py:68 taho/forms/fields/reward_pack.py:77
+#: taho/forms/form.py:48
 msgid "Finish"
 msgstr ""
 
-#: taho/forms/form.py:47
+#: taho/forms/form.py:50
 msgid "Go to"
 msgstr ""
 
-#: taho/forms/form.py:50
+#: taho/forms/form.py:53
 msgid "Previous"
 msgstr ""
 
-#: taho/forms/form.py:51
+#: taho/forms/form.py:54
 msgid "Next"
 msgstr ""
 
-#: taho/forms/form.py:424
+#: taho/forms/form.py:428
 msgid ""
 "Please fill out the form below.\n"
 "You can use the buttons below to navigate the form.\n"
@@ -250,7 +254,7 @@ msgid ""
 "it cannot be defined.\n"
 msgstr ""
 
-#: taho/forms/form.py:513
+#: taho/forms/form.py:519
 msgid ""
 "This form as no timeout, but due to Discord limitations on ephemeral "
 "messages, it may start to bug after 15 mins."
@@ -302,23 +306,23 @@ msgstr ""
 msgid "The value %(value)s is forbidden."
 msgstr ""
 
-#: taho/forms/fields/access.py:55 taho/forms/fields/reward_pack.py:60
+#: taho/forms/fields/access.py:56 taho/forms/fields/reward_pack.py:61
 msgid "What do you want to do?"
 msgstr ""
 
-#: taho/forms/fields/access.py:58
+#: taho/forms/fields/access.py:59
 msgid "Add a rule"
 msgstr ""
 
-#: taho/forms/fields/access.py:62
+#: taho/forms/fields/access.py:63
 msgid "Remove a rule"
 msgstr ""
 
-#: taho/forms/fields/access.py:84
+#: taho/forms/fields/access.py:85
 msgid "**No rules have been set yet.**"
 msgstr ""
 
-#: taho/forms/fields/access.py:98
+#: taho/forms/fields/access.py:99
 #, python-format
 msgid ""
 "The access is a list of roles that can/cannot use what you are creating.\n"
@@ -329,48 +333,48 @@ msgid ""
 "list** option, then selecting the type of access, and the roles you want."
 msgstr ""
 
-#: taho/forms/fields/access.py:183
+#: taho/forms/fields/access.py:186
 msgid "Entities will have access to it or not?"
 msgstr ""
 
-#: taho/forms/fields/access.py:186
+#: taho/forms/fields/access.py:189
 msgid "Have access"
 msgstr ""
 
-#: taho/forms/fields/access.py:191
+#: taho/forms/fields/access.py:194
 msgid "Do not have access"
 msgstr ""
 
-#: taho/forms/fields/access.py:201 taho/forms/fields/access.py:346
-#: taho/forms/fields/reward_pack.py:312 taho/forms/fields/reward_pack.py:555
-#: taho/forms/fields/reward_pack.py:655 taho/views/confirmation.py:43
+#: taho/forms/fields/access.py:204 taho/forms/fields/access.py:349
+#: taho/forms/fields/reward_pack.py:315 taho/forms/fields/reward_pack.py:558
+#: taho/forms/fields/reward_pack.py:658 taho/views/confirmation.py:44
 msgid "Confirm"
 msgstr ""
 
-#: taho/forms/fields/access.py:246
+#: taho/forms/fields/access.py:249
 msgid "There are no roles with no access rule yet."
 msgstr ""
 
-#: taho/forms/fields/access.py:282
+#: taho/forms/fields/access.py:285
 msgid "Pick roles in the lists."
 msgstr ""
 
-#: taho/forms/fields/access.py:371
+#: taho/forms/fields/access.py:374
 msgid ""
 "Select the rules you want to remove in the list below.\n"
 "\n"
 msgstr ""
 
-#: taho/forms/fields/access.py:415
+#: taho/forms/fields/access.py:418
 msgid "Select rules to remove in the list"
 msgstr ""
 
-#: taho/forms/fields/access.py:488
+#: taho/forms/fields/access.py:491
 msgid "There are no roles configured, so you can't create an access rule."
 msgstr ""
 
-#: taho/forms/fields/access.py:509 taho/forms/fields/emoji.py:158
-#: taho/forms/fields/field.py:129 taho/forms/fields/number.py:120
+#: taho/forms/fields/access.py:512 taho/forms/fields/emoji.py:158
+#: taho/forms/fields/field.py:131 taho/forms/fields/number.py:120
 #: taho/forms/fields/reward.py:230 taho/forms/fields/select.py:198
 #: taho/forms/fields/text.py:120
 msgid "*Unanswered*"
@@ -423,7 +427,7 @@ msgstr ""
 msgid "Click on **Respond** to create a new reward pack"
 msgstr ""
 
-#: taho/forms/fields/field.py:347 taho/forms/fields/field.py:393
+#: taho/forms/fields/field.py:351 taho/forms/fields/field.py:399
 #, python-format
 msgid "Successfully set value to: %(value)s"
 msgstr ""
@@ -450,123 +454,123 @@ msgstr ""
 msgid "• %(reward_display)s"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:63
+#: taho/forms/fields/reward_pack.py:64
 msgid "Add a reward"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:67
+#: taho/forms/fields/reward_pack.py:68
 msgid "Remove a reward"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:71
+#: taho/forms/fields/reward_pack.py:72
 msgid "Delete the pack"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:147
+#: taho/forms/fields/reward_pack.py:148
 msgid "Reward amount"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:150
+#: taho/forms/fields/reward_pack.py:151
 msgid "Minimum amount"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:151
+#: taho/forms/fields/reward_pack.py:152
 msgid "Minimum amount, can be negative."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:157
+#: taho/forms/fields/reward_pack.py:158
 msgid "Maximum amount"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:158
+#: taho/forms/fields/reward_pack.py:159
 msgid "Maximum amount, can be negative. Keep empty for fix amount."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:194
+#: taho/forms/fields/reward_pack.py:195
 msgid "Minimum amount can't be greater than maximum amount."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:226
+#: taho/forms/fields/reward_pack.py:227
 #, python-format
 msgid "Reward amount set to %(min_amount)s/%(max_amount)s."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:235
+#: taho/forms/fields/reward_pack.py:236
 #, python-format
 msgid "Reward amount set to %(amount)s."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:283
+#: taho/forms/fields/reward_pack.py:286
 msgid "Item (or currency)"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:284
+#: taho/forms/fields/reward_pack.py:287
 msgid "RP Role"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:285
+#: taho/forms/fields/reward_pack.py:288
 msgid "Stat"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:289
+#: taho/forms/fields/reward_pack.py:292
 msgid "What type of reward do you want to add?"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:300
+#: taho/forms/fields/reward_pack.py:303
 msgid "What to you want to add?"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:306
+#: taho/forms/fields/reward_pack.py:309
 msgid "Define quantity"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:329
+#: taho/forms/fields/reward_pack.py:332
 msgid "Quantity"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:339
+#: taho/forms/fields/reward_pack.py:342
 msgid "Maximum"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:343
+#: taho/forms/fields/reward_pack.py:346
 msgid "Regeneration"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:375
+#: taho/forms/fields/reward_pack.py:378
 msgid "There are no rewards available to add (role, item or stat)."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:406
+#: taho/forms/fields/reward_pack.py:409
 msgid "Pick an item in the list."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:407
+#: taho/forms/fields/reward_pack.py:410
 msgid "Pick a role in the list."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:408
+#: taho/forms/fields/reward_pack.py:411
 msgid "Pick a stat in the list."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:580
+#: taho/forms/fields/reward_pack.py:583
 msgid ""
 "Select the rewards you want to remove in the list below.\n"
 "\n"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:612
+#: taho/forms/fields/reward_pack.py:615
 msgid "Select rewards to remove in the list"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:673
+#: taho/forms/fields/reward_pack.py:676
 msgid "__**Are you sure you want to delete this pack?**__"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:685
+#: taho/forms/fields/reward_pack.py:688
 msgid "The pack has been deleted."
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:726
+#: taho/forms/fields/reward_pack.py:729
 msgid "*No rewards*"
 msgstr ""
 
@@ -633,7 +637,7 @@ msgstr ""
 msgid "❌ %(entity)s"
 msgstr ""
 
-#: taho/views/confirmation.py:69 taho/views/confirmation.py:73
+#: taho/views/confirmation.py:70 taho/views/confirmation.py:74
 msgid "Cancelled."
 msgstr ""
 
