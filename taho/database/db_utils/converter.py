@@ -22,20 +22,16 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __future__ import annotations
-from taho.enums import InfoType, ShortcutableType
+from taho.enums import InfoType
 from typing import TYPE_CHECKING
-from taho.abc import Shortcutable
 
 if TYPE_CHECKING:
     from typing import Union
-    from ..models import Shortcut, Server, Cluster
-    import discord
 
 __all__ = (
     "convert_to_type",
     "get_type",
 )
-
 
 def convert_to_type(value: str, type: InfoType) -> Union[None, bool, int, float, str]:
     """
@@ -98,6 +94,3 @@ def get_type(value: Union[None, bool, int, float, str]) -> InfoType:
         float: InfoType.FLOAT
     }
     return types[type(value)]
-
-    #server = await create_server(guild)
-    #return server.cluster
