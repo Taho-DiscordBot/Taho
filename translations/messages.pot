@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-21 09:01+0000\n"
+"POT-Creation-Date: 2022-08-23 16:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -173,6 +173,57 @@ msgstr ""
 
 #: taho/base_view.py:56
 msgid "You are not allowed to use this view."
+msgstr ""
+
+#: taho/abstract/access_rule.py:132
+#, python-format
+msgid "✅ %(entity)s"
+msgstr ""
+
+#: taho/abstract/access_rule.py:134
+#, python-format
+msgid "❌ %(entity)s"
+msgstr ""
+
+#: taho/abstract/info.py:126
+#, python-format
+msgid "*%(info_text)s*: **%(value)s"
+msgstr ""
+
+#: taho/abstract/reward.py:183
+#, python-format
+msgid "%(luck)s %%"
+msgstr ""
+
+#: taho/abstract/reward.py:313
+#, python-format
+msgid "**%(role)s**"
+msgstr ""
+
+#: taho/abstract/reward.py:322
+msgid "*(durability)*"
+msgstr ""
+
+#: taho/abstract/reward.py:324
+msgid "*(quantity)*"
+msgstr ""
+
+#: taho/abstract/reward.py:327
+msgid "*(regeneration)*"
+msgstr ""
+
+#: taho/abstract/reward.py:329
+msgid "*(maximum)*"
+msgstr ""
+
+#: taho/abstract/reward.py:332
+#, python-format
+msgid "%(min_amount)s/%(max_amount)s **%(stuff_name)s** %(additional_info)s"
+msgstr ""
+
+#: taho/abstract/reward.py:340
+#, python-format
+msgid "%(min_amount)s **%(stuff_name)s** %(additional_info)s"
 msgstr ""
 
 #: taho/database/models/item.py:305 taho/forms/fields/number.py:122
@@ -589,52 +640,6 @@ msgstr ""
 
 #: taho/forms/fields/select.py:169
 msgid "No choices available."
-msgstr ""
-
-#: taho/utils/abstract.py:184
-#, python-format
-msgid "%(luck)s %%"
-msgstr ""
-
-#: taho/utils/abstract.py:314
-#, python-format
-msgid "**%(role)s**"
-msgstr ""
-
-#: taho/utils/abstract.py:323
-msgid "*(durability)*"
-msgstr ""
-
-#: taho/utils/abstract.py:325
-msgid "*(quantity)*"
-msgstr ""
-
-#: taho/utils/abstract.py:328
-msgid "*(regeneration)*"
-msgstr ""
-
-#: taho/utils/abstract.py:330
-msgid "*(maximum)*"
-msgstr ""
-
-#: taho/utils/abstract.py:333
-#, python-format
-msgid "%(min_amount)s/%(max_amount)s **%(stuff_name)s** %(additional_info)s"
-msgstr ""
-
-#: taho/utils/abstract.py:341
-#, python-format
-msgid "%(min_amount)s **%(stuff_name)s** %(additional_info)s"
-msgstr ""
-
-#: taho/utils/abstract.py:441
-#, python-format
-msgid "✅ %(entity)s"
-msgstr ""
-
-#: taho/utils/abstract.py:443
-#, python-format
-msgid "❌ %(entity)s"
 msgstr ""
 
 #: taho/views/confirmation.py:70 taho/views/confirmation.py:74
