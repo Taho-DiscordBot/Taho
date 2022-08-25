@@ -39,7 +39,7 @@ if TYPE_CHECKING:
     from taho import Bot, Emoji
     from typing import Any, List, Optional, Union, Dict, AsyncGenerator
     from taho.enums import RoleType
-    from taho.abstract import AbstractAccessRule, AbstractRewardPack
+    from taho.abstract import AbstractAccessRule, AbstractRewardPack, AbstractInfo
     from .server import Server
     from .user import User
     from .bank import Bank
@@ -773,7 +773,14 @@ class Cluster(BaseModel):
 
             return item
 
-    async def create_bank(self, name: str) -> Bank:
+    async def create_bank(
+        self, 
+        name: str,
+        emoji: Optional[Emoji] = None,
+        description: Optional[str] = None,
+        owner: Optional[User] = None,
+        infos: List[AbstractInfo] = []
+    ) -> Bank:
         """|coro|
 
         Create a bank in the cluster.
@@ -782,18 +789,48 @@ class Cluster(BaseModel):
         -----------
         name: :class:`str`
             The name of the bank.
+        emoji: Optional[:class:`~taho.Emoji`]
+            The emoji of the bank.
+        description: Optional[:class:`str`]
+            The description of the bank.
+        owner: Optional[:class:`~taho.database.models.User`]
+            The owner of the bank.
+        infos: List[:class:`~taho.utils.AbstractInfo`]
 
         Raises
         -------
         ~taho.exceptions.AlreadyExists
             A bank with the same name already exists.
-        
-        Returns
-        --------
-        :class:`~taho.database.models.Bank`
-            The created bank.
         """
-        from .bank import Bank
+        from .bank import Bank, BankInfo # avoid circular import
+
+        try:
+            # Create the item
+            bank = await Bank.create(
+                cluster=self, 
+                name=name, 
+                emoji=emoji,
+                description=description,
+                owner=owner
+                )
+        except t_exceptions.IntegrityError:
+            raise AlreadyExists("A bank with the same name already exists.")
+        else:
+
+            # Register coroutines to create the infos
+            if infos:
+                queries = []
+                for info in infos:
+                    queries.append(info.to_db_access(
+                        BankInfo,
+                        bank
+                        ))
+
+                # Execute the coroutines
+                await asyncio.gather(*queries)
+
+            return bank
+
 
 @post_save(Cluster)
 async def cluster_post_save(_, instance: Cluster, created: bool, *args, **kwargs) -> None:
