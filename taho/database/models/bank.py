@@ -127,6 +127,15 @@ class Bank(BaseModel):
                 - :attr:`related_name` ``banks``
             
             Python: :class:`~taho.database.models.Cluster`
+        
+        .. collapse:: default_currency
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Currency`
+                - :attr:`null` ``True``
+            
+            Python: :class:`~taho.database.models.Currency`
     
     Attributes
     -----------
@@ -144,6 +153,9 @@ class Bank(BaseModel):
         (cash bank).
     cluster: :class:`~taho.database.models.Cluster`
         The cluster where the bank is.
+    default_currency: Optional[:class:`~taho.database.models.Currency`]
+        The bank's default currency.
+        The currency will be used as a reference 
     """
     class Meta:
         table = "banks"
@@ -155,6 +167,7 @@ class Bank(BaseModel):
     name = fields.CharField(max_length=255)
     emoji = fields.CharField(max_length=255, null=True)
     description = fields.TextField(null=True)
+    default_currency = fields.ForeignKeyField("main.Currency", null=True)
 
     infos: fields.ReverseRelation["BankInfo"]
     accounts: fields.ReverseRelation["BankAccount"]
