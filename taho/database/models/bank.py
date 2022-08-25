@@ -33,6 +33,7 @@ from taho.enums import ShortcutType
 from taho.database import db_utils
 from taho.abc import OwnerShortcutable
 from .info import Info
+import asyncio
 
 import sys
 
@@ -343,6 +344,37 @@ class Bank(BaseModel):
             if force_get:
                 return await self._create_default_account(default_user=default_user)
             raise DoesNotExist("Default account does not exist.")
+    
+    async def edit(self, **options) -> None:
+        """|coro|
+
+        Edits the bank.
+
+        Parameters
+        -----------
+        options: :class:`dict`
+            The fields to edit.
+            The keys are the field names.
+        """
+        edit_dict = {}
+        queries = []
+        for option, value in options.items():
+            if option == "infos":
+                queries.append(self.infos.all().delete())
+                if value:
+                    for info in value:
+                        queries.append(info.to_db_access(
+                            BankInfo,
+                            self
+                        ))
+
+            else:
+                edit_dict[option] = value
+        
+        self.update_from_dict(edit_dict)
+
+        await self.save()
+        await asyncio.gather(*queries)
 
 @post_save(Bank)
 async def bank_post_save(_, instance: Bank, created: bool, *args, **kwargs) -> None:
