@@ -153,6 +153,13 @@ class Select(Field):
         
         self.description = description
 
+        self.choices = choices
+        self.min_values = min_values
+        self.max_values = max_values
+
+        if self.max_values == -1 and self.choices:
+            self.max_values = len(self.choices)
+
         if not self.description:
             self.description = _(
                 "Select between %(min_values)s and %(max_values)s values.",

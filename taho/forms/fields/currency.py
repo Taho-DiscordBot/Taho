@@ -75,5 +75,8 @@ class Currency(Select):
                         value=value,
                         emoji=value.emoji
                     ))
+            
+            if self.max_values == -1:
+                self.max_values = len(self.choices)
             return True
 
