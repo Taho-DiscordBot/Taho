@@ -180,6 +180,43 @@ class Bank(BaseModel):
         async for account in self.accounts:
             yield account
     
+    async def to_dict(self, to_edit: bool = False) -> Dict[str, Any]:
+        """
+        |coro|
+        
+        Returns the bank's dictionary.
+
+        Parameters
+        -----------
+        to_edit: :class:`bool`
+            Whether to return the bank's edit dictionary.
+            This will remove several keys from the dictionary.
+        
+        Returns
+        -------
+        :class:`dict`
+            The bank's dictionary.
+        """
+
+        bank_dict = {
+            "id": self.id,
+            "cluster_id": self.cluster_id,
+            "name": self.name,
+            "emoji": self.emoji,
+            "description": self.description,
+            "default_currency_id": self.default_currency_id,
+            "default_currency": await self.default_currency if self.default_currency_id else None,
+            "infos": [
+                await info.to_abstract() async for info in self.infos.all()
+            ],
+        }
+
+        if to_edit:
+            bank_dict.pop("cluster_id", None)
+            bank_dict.pop("default_currency_id", None)
+
+        return bank_dict
+
     async def get_info(self, key: str) -> Union[str, int, float, None]:
         """|coro|
 
