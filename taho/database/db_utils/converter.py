@@ -93,4 +93,4 @@ def get_type(value: Union[None, bool, int, float, str]) -> InfoType:
         str: InfoType.STR,
         float: InfoType.FLOAT
     }
-    return types[type(value)]
+    return types.get(type(value), InfoType.other)
