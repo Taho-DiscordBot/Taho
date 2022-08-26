@@ -257,6 +257,8 @@ class Field:
         :class:`bool`
             Whether the field must appear in the form.
         """
+        if not self.form:
+            return True
         form_dict = self.form.to_dict()
         return all(validator(form_dict) for validator in self.appear_validators)
     
