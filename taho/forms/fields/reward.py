@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from typing import List, Callable, Optional, TypeVar, Dict, Literal, Union
     from taho.enums import RewardType
     from discord import Interaction
-    from taho.utils import AbstractRewardPack
+    from taho.abstract import AbstractRewardPack
     from ..form import Form
 
     T = TypeVar("T")
