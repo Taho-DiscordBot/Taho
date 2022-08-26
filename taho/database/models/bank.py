@@ -38,7 +38,7 @@ import asyncio
 import sys
 
 if TYPE_CHECKING:
-    from typing import AsyncGenerator, Optional, Tuple, Union, List
+    from typing import AsyncGenerator, Optional, Tuple, Union, List, Dict, Any
     from .user import User
     from .currency import Currency
     from taho import CurrencyAmount
@@ -400,11 +400,10 @@ class Bank(BaseModel):
                 queries.append(self.infos.all().delete())
                 if value:
                     for info in value:
-                        queries.append(info.to_db_access(
+                        queries.append(info.to_db_info(
                             BankInfo,
                             self
                         ))
-
             else:
                 edit_dict[option] = value
         
