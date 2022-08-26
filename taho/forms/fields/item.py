@@ -96,5 +96,8 @@ class Item(Select):
                 )
             )
         self.choices = choices
+
+        if self.max_values == -1:
+            self.max_values = len(self.choices)
         return True
     
