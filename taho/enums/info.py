@@ -33,3 +33,4 @@ class InfoType(IntEnum):
     INT = 2
     FLOAT = 3
     STR = 4
+    other = 5
