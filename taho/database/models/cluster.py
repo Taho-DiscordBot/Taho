@@ -776,6 +776,7 @@ class Cluster(BaseModel):
     async def create_bank(
         self, 
         name: str,
+        default_currency: Currency,
         emoji: Optional[Emoji] = None,
         description: Optional[str] = None,
         owner: Optional[User] = None,
@@ -789,6 +790,8 @@ class Cluster(BaseModel):
         -----------
         name: :class:`str`
             The name of the bank.
+        default_currency: :class:`~taho.database.models.Currency`
+            The bank's default currency.
         emoji: Optional[:class:`~taho.Emoji`]
             The emoji of the bank.
         description: Optional[:class:`str`]
@@ -809,6 +812,7 @@ class Cluster(BaseModel):
             bank = await Bank.create(
                 cluster=self, 
                 name=name, 
+                default_currency=default_currency,
                 emoji=emoji,
                 description=description,
                 owner=owner
@@ -821,7 +825,7 @@ class Cluster(BaseModel):
             if infos:
                 queries = []
                 for info in infos:
-                    queries.append(info.to_db_access(
+                    queries.append(info.to_db_info(
                         BankInfo,
                         bank
                         ))
