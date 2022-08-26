@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 __all__ = (
     "TahoException",
+    "BadFormat",
     "AlreadyExists",
     "QuantityException",
     "NPCException",
@@ -36,6 +37,12 @@ __all__ = (
 class TahoException(Exception):
     """
     Raised when an error occurs in the Taho framework.
+    """
+    pass
+
+class BadFormat(TahoException):
+    """
+    Raised when a format is not respected.
     """
     pass
 
