@@ -26,8 +26,7 @@ from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from taho.abstract import AbstractInfo
-from taho.enums import InfoType
-from ..db_utils import convert_to_type
+from ..db_utils import value_from_json
 
 if TYPE_CHECKING:
     from typing import TypeVar
@@ -116,17 +115,19 @@ class Info(BaseModel):
     id = fields.IntField(pk=True)
 
     key = fields.CharField(max_length=255)
-    type = fields.IntEnumField(InfoType)
-    value = fields.CharField(max_length=255)
+    value = fields.JSONField()
 
     def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
-            return self.py_value == other.py_value
-        return other == self.py_value
+            return self.value == other.value
+        return other == self.value["value"]
 
-    @property
-    def py_value(self) -> T:
-        return convert_to_type(self.value, self.type)
+    async def get_py_value(self) -> T:
+        if hasattr(self, "_py_value"):
+            return self._py_value
+        
+        self._py_value = await value_from_json(self.value, fetch=True, silent_error=True)
+        return self._py_value
 
     async def to_abstract(self) -> AbstractInfo:
         """|coro|
@@ -140,5 +141,5 @@ class Info(BaseModel):
         """
         return AbstractInfo(
             key=self.key,
-            value=self.py_value
+            value=await self.get_py_value()
         )

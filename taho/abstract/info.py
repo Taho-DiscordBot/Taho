@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.babel import _
 from taho.database.db_utils import value_to_json, get_link_field
+from taho.utils import _get_display
 
 if TYPE_CHECKING:
     from typing import TypeVar, Dict, Union, Type
@@ -66,9 +67,8 @@ class AbstractInfo:
         Returns a dictionary representation of the info.
         """
         return {
-            "key": self.key,
-            "value": str(self.value),
-            "type": get_type(self.value),
+            "key": self.key,    
+            "value": value_to_json(self.value)
         }
     
     async def to_db_info(self, info_type: Type[U], link: MODEL) -> U:
@@ -92,11 +92,7 @@ class AbstractInfo:
         --------
             The converted info.
         """
-
-        link_field = [
-            f["name"] for f in info_type.get_fields() 
-            if f["field_type"] == "ForeignKeyField"
-            ][0]
+        link_field = get_link_field(info_type)
         
         self_dict = self.to_dict()
         self_dict[link_field] = link
@@ -123,7 +119,7 @@ class AbstractInfo:
         self._display = _(
             "*%(info_text)s*: **%(value)s",
             info_text=await get_info_text(self.key),
-            value=str(self.value)
+            value=_get_display(self.value)
         )
 
         return self._display 
