@@ -69,7 +69,7 @@ class Item(Select):
         
         self.item_types = item_types
     
-    async def get_choices(self, interaction: Interaction) -> None:
+    async def get_choices(self, interaction: Interaction = None) -> None:
         cluster = await db_utils.get_cluster(
                 interaction.client, 
                 interaction.guild
@@ -78,10 +78,12 @@ class Item(Select):
             cluster__id=cluster.id,
             type__in=self.item_types
         )
-        if item_list.count() == 0:
+        if item_list.count() == 0 and interaction:
             await interaction.response.send_message(
                 _("No items available.")
             )
+            return False
+        elif item_list.count() == 0:
             return False
         choices = []
         for item in item_list:

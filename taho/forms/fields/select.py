@@ -167,14 +167,11 @@ class Select(Field):
                 max_values=max_values,
             )
         
-        self.choices = choices
-        self.min_values = min_values
-        self.max_values = max_values
-
-    async def get_choices(self, interaction: Interaction) -> bool:
-        await interaction.response.send_message(
-            _("No choices available.")
-        )
+    async def get_choices(self, interaction: Interaction = None) -> bool:
+        if interaction:
+            await interaction.response.send_message(
+                _("No choices available.")
+            )
         return False
 
     async def ask(self, interaction: Interaction) -> Optional[bool]:
