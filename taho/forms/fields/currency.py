@@ -27,10 +27,10 @@ from discord import Interaction
 from taho.babel import _
 from taho.database.models import Cluster, Currency as _Currency
 from taho.forms.fields.select import Select
+from ..choice import Choice
 
 if TYPE_CHECKING:
     from typing import Optional, List, TypeVar, Union
-    from ..choice import Choice
 
     T = TypeVar("T")
 
@@ -43,7 +43,7 @@ class Currency(Select):
         self,
         *args, 
         cluster: Union[int, Cluster] = None,
-        db_filters: Optional[dict] = None,
+        db_filters: Optional[dict] = {},
         **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -54,13 +54,10 @@ class Currency(Select):
         
         self.db_filters = db_filters
     
-    async def get_choices(self, interaction: Interaction) -> bool:
-        print(self.db_filters)
+    async def get_choices(self, interaction: Interaction = None) -> bool:
         currencies: List[_Currency] = await _Currency.filter(cluster_id=self.cluster, **self.db_filters).all()
-        print(currencies)
         if not currencies:
             return await super().get_choices(interaction)
-        
         else:
             self.choices = [
                 Choice(
