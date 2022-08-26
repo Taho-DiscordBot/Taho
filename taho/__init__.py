@@ -23,6 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 __version__ = '1.0.0a'
 from .babel import *
+from .babel.babel import _
 from .database import *
 from .enums import *
 from .exceptions import *
