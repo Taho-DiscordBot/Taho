@@ -24,4 +24,5 @@ DEALINGS IN THE SOFTWARE.
 from .converter import *
 from .get import *
 from .shortcut import *
+from .json import *
 from .fields import *
