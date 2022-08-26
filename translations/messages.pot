@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-23 16:44+0000\n"
+"POT-Creation-Date: 2022-08-26 16:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,171 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
+
+#: cogs/bank.py:47 cogs/bank.py:365 cogs/bank.py:381
+msgid "Create a bank"
+msgstr ""
+
+#: cogs/bank.py:48 cogs/bank.py:382
+msgid "Edit an existing bank"
+msgstr ""
+
+#: cogs/bank.py:49 cogs/bank.py:383
+msgid "Delete an existing bank"
+msgstr ""
+
+#: cogs/bank.py:50 cogs/bank.py:384
+msgid "List all banks"
+msgstr ""
+
+#: cogs/bank.py:54 cogs/bank.py:388 cogs/item.py:54 cogs/item.py:347
+msgid "Select an action"
+msgstr ""
+
+#: cogs/bank.py:97
+msgid "Select a bank"
+msgstr ""
+
+#: cogs/bank.py:115
+msgid "Please select only one bank."
+msgstr ""
+
+#: cogs/bank.py:174
+msgid "Allow currency exchange"
+msgstr ""
+
+#: cogs/bank.py:175
+msgid "Can this bank exchange currencies for its customers?"
+msgstr ""
+
+#: cogs/bank.py:182 taho/utils/utils_.py:122
+msgid "Yes"
+msgstr ""
+
+#: cogs/bank.py:186 taho/utils/utils_.py:124
+msgid "No"
+msgstr ""
+
+#: cogs/bank.py:193
+msgid "Allowed currencies"
+msgstr ""
+
+#: cogs/bank.py:194
+msgid "Accounts can only support these currencies."
+msgstr ""
+
+#: cogs/bank.py:204
+#, python-format
+msgid "Exchange fee (as a %% of the amount exchanged)"
+msgstr ""
+
+#: cogs/bank.py:216
+msgid "Account opening fee"
+msgstr ""
+
+#: cogs/bank.py:224
+#, python-format
+msgid "Interests (as a %% of the balance)"
+msgstr ""
+
+#: cogs/bank.py:233
+msgid "Account maintenance fees (recurrent)"
+msgstr ""
+
+#: cogs/bank.py:241
+#, python-format
+msgid "Withdrawal fee (as a %% of the withdraw)"
+msgstr ""
+
+#: cogs/bank.py:306 cogs/item.py:190
+msgid "Name"
+msgstr ""
+
+#: cogs/bank.py:307
+msgid "The name of the bank"
+msgstr ""
+
+#: cogs/bank.py:320 cogs/item.py:204
+msgid "Emoji"
+msgstr ""
+
+#: cogs/bank.py:321
+msgid "The emoji of the bank"
+msgstr ""
+
+#: cogs/bank.py:326 cogs/item.py:210
+msgid "Description"
+msgstr ""
+
+#: cogs/bank.py:327
+msgid "The description of the bank"
+msgstr ""
+
+#: cogs/bank.py:336
+msgid "Default currency"
+msgstr ""
+
+#: cogs/bank.py:337
+msgid "The interests and fees will be converted to this currency."
+msgstr ""
+
+#: cogs/bank.py:359
+#, python-format
+msgid "Edit %(bank_name)s"
+msgstr ""
+
+#: cogs/bank.py:375
+msgid "bank"
+msgstr ""
+
+#: cogs/bank.py:376
+msgid "Manage banks"
+msgstr ""
+
+#: cogs/bank.py:391 cogs/item.py:350
+msgid "action"
+msgstr ""
+
+#: cogs/bank.py:422
+#, python-format
+msgid "You have successfully created the bank **%(bank_display)s**."
+msgstr ""
+
+#: cogs/bank.py:432
+msgid "There are no banks to edit."
+msgstr ""
+
+#: cogs/bank.py:460
+#, python-format
+msgid "You have successfully edited the bank **%(bank_display)s**."
+msgstr ""
+
+#: cogs/bank.py:470
+msgid "There are no banks to delete."
+msgstr ""
+
+#: cogs/bank.py:492
+#, python-format
+msgid "Are you sure you want to delete the bank **%(bank)s**?"
+msgstr ""
+
+#: cogs/bank.py:509
+#, python-format
+msgid "You have successfully deleted the bank **%(bank)s**."
+msgstr ""
+
+#: cogs/bank.py:520
+msgid "There are no banks to list."
+msgstr ""
+
+#: cogs/bank.py:529
+#, python-format
+msgid ""
+"Here is a list of all banks, select a bank in the selects below to get "
+"more information about it.\n"
+"\n"
+"%(banks)s"
+msgstr ""
 
 #: cogs/item.py:47 cogs/item.py:324 cogs/item.py:340
 msgid "Create an item"
@@ -33,10 +198,6 @@ msgstr ""
 msgid "List all items"
 msgstr ""
 
-#: cogs/item.py:54 cogs/item.py:347
-msgid "Select an action"
-msgstr ""
-
 #: cogs/item.py:97
 msgid "Select an item"
 msgstr ""
@@ -45,24 +206,12 @@ msgstr ""
 msgid "Please select only one item."
 msgstr ""
 
-#: cogs/item.py:190
-msgid "Name"
-msgstr ""
-
 #: cogs/item.py:191
 msgid "The name of the item"
 msgstr ""
 
-#: cogs/item.py:204
-msgid "Emoji"
-msgstr ""
-
 #: cogs/item.py:205
 msgid "The emoji of the item"
-msgstr ""
-
-#: cogs/item.py:210
-msgid "Description"
 msgstr ""
 
 #: cogs/item.py:211
@@ -126,10 +275,6 @@ msgstr ""
 msgid "Manage items"
 msgstr ""
 
-#: cogs/item.py:350
-msgid "action"
-msgstr ""
-
 #: cogs/item.py:381
 #, python-format
 msgid "You have successfully created the item **%(item_display)s**."
@@ -175,53 +320,53 @@ msgstr ""
 msgid "You are not allowed to use this view."
 msgstr ""
 
-#: taho/abstract/access_rule.py:132
+#: taho/abstract/access_rule.py:130
 #, python-format
 msgid "✅ %(entity)s"
 msgstr ""
 
-#: taho/abstract/access_rule.py:134
+#: taho/abstract/access_rule.py:132
 #, python-format
 msgid "❌ %(entity)s"
 msgstr ""
 
-#: taho/abstract/info.py:126
+#: taho/abstract/info.py:122
 #, python-format
 msgid "*%(info_text)s*: **%(value)s"
 msgstr ""
 
-#: taho/abstract/reward.py:183
+#: taho/abstract/reward.py:180
 #, python-format
 msgid "%(luck)s %%"
 msgstr ""
 
-#: taho/abstract/reward.py:313
+#: taho/abstract/reward.py:310
 #, python-format
 msgid "**%(role)s**"
 msgstr ""
 
-#: taho/abstract/reward.py:322
+#: taho/abstract/reward.py:319
 msgid "*(durability)*"
 msgstr ""
 
-#: taho/abstract/reward.py:324
+#: taho/abstract/reward.py:321
 msgid "*(quantity)*"
 msgstr ""
 
-#: taho/abstract/reward.py:327
+#: taho/abstract/reward.py:324
 msgid "*(regeneration)*"
 msgstr ""
 
-#: taho/abstract/reward.py:329
+#: taho/abstract/reward.py:326
 msgid "*(maximum)*"
 msgstr ""
 
-#: taho/abstract/reward.py:332
+#: taho/abstract/reward.py:329
 #, python-format
 msgid "%(min_amount)s/%(max_amount)s **%(stuff_name)s** %(additional_info)s"
 msgstr ""
 
-#: taho/abstract/reward.py:340
+#: taho/abstract/reward.py:337
 #, python-format
 msgid "%(min_amount)s **%(stuff_name)s** %(additional_info)s"
 msgstr ""
@@ -425,8 +570,9 @@ msgid "There are no roles configured, so you can't create an access rule."
 msgstr ""
 
 #: taho/forms/fields/access.py:512 taho/forms/fields/emoji.py:158
-#: taho/forms/fields/field.py:131 taho/forms/fields/number.py:120
-#: taho/forms/fields/reward.py:230 taho/forms/fields/select.py:198
+#: taho/forms/fields/field.py:131 taho/forms/fields/infos.py:116
+#: taho/forms/fields/infos.py:121 taho/forms/fields/number.py:120
+#: taho/forms/fields/reward.py:230 taho/forms/fields/select.py:200
 #: taho/forms/fields/text.py:120
 msgid "*Unanswered*"
 msgstr ""
@@ -478,9 +624,24 @@ msgstr ""
 msgid "Click on **Respond** to create a new reward pack"
 msgstr ""
 
-#: taho/forms/fields/field.py:351 taho/forms/fields/field.py:399
+#: taho/forms/fields/field.py:353 taho/forms/fields/field.py:401
 #, python-format
 msgid "Successfully set value to: %(value)s"
+msgstr ""
+
+#: taho/forms/fields/infos.py:86
+#, python-format
+msgid "The field **%(field_name)s** has not been updated."
+msgstr ""
+
+#: taho/forms/fields/infos.py:102
+#, python-format
+msgid "The field **%(field_name)s** has been updated."
+msgstr ""
+
+#: taho/forms/fields/infos.py:113 taho/forms/fields/infos.py:137
+#, python-format
+msgid "**%(info_name)s:** %(info_value)s"
 msgstr ""
 
 #: taho/forms/fields/item.py:83
@@ -633,12 +794,12 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: taho/forms/fields/select.py:157
+#: taho/forms/fields/select.py:164
 #, python-format
 msgid "Select between %(min_values)s and %(max_values)s values."
 msgstr ""
 
-#: taho/forms/fields/select.py:169
+#: taho/forms/fields/select.py:173
 msgid "No choices available."
 msgstr ""
 
