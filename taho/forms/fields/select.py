@@ -198,16 +198,21 @@ class Select(Field):
         )
         await view.wait()
 
-
-    
     async def display(self) -> str:
         if self.value is None:
             self.display_value = _("*Unanswered*")
         else:
-            if isinstance(self.value, list):
-                self.display_value = ", ".join(
-                    [_get_display(value) for value in self.value]
-                )
+            if not self.choices:
+                await self.get_choices()
+            
+            if not self.choices:
+                await self.set_value(None)
             else:
-                self.display_value = _get_display(self.value)
+                if isinstance(self.value, list):
+                    self.display_value = ", ".join(
+                        [_get_display(v) for v in self.value]
+                    )
+                else:
+                    self.display_value = _get_display(self.value)
+
         return self.display_value
