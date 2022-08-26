@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 import uuid
 from enum import Enum
+from taho.babel import _
 
 if TYPE_CHECKING:
     from typing import Union, List, TypeVar
@@ -116,6 +117,13 @@ def split_list(to_split: List[T], split_at: int) -> List[List[T]]:
 def _get_display(value: T) -> str:
     if isinstance(value, Enum):
         return get_enum_text(value)
+    elif isinstance(value, bool):
+        if value:
+            return _("Yes")
+        else:
+            return _("No")
+    elif isinstance(value, (list, tuple)):
+        return ", ".join([_get_display(v) for v in value])
     else:
         return str(value)
 
