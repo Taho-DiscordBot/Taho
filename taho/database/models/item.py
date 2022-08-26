@@ -363,7 +363,7 @@ class Item(BaseModel, StuffShortcutable):
 
         if to_edit:
             item_dict.pop("cluster_id", None)
-            item_dict.pop("currency", None)
+            item_dict.pop("currency_id", None)
 
         return item_dict
 
