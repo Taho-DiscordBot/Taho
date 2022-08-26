@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.babel import _
+from taho.database.db_utils import get_link_field
 
 if TYPE_CHECKING:
     from typing import TypeVar, Dict, Union, Type
@@ -96,12 +97,9 @@ class AbstractAccessRule:
         --------
             The converted access rule.
         """
-
-        link_field = [
-            f["name"] for f in access_type.get_fields() 
-            if f["field_type"] == "ForeignKeyField"
-            ][0]
         
+        link_field = get_link_field(access_type)
+
         self_dict = self.to_dict()
         self_dict[link_field] = link
 

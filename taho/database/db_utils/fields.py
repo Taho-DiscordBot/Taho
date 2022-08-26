@@ -21,7 +21,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .converter import *
-from .get import *
-from .shortcut import *
-from .fields import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Optional, Type
+    from ..models import BaseModel
+
+__all__ = (
+    "get_link_field",
+)
+
+def get_link_field(model: Type[BaseModel]) -> Optional[str]:
+    """
+    Get the "link field" of a DB model,
+    the ForeignKey field.
+    Used for Abstract Models.
+
+    Parameters
+    -----------
+    Type[:class:`~taho.database.models.BaseModel`]
+        The model to get the field from.
+    
+    Returns
+    --------
+    Optional[:class:`str`]
+        The link field, if exists.
+    """
+    link_field = [
+        f["name"] for f in model.get_fields() 
+        if f["field_type"] in ("ForeignKeyField", "ForeignKeyFieldInstance")
+    ]
+    if link_field:
+        return link_field[0]
+    else:
+        return None

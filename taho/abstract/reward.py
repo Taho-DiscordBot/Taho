@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from taho.enums import RewardType, get_reward_type_text
 from taho.babel import _
+from taho.database.db_utils import get_link_field
 
 if TYPE_CHECKING:
     from typing import Optional, List, TypeVar, Dict, Union, Type
@@ -159,11 +160,7 @@ class AbstractRewardPack:
 
             item_reward_pack = await reward_pack.to_other_pack(ItemRewardPack, ItemReward, item)
         """
-
-        link_field = [
-            f["name"] for f in pack_type.get_fields() 
-            if f["field_type"] == "ForeignKeyField"
-            ][0]
+        link_field = get_link_field(pack_type)
 
         new_pack = await pack_type.create(
             type=self.type,
