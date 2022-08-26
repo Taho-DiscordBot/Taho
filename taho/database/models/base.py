@@ -132,7 +132,7 @@ class BaseModel(Model):
             type_: ShortcutType, 
             model: Shortcutable, 
             field_name: str
-            ) -> None:
+        ) -> None:
             id_name = field_name + "_id"
 
             short_name = field_name.replace("_shortcut", "")
@@ -168,6 +168,8 @@ class BaseModel(Model):
 
                     # Get the property.
                     shortcut_model = getattr(self, short_name)
+                    if not shortcut_model:
+                        continue
 
                     # Get the ShortcutType of the model, to get 
                     # the corresponding Shortcut model.
@@ -215,7 +217,7 @@ class BaseModel(Model):
 
                 # If the model already has the coroutine registered,
                 # we don't want to register it again.
-                if hasattr(model, id_name) and not hasattr(model, short_name):
+                if hasattr(model, id_name) and getattr(model, id_name) and not hasattr(model, short_name):
                     
                     # Register the coroutine.
                     setattr(model, short_name, _Shortcut(model, field_name))
