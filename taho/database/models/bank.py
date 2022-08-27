@@ -41,6 +41,7 @@ import sys
 if TYPE_CHECKING:
     from typing import AsyncGenerator, Optional, Tuple, Union, List, Dict, Any
     from .user import User
+    from .role import Role
     from .currency import Currency
     from taho import CurrencyAmount
 
@@ -450,6 +451,30 @@ class Bank(BaseModel):
 
         await self.save()
         await asyncio.gather(*queries)
+
+    async def have_access(self, entity: Union[User, Role]) -> bool:
+        access_rules = await self.access_rules.all().values_list("access_shortcut__role_id", "have_access")
+        if not access_rules:
+            return True
+        from .user import User
+        from .role import Role
+        if isinstance(entity, User):
+            roles = await entity.get_roles()
+            print(roles)
+            rules_map = {
+                rule[0]: rule[1] for rule in access_rules
+            }
+            for role in roles:
+                have_access = rules_map.get(role.id, None)
+                if have_access is not None:
+                    return have_access
+        elif isinstance(entity, Role):
+            for rule in access_rules:
+                if rule[0] == entity.id:
+                    return rule[1]
+        
+        return True
+
 
 @post_save(Bank)
 async def bank_post_save(_, instance: Bank, created: bool, *args, **kwargs) -> None:
