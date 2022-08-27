@@ -132,7 +132,7 @@ class BankCog(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
     
-    async def _get_bank_infos_fields(
+    async def _get_infos_fields(
         self, 
         ctx: TahoContext, 
         ) -> List[forms.Field]:
@@ -350,7 +350,7 @@ class BankCog(commands.Cog):
             forms.Infos(
                 name="infos",
                 label="Infos",
-                infos_fields=await self._get_bank_infos_fields(ctx),
+                infos_fields=await self._get_infos_fields(ctx),
                 required=True,
                 validators=[
                     lambda x: forms.required(x)
