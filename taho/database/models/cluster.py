@@ -324,6 +324,47 @@ class Cluster(BaseModel):
 
         return roles_by_name
 
+    async def get_discord_roles(self, bot: Bot) -> Dict[Role, List[discord.Role]]:
+        """|coro|
+        
+        Gets all the roles and discord roles in the cluster and organizes 
+        them.
+
+        Parameters
+        -----------
+        bot: :class:`~taho.Bot`
+            The bot instance.
+
+        Returns
+        --------
+        Dict[:class:`~taho.database.models.Role`, List[:class:`discord.Role`]]
+            The roles organized.
+        
+
+        Example
+        --------
+        How are roles organized?
+
+        .. code-block:: python3
+
+            {
+                Role1: [discordRole1, discordRole2...],
+                Role2: [discordRole3, discordRole4...],
+                ...
+            }
+        """
+        # Get all the cluster's roles
+
+        roles = await self.roles.all().prefetch_related("server_roles")
+        roles_organized = {}
+
+        # For every Role in cluster
+        for c_role in roles:
+            # Get every Discord roles of the Role
+            roles_organized[c_role] = await c_role.get_discord_roles(bot)
+
+        return roles_organized
+
     async def get_users_by_name(self, bot: Bot) -> Dict[str, User]:
         """|coro|
         
