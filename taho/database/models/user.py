@@ -26,9 +26,9 @@ from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
 from tortoise.signals import post_save
-from tortoise import exceptions as t_exceptions
 from taho.exceptions import QuantityException, NPCException
 from taho.enums import ItemUse, ItemType, ItemReason, RoleAddedBy
+from .. import db_utils
 from .npc import NPC
 from taho.abc import AccessRuleShortcutable, OwnerShortcutable
 from permissions import Permissions
@@ -211,16 +211,25 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         """
         if self.is_npc:
             raise NPCException("The user is an NPC")
-        return await self.cluster.get_discord_members(bot, self.user_id)
+        return [
+            await db_utils.get_discord_member(bot, server.id, self.user_id)
+            for server in (await self.cluster.prefetch_related("servers")).servers
+        ]
 
-    async def get_roles(self, bot: Bot) -> List[Role]:
+    async def get_roles(self, bot: Bot = None) -> List[Role]:
         """
         Get the roles of the user.
         """
         if self.is_npc:
             return await (await self.get_npc()).roles.all() # Get the roles of the NPC
+        
+        if not bot:
+            from taho.utils import get_bot
+            bot = get_bot()
+            
         user_roles = []
-        cluster_roles = await self.cluster.get_servers_roles(bot)
+        cluster = await self.cluster
+        cluster_roles = await cluster.get_discord_roles(bot)
         member_roles = [m.roles for m in await self.get_discord_member(bot)]
         for role, roles in cluster_roles.items():
             for r in roles:
