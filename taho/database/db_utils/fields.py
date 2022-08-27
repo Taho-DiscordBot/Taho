@@ -50,7 +50,8 @@ def get_link_field(model: Type[BaseModel]) -> Optional[str]:
     """
     link_field = [
         f["name"] for f in model.get_fields() 
-        if f["field_type"] in ("ForeignKeyField", "ForeignKeyFieldInstance")
+        if f["field_type"] in ("ForeignKeyField", "ForeignKeyFieldInstance") \
+            and not "shortcut" in f["name"]
     ]
     if link_field:
         return link_field[0]
