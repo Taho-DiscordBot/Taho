@@ -28,6 +28,7 @@ from taho.database.models import *
 from taho.exceptions import DoesNotExist, TahoException
 from taho.enums import *
 from taho import Emoji
+from taho.abstract import AbstractInfo
 
 
 if TYPE_CHECKING:
@@ -250,6 +251,30 @@ async def setup_db_test(bot: Bot) -> List[str]:
         for item_data in items_data:
             item = await cluster.create_item(**item_data)
             items.append(item)
+        
+    currencies = [
+        await cluster.get_default_currency() for cluster in clusters
+    ]
+    banks = []
+    for i in range(2):
+        banks.append(
+            await clusters[i].create_bank(
+                name="Banque de France",
+                emoji=Emoji("🏦"),
+                description="A bank intended for testing",
+                default_currency=currencies[i],
+                infos=[
+                    AbstractInfo(
+                        "allowed_currencies",
+                        currencies[i]
+                    ),
+                    AbstractInfo(
+                        "allow_currency_exchange",
+                        True
+                    ),
+                ]
+            ),
+        )
 
 
     return None
