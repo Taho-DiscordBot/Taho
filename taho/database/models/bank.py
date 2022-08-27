@@ -189,7 +189,7 @@ class Bank(BaseModel):
     access_rules: fields.ReverseRelation["BankAccessRule"]
     
     def __str__(self) -> str:
-        return self.name
+        return self.get_display()
     
     async def __aiter__(self) -> AsyncGenerator[BankAccount]:
         async for account in self.accounts:
@@ -234,6 +234,17 @@ class Bank(BaseModel):
             bank_dict.pop("default_currency_id", None)
 
         return bank_dict
+
+    def get_display(self) -> str:
+        """
+        Returns the bank's display.
+
+        Returns
+        -------
+        :class:`str`
+            The bank's display.
+        """
+        return f"**{self.emoji} {self.name}**" if self.emoji else f"**{self.name}**"
 
     async def get_info(self, key: str) -> Union[str, int, float, None]:
         """|coro|
