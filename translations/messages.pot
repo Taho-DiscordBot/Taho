@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: cogs/bank.py:47 cogs/bank.py:365 cogs/bank.py:381
+#: cogs/bank.py:47 cogs/bank.py:370 cogs/bank.py:386
 msgid "Create a bank"
 msgstr ""
 
-#: cogs/bank.py:48 cogs/bank.py:382
+#: cogs/bank.py:48 cogs/bank.py:387
 msgid "Edit an existing bank"
 msgstr ""
 
-#: cogs/bank.py:49 cogs/bank.py:383
+#: cogs/bank.py:49 cogs/bank.py:388
 msgid "Delete an existing bank"
 msgstr ""
 
-#: cogs/bank.py:50 cogs/bank.py:384
+#: cogs/bank.py:50 cogs/bank.py:389
 msgid "List all banks"
 msgstr ""
 
-#: cogs/bank.py:54 cogs/bank.py:388 cogs/item.py:54 cogs/item.py:347
+#: cogs/bank.py:54 cogs/bank.py:393 cogs/item.py:54 cogs/item.py:347
 msgid "Select an action"
 msgstr ""
 
@@ -124,56 +124,60 @@ msgstr ""
 msgid "The interests and fees will be converted to this currency."
 msgstr ""
 
-#: cogs/bank.py:359
+#: cogs/bank.py:347 cogs/item.py:292
+msgid "Access rules"
+msgstr ""
+
+#: cogs/bank.py:364
 #, python-format
 msgid "Edit %(bank_name)s"
 msgstr ""
 
-#: cogs/bank.py:375
+#: cogs/bank.py:380
 msgid "bank"
 msgstr ""
 
-#: cogs/bank.py:376
+#: cogs/bank.py:381
 msgid "Manage banks"
 msgstr ""
 
-#: cogs/bank.py:391 cogs/item.py:350
+#: cogs/bank.py:396 cogs/item.py:350
 msgid "action"
 msgstr ""
 
-#: cogs/bank.py:422
+#: cogs/bank.py:427
 #, python-format
 msgid "You have successfully created the bank **%(bank_display)s**."
 msgstr ""
 
-#: cogs/bank.py:432
+#: cogs/bank.py:437
 msgid "There are no banks to edit."
 msgstr ""
 
-#: cogs/bank.py:460
+#: cogs/bank.py:465
 #, python-format
 msgid "You have successfully edited the bank **%(bank_display)s**."
 msgstr ""
 
-#: cogs/bank.py:470
+#: cogs/bank.py:475
 msgid "There are no banks to delete."
 msgstr ""
 
-#: cogs/bank.py:492
+#: cogs/bank.py:497
 #, python-format
 msgid "Are you sure you want to delete the bank **%(bank)s**?"
 msgstr ""
 
-#: cogs/bank.py:509
+#: cogs/bank.py:514
 #, python-format
 msgid "You have successfully deleted the bank **%(bank)s**."
 msgstr ""
 
-#: cogs/bank.py:520
+#: cogs/bank.py:525
 msgid "There are no banks to list."
 msgstr ""
 
-#: cogs/bank.py:529
+#: cogs/bank.py:534
 #, python-format
 msgid ""
 "Here is a list of all banks, select a bank in the selects below to get "
@@ -252,10 +256,6 @@ msgstr ""
 
 #: cogs/item.py:280
 msgid "Cooldown"
-msgstr ""
-
-#: cogs/item.py:292
-msgid "Access rules"
 msgstr ""
 
 #: cogs/item.py:297 taho/forms/fields/reward.py:203
@@ -416,33 +416,33 @@ msgstr ""
 
 #: taho/forms/fields/access.py:211 taho/forms/fields/access.py:355
 #: taho/forms/fields/reward_pack.py:322 taho/forms/fields/reward_pack.py:564
-#: taho/forms/fields/reward_pack.py:663 taho/forms/form.py:46
+#: taho/forms/fields/reward_pack.py:663 taho/forms/form.py:47
 #: taho/views/confirmation.py:52
 msgid "Cancel"
 msgstr ""
 
-#: taho/forms/form.py:47
+#: taho/forms/form.py:48
 msgid "Respond"
 msgstr ""
 
 #: taho/forms/fields/access.py:68 taho/forms/fields/reward_pack.py:77
-#: taho/forms/form.py:48
+#: taho/forms/form.py:49
 msgid "Finish"
 msgstr ""
 
-#: taho/forms/form.py:50
+#: taho/forms/form.py:51
 msgid "Go to"
 msgstr ""
 
-#: taho/forms/form.py:53
+#: taho/forms/form.py:54
 msgid "Previous"
 msgstr ""
 
-#: taho/forms/form.py:54
+#: taho/forms/form.py:55
 msgid "Next"
 msgstr ""
 
-#: taho/forms/form.py:428
+#: taho/forms/form.py:437
 msgid ""
 "Please fill out the form below.\n"
 "You can use the buttons below to navigate the form.\n"
@@ -450,7 +450,7 @@ msgid ""
 "it cannot be defined.\n"
 msgstr ""
 
-#: taho/forms/form.py:519
+#: taho/forms/form.py:528
 msgid ""
 "This form as no timeout, but due to Discord limitations on ephemeral "
 "messages, it may start to bug after 15 mins."
@@ -570,8 +570,8 @@ msgid "There are no roles configured, so you can't create an access rule."
 msgstr ""
 
 #: taho/forms/fields/access.py:512 taho/forms/fields/emoji.py:158
-#: taho/forms/fields/field.py:131 taho/forms/fields/infos.py:116
-#: taho/forms/fields/infos.py:121 taho/forms/fields/number.py:120
+#: taho/forms/fields/field.py:131 taho/forms/fields/infos.py:121
+#: taho/forms/fields/infos.py:126 taho/forms/fields/number.py:120
 #: taho/forms/fields/reward.py:230 taho/forms/fields/select.py:200
 #: taho/forms/fields/text.py:120
 msgid "*Unanswered*"
@@ -629,17 +629,17 @@ msgstr ""
 msgid "Successfully set value to: %(value)s"
 msgstr ""
 
-#: taho/forms/fields/infos.py:86
+#: taho/forms/fields/infos.py:89
 #, python-format
 msgid "The field **%(field_name)s** has not been updated."
 msgstr ""
 
-#: taho/forms/fields/infos.py:102
+#: taho/forms/fields/infos.py:106
 #, python-format
 msgid "The field **%(field_name)s** has been updated."
 msgstr ""
 
-#: taho/forms/fields/infos.py:113 taho/forms/fields/infos.py:137
+#: taho/forms/fields/infos.py:118 taho/forms/fields/infos.py:142
 #, python-format
 msgid "**%(info_name)s:** %(info_value)s"
 msgstr ""
