@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from typing import List, Optional, Tuple
     from .fields import Field
     from taho import TahoContext
+    from discord import Interaction
     from discord.abc import Snowflake
 
 
@@ -54,7 +55,7 @@ class FormView(BaseView):
         self.next.label = _("Next")
 
         self.disable_check()
-    
+
     def get_current_field(self) -> Tuple[Field, int]:
         """
         Get the current field and its index.
@@ -199,7 +200,7 @@ class FormView(BaseView):
         if interaction.response.is_done():
             # original = await interaction.original_response()
             # await original.edit(content=None, embed=embed, view=self)
-            await self.form.message.edit(content=None, embed=embed, view=self)
+            await self.form.msg.edit(content=None, embed=embed, view=self)
         else:
             await interaction.response.edit_message(content=None, embed=embed, view=self)
         
@@ -356,26 +357,30 @@ class FormView(BaseView):
         await self._go_to(interaction, field)
 
     async def on_timeout(self) -> None:
-        await self.cancel_form(message=self.form.message)
+        await self.cancel_form(message=self.form.msg)
     
     async def finish_form(self, interaction: discord.Interaction) -> None:
+        if self.form.edit_after:
+            embed = await self.form.generate_embed(finished=True)
 
-        embed = await self.form.generate_embed(finished=True)
-
-        await interaction.response.edit_message(embed=embed, view=None)
+            await interaction.response.edit_message(embed=embed, view=None)
+        else:
+            self.form.final_interaction = interaction
         
         self.form.stop()
 
 
     async def cancel_form(self, interaction: discord.Interaction = None, message: discord.Message = None) -> None:
+        if self.form.edit_after:
+            embed = await self.form.generate_embed(canceled=True)
+
+            if interaction:
+                await interaction.response.edit_message(embed=embed, view=None)
+            elif message:
+                await message.edit(embed=embed, view=None)
         
-        embed = await self.form.generate_embed(canceled=True)
-
-
-        if interaction:
-            await interaction.response.edit_message(embed=embed, view=None)
-        elif message:
-            await message.edit(embed=embed, view=None)
+        else:
+            self.form.final_interaction = interaction
         
         self.form.stop(cancel=True)
         
@@ -414,15 +419,19 @@ class Form:
         fields: List[Field], 
         description: Optional[str] = None,
         is_info: bool = False,
+        edit_after: bool = True
         ) -> None:
         self.title = title
         self.fields = fields
         self.description = description
         self.is_info = is_info
+        self.edit_after = edit_after
 
-        self.message: discord.Message = None
+        self.msg: discord.Message = None
         self.guild: discord.Guild = None
         self.user: Optional[Snowflake] = None
+
+        self.final_interaction: Optional[Interaction] = None
 
         if not self.description:
             self.description = _(
@@ -482,10 +491,10 @@ class Form:
         if ctx:
             msg = await ctx.send(embed=embed, view=view, ephemeral=ephemeral)
 
-            self.message = msg
+            self.msg = msg
         elif interaction:
             await interaction.response.send_message(embed=embed, view=view, ephemeral=ephemeral)
-            self.message = await interaction.original_response()
+            self.msg = await interaction.original_response()
             
     async def generate_embed(self, canceled: bool = False, finished: bool = False) -> discord.Embed:
         """|coro|
