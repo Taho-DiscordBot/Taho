@@ -168,7 +168,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         Raises an exception if:
         - NPCException: the user is an NPC
         """
-        if await self.is_npc():
+        if self.is_npc:
             raise NPCException("The user is an NPC")
         return await self.npcs.all()
 
@@ -209,7 +209,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         Raises an exception if:
         - NPCException: the user is an NPC
         """
-        if await self.is_npc():
+        if self.is_npc:
             raise NPCException("The user is an NPC")
         return await self.cluster.get_discord_members(bot, self.user_id)
 
@@ -217,7 +217,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         """
         Get the roles of the user.
         """
-        if await self.is_npc():
+        if self.is_npc:
             return await (await self.get_npc()).roles.all() # Get the roles of the NPC
         user_roles = []
         cluster_roles = await self.cluster.get_servers_roles(bot)
@@ -340,7 +340,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         """
         if role in await self.get_roles(bot): # Check if the role is already in the user's roles
             return
-        if await self.is_npc():
+        if self.is_npc:
             npc = await self.get_npc()
             await npc.add_role(role) # Add the role to the NPC
         else:
@@ -360,7 +360,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         """
         if not role in await self.get_roles(bot): # Check if the user already has the role
             return
-        if await self.is_npc():
+        if self.is_npc:
             await self.get_npc().remove_role(role) # Remove the role from the NPC
         else:
             discord_roles = await role.get_discord_roles(bot) # Get the discord roles to remove
