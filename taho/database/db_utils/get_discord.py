@@ -21,9 +21,34 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .converter import *
-from .get import *
-from .get_discord import *
-from .shortcut import *
-from .json import *
-from .fields import *
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from taho import Bot
+    from typing import Optional
+    import discord
+
+__all__ = (
+    "get_discord_guild",
+    "get_discord_role",
+    "get_discord_member"
+)
+
+async def get_discord_guild(bot: Bot, guild_id: int) -> Optional[discord.Guild]:
+    guild = bot.get_guild(guild_id)
+    if guild and not guild.chunked:
+        await guild.chunk()
+    return guild
+
+async def get_discord_role(bot: Bot, guild_id: int, role_id: int) -> Optional[discord.Role]:
+    guild = await get_discord_guild(bot, guild_id)
+    if not guild:
+        return None
+    return guild.get_role(role_id)
+
+async def get_discord_member(bot: Bot, guild_id: int, user_id: int) -> Optional[discord.Member]:
+    guild = await get_discord_guild(bot, guild_id)
+    if not guild:
+        return None
+    return guild.get_member(user_id)
