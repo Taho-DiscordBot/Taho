@@ -76,18 +76,22 @@ class Infos(Field):
 
         form = Form(
             self.label,
-            fields=self.infos_fields
+            fields=self.infos_fields,
+            edit_after=False
         )
         await form.send(interaction=interaction, ephemeral=True)
         await form.wait()
+        
+        interaction = form.final_interaction
 
         if form.is_canceled():
-            await interaction.followup.send(
-                _(
+            await interaction.response.edit_message(
+                content=_(
                     "The field **%(field_name)s** has not been updated.",
                     field_name=self.label
                 ),
-                ephemeral=True
+                view=None,
+                embed=None
             )
         else:
             value = []
@@ -98,12 +102,13 @@ class Infos(Field):
                     )
             await self.set_value(value)
 
-            await interaction.followup.send(
-                _(
+            await interaction.response.edit_message(
+                content=_(
                     "The field **%(field_name)s** has been updated.",
                     field_name=self.label
                 ),
-                ephemeral=True
+                view=None,
+                embed=None
             )
     
     def _initial_display(self) -> str:
