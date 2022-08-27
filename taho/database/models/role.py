@@ -28,12 +28,13 @@ from typing import TYPE_CHECKING
 from taho.enums import RoleType
 from taho.abc import AccessRuleShortcutable, StuffShortcutable
 from taho.exceptions import DoesNotExist
+from .. import db_utils
 
 
 if TYPE_CHECKING:
     from taho import Bot
     import discord
-    from typing import AsyncGenerator, Optional, List
+    from typing import Optional, List
 
 __all__ = (
     "Role",
@@ -110,7 +111,7 @@ class Role(BaseModel, StuffShortcutable, AccessRuleShortcutable):
 
     server_roles: fields.ReverseRelation["ServerRole"]
 
-    async def get_discord_roles(self, bot: Bot) -> AsyncGenerator[discord.Role]:
+    async def get_discord_roles(self, bot: Bot) -> List[discord.Role]:
         """|coro|
 
         Get the Discord roles in every guild of the cluster
@@ -123,15 +124,15 @@ class Role(BaseModel, StuffShortcutable, AccessRuleShortcutable):
         
         Returns
         --------
-        AsyncGenerator[:class:`discord.Role`]
+        List[:class:`discord.Role`]
             The Discord roles.
         """
-        server_roles = await self.server_roles.all().prefetch_related("server")
-        # Go through all guilds
-        for s_role in server_roles:
-            # Get the role from the Server object
-            server = s_role.server
-            yield await server.get_role(bot, s_role.discord_role_id)
+        server_roles = await self.server_roles.all()
+        return [
+            db_utils.get_discord_role(bot, s_role.server_id, s_role.discord_role_id)
+            for s_role in server_roles
+        ]
+        return roles
 
     async def get_discord_role(self, bot: Bot, server_id: int) -> discord.Role:
         """|coro|
