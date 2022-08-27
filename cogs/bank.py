@@ -531,7 +531,7 @@ class BankCog(commands.Cog):
                 "Here is a list of all banks, select a bank in the selects "
                 "below to get more information about it.\n\n"
                 "%(banks)s",
-                banks="\n".join(bank.get_display(long=True) for bank in banks)
+                banks="\n".join(bank.get_display() for bank in banks)
             )
             view = BankChoiceView(banks, user=ctx.author)
             msg = await ctx.send(content=content, view=view)
