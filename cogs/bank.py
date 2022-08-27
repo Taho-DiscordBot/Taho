@@ -342,6 +342,11 @@ class BankCog(commands.Cog):
                 ],
                 max_values=1
             ),
+            forms.AccessRule(
+                name="access_rules",
+                label=_("Access rules"),
+                required=False,
+            ),
             forms.Infos(
                 name="infos",
                 label="Infos",

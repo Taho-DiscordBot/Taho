@@ -33,6 +33,7 @@ from taho.enums import ShortcutType
 from taho.database import db_utils
 from taho.abc import OwnerShortcutable
 from .info import Info
+from .access_rule import AccessRule
 import asyncio
 
 import sys
@@ -156,7 +157,20 @@ class Bank(BaseModel):
         The cluster where the bank is.
     default_currency: Optional[:class:`~taho.database.models.Currency`]
         The bank's default currency.
-        The currency will be used as a reference 
+        The currency will be used as a reference
+    infos: List[:class:`.BankInfo`]
+        |coro_attr|
+
+        The infos related to the bank.
+    accounts: List[:class:`.BankAccount`]
+        |coro_attr|
+
+        The accounts opened in the bank.
+    access_rules: List[:class:`.BankAccessRule`]
+        |coro_attr|
+
+        The access rules of the bank.
+        The list of entities who can or cannot access to the bank.
     """
     class Meta:
         table = "banks"
@@ -172,6 +186,7 @@ class Bank(BaseModel):
 
     infos: fields.ReverseRelation["BankInfo"]
     accounts: fields.ReverseRelation["BankAccount"]
+    access_rules: fields.ReverseRelation["BankAccessRule"]
     
     def __str__(self) -> str:
         return self.name
@@ -208,6 +223,9 @@ class Bank(BaseModel):
             "default_currency": await self.default_currency if self.default_currency_id else None,
             "infos": [
                 await info.to_abstract() async for info in self.infos.all()
+            ],
+            "access_rules": [
+                await rule.to_abstract() async for rule in self.access_rules.all()
             ],
         }
 
@@ -404,6 +422,16 @@ class Bank(BaseModel):
                             BankInfo,
                             self
                         ))
+
+            elif option == "access_rules":
+                queries.append(self.access_rules.all().delete())
+                if value:
+                    for rule in value:
+                        queries.append(rule.to_db_access(
+                            BankAccessRule,
+                            self
+                        ))
+            
             else:
                 edit_dict[option] = value
         
@@ -514,6 +542,79 @@ class BankInfo(Info):
         table = "bank_infos"
 
     bank = fields.ForeignKeyField("main.Bank", related_name="infos")
+
+class BankAccessRule(AccessRule):
+    """Represents an access rule to a bank.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two rules are equal.
+
+        .. describe:: x != y
+
+            Checks if two rules are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the rule's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+            
+        .. collapse:: bank
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Bank`
+                - :attr:`related_name` ``access_rules``
+            
+            Python: :class:`~taho.database.models.Bank`
+        
+        .. collapse:: have_access
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+            Python: :class:`bool`
+        
+        .. collapse:: access_shortcut
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.AccessRuleShortcut`
+            
+            Python: :class:`~taho.database.models.StuffShortcut`
+        
+    Attributes
+    -----------
+    id: :class:`int`
+        The bank access's ID.
+    bank: :class:`~taho.database.models.Bank`
+        |coro_attr|
+
+        The bank linked to this access.
+    have_access: :class:`bool`
+        Whether the user/role has access to the bank.
+    access_shortcut: :class:`~taho.database.models.AccessRuleShortcut`
+        |coro_attr|
+        
+        The shortcut to the entity which has access to the bank.
+    """
+    class Meta:
+        table = "bank_access_rules"
+    
+    id = fields.IntField(pk=True)
+
+    bank = fields.ForeignKeyField("main.Bank", related_name="access_rules")
+
 
 @overload
 async def create_transaction_operation(
