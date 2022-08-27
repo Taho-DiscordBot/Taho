@@ -80,7 +80,7 @@ class OwnerShortcut(Shortcut):
     class Meta:
         table = "shortcuts_owner"
 
-    user = fields.ForeignKeyField("main.User")
+    user = fields.ForeignKeyField("main.User", null=True)
 
     converters = {
         ShortcutableType.user: "user",
@@ -107,11 +107,11 @@ class StuffShortcut(Shortcut):
     class Meta:
         table = "shortcuts_stuff"
 
-    item = fields.ForeignKeyField("main.Item")
-    stat = fields.ForeignKeyField("main.Stat")
-    role = fields.ForeignKeyField("main.Role")
-    currency = fields.ForeignKeyField("main.Currency")
-    inventory = fields.ForeignKeyField("main.Inventory")
+    item = fields.ForeignKeyField("main.Item", null=True)
+    stat = fields.ForeignKeyField("main.Stat", null=True)
+    role = fields.ForeignKeyField("main.Role", null=True)
+    currency = fields.ForeignKeyField("main.Currency", null=True)
+    inventory = fields.ForeignKeyField("main.Inventory", null=True)
 
     converters = {
         ShortcutableType.item: "item",
@@ -142,8 +142,8 @@ class AccessRuleShortcut(Shortcut):
     class Meta:
         table = "shortcuts_access"
 
-    user = fields.ForeignKeyField("main.User")
-    role = fields.ForeignKeyField("main.Role")
+    user = fields.ForeignKeyField("main.User", null=True)
+    role = fields.ForeignKeyField("main.Role", null=True)
 
     converters = {
         ShortcutableType.user: "user",
@@ -171,8 +171,8 @@ class TradeStuffShortcut(Shortcut):
     class Meta:
         table = "shortcuts_trade_stuff"
 
-    inventory = fields.ForeignKeyField("main.Inventory")
-    currency_amount = fields.ForeignKeyField("main.CurrencyAmount")
+    inventory = fields.ForeignKeyField("main.Inventory", null=True)
+    currency_amount = fields.ForeignKeyField("main.CurrencyAmount", null=True)
 
     converters = {
         ShortcutableType.inventory: "inventory",
