@@ -252,7 +252,7 @@ class Currency(BaseModel, StuffShortcutable):
                             name=name,
                             type=ItemType.currency,
                             emoji=emoji,
-                            description=_(f"A cash item for the Currency {name}"),
+                            description=_(f"A cash item for the Currency %(name)s", name=name),
                             currency=self
                         )
                     )
