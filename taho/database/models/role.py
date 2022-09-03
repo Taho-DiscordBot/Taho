@@ -222,7 +222,7 @@ class Role(BaseModel, StuffShortcutable, AccessRuleShortcutable):
         try:
             role = await self.get_discord_role(bot, server_id)
         except DoesNotExist:
-            return next(role.name async for role in self.get_discord_roles(bot))
+            return next(role.name for role in await self.get_discord_roles(bot))
         else:
             return role.mention
 

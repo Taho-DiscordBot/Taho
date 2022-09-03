@@ -319,7 +319,7 @@ class Cluster(BaseModel):
         # For every Role in cluster
         for c_role in roles:
             # Get every Discord roles of the Role
-            async for s_role in c_role.get_discord_roles(bot):
+            for s_role in await c_role.get_discord_roles(bot):
                 roles_by_name[s_role.name] = c_role
 
         return roles_by_name
