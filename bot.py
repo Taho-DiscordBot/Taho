@@ -101,7 +101,10 @@ def update_babel(parser: argparse.ArgumentParser=None, args: argparse.Namespace=
         print("Make sure you have babel installed, and you activated the virtual environment")
     else:
         print("Skipping POT-Creation-Date update (if no change in messages.pot)... ")
-        skip_post_creation(before_creation_date)
+        try:
+            skip_post_creation(before_creation_date)
+        except UnboundLocalError:
+            pass
         print("==============================")
         print("Updated translations")
 
