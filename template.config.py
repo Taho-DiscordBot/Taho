@@ -8,8 +8,6 @@ BOT_LANGUAGE = "english"
 
 DEBUG = True # Set to False for production
 
-# CommandTree will by synced is these guilds on every startup
-# if DEBUG is True
 TEST_GUILDS = [] # Enter guild ids here
 
 BABEL_DOMAIN = "messages"
