@@ -150,10 +150,10 @@ class Currency(BaseModel, StuffShortcutable):
             as this will cause a division by zero.
     is_default: :class:`bool`
         Whether the currency is the default one.
-    item: Optional[:class:`~taho.database.models.Item`]
+    currency: Optional[:class:`~taho.database.models.Item`]
         |coro_attr|
 
-        The currency's item.
+        The currency's currency.
         Used to be the Cash of this currency.
     """
     class Meta:
@@ -181,7 +181,7 @@ class Currency(BaseModel, StuffShortcutable):
         Returns
         -------
         :class:`str`
-            The item's display.
+            The currency's display.
         """
         if self.code:
             return f"{self.emoji} {self.code}" if self.emoji else self.code
