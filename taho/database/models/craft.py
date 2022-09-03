@@ -28,9 +28,10 @@ from tortoise import fields
 from .reward import RewardPack, Reward
 from taho.enums import RewardType
 from .access_rule import AccessRule
+import asyncio
 
 if TYPE_CHECKING:
-    from typing import List, Dict
+    from typing import List, Dict, Any
 
 __all__ = (
     "Craft",
@@ -213,6 +214,87 @@ class Craft(BaseModel):
         
         return rewards
     
+    async def to_dict(self, to_edit: bool = False) -> Dict[str, Any]:
+        """
+        |coro|
+        
+        Returns the craft's dictionary.
+
+        Parameters
+        -----------
+        to_edit: :class:`bool`
+            Whether to return the craft's edit dictionary.
+            This will remove several keys from the dictionary.
+        
+        Returns
+        -------
+        :class:`dict`
+            The craft's dictionary.
+        """
+
+        craft_dict = {
+            "id": self.id,
+            "cluster_id": self.cluster_id,
+            "name": self.name,
+            "emoji": self.emoji,
+            "description": self.description,
+            "time": self.time,
+            "per": self.per,
+            "access_rules": [
+                await rule.to_abstract() async for rule in self.access_rules.all()
+            ],
+            "reward_packs": [
+                await pack.to_abstract() async for pack in self.reward_packs.all()
+            ],
+        }
+
+        if to_edit:
+            craft_dict.pop("cluster_id", None)
+
+        return craft_dict
+    
+    async def edit(self, **options) -> None:
+        """|coro|
+
+        Edits the craft.
+
+        Parameters
+        -----------
+        options: :class:`dict`
+            The fields to edit.
+            The keys are the field names.
+        """
+        edit_dict = {}
+        queries = []
+        for option, value in options.items():
+            if option == "access_rules":
+                queries.append(self.access_rules.all().delete())
+                if value:
+                    for rule in value:
+                        queries.append(rule.to_db_access(
+                            CraftAccessRule,
+                            self
+                        ))
+            
+            elif option == "reward_packs":
+                queries.append(self.reward_packs.all().delete())
+                if value:
+                    for pack in value:
+                        queries.append(pack.to_db_pack(
+                            CraftRewardPack,
+                            CraftReward,
+                            self
+                        ))
+
+            else:
+                edit_dict[option] = value
+        
+        self.update_from_dict(edit_dict)
+
+        await self.save()
+        await asyncio.gather(*queries)
+
+
 
 class CraftRewardPack(RewardPack):
     """
