@@ -83,8 +83,9 @@ class Currency(BaseModel, StuffShortcutable):
             Tortoise: :class:`tortoise.fields.CharField`
 
                 - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
 
-            Python: :class:`str`
+            Python: Optional[:class:`str`]
         
         .. collapse:: code
 
@@ -132,7 +133,7 @@ class Currency(BaseModel, StuffShortcutable):
     name: :class:`str`
         The currency's name.
         ex: 'Euro'
-    symbol: :class:`str`
+    symbol: Optional[:class:`str`]
         The currency's symbol.
         ex: '€'
     code: :class:`str`
@@ -163,7 +164,7 @@ class Currency(BaseModel, StuffShortcutable):
 
     cluster = fields.ForeignKeyField("main.Cluster", related_name="currencies")
     name = fields.CharField(max_length=255)
-    symbol = fields.CharField(max_length=255)
+    symbol = fields.CharField(max_length=255, null=True)
     code = fields.CharField(max_length=255, null=True)
     emoji = fields.CharField(max_length=255, null=True)
     exchange_rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
