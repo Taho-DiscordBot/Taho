@@ -129,6 +129,10 @@ class Cluster(BaseModel):
         |coro_attr|
 
         The cluster's stats.
+    currencies: List[:class:`~taho.database.models.Currency`]
+        |coro_attr|
+
+        The cluster's currencies.
     """
     class Meta:
         table = "clusters"
@@ -144,6 +148,7 @@ class Cluster(BaseModel):
     items: fields.ReverseRelation["Item"]
     stats: fields.ReverseRelation["Stat"]
     roles: fields.ReverseRelation["Role"]
+    currencies: fields.ReverseRelation["Currency"]
 
     async def __aiter__(self) -> AsyncGenerator[Server]:
         async for server in self.servers:
