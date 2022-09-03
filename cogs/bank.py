@@ -41,7 +41,6 @@ class BankActionChoiceView(BaseView):
         super().__init__(user, *args, **kwargs)
 
         self.value: Literal["create", "delete", "edit", "list"] = None
-        super().__init__()
 
         actions = {
             "create": _("Create a bank"),
@@ -73,7 +72,6 @@ class BankChoiceView(BaseView):
 
         self.value: Bank = None
         self.multiple = multiple
-        super().__init__()
 
         choices = [
             forms.Choice(

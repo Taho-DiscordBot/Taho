@@ -41,7 +41,6 @@ class ItemActionChoiceView(BaseView):
         super().__init__(user, *args, **kwargs)
 
         self.value: Literal["create", "delete", "edit", "list"] = None
-        super().__init__()
 
         actions = {
             "create": _("Create an item"),
@@ -73,7 +72,6 @@ class ItemChoiceView(BaseView):
 
         self.value: Item = None
         self.multiple = multiple
-        super().__init__()
 
         choices = [
             forms.Choice(
