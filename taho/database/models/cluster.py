@@ -880,6 +880,78 @@ class Cluster(BaseModel):
                 await asyncio.gather(*queries)
 
             return bank
+    
+    async def create_currency(
+        self, 
+        name: str,
+        code: str,
+        exchange_rate: float,
+        is_default: bool,
+        supports_cash: bool,
+        symbol: Optional[str] = None,
+        emoji: Optional[Emoji] = None,
+    ) -> Currency:
+        """|coro|
+
+        Create a bank in the cluster.
+
+        Parameters
+        -----------
+        name: :class:`str`
+            The name of the currency.
+        code: :class:`str`
+            The code of the currency.
+        exchange_rate: :class:`float`
+            The exchange rate of the currency.
+        is_default: :class:`bool`
+            Whether the currency is the default currency of the cluster.
+        supports_cash: :class:`bool`
+            Whether the currency supports cash.
+        symbol: Optional[:class:`str`]
+            The symbol of the currency.
+        emoji: Optional[:class:`~taho.Emoji`]
+            The emoji of the currency.
+
+        Raises
+        -------
+        ~taho.exceptions.AlreadyExists
+            A currency with the same name already exists.
+            ``supports_cash`` is ``True`` and an item with the same name already exists.
+        """
+        from .currency import Currency # avoid circular import
+
+        try:
+            # Create the item
+            currency = await Currency.create(
+                cluster=self, 
+                name=name, 
+                code=code,
+                exchange_rate=exchange_rate,
+                is_default=is_default,
+                symbol=symbol,
+                emoji=emoji,
+                )
+        except t_exceptions.IntegrityError:
+            raise AlreadyExists(_("A currency with the same name already exists."))
+        else:
+            # Create the item for the cash
+            if supports_cash:
+                try:
+                    await self.create_item(
+                        name=name,
+                        type=ItemType.currency,
+                        emoji=emoji,
+                        description=_(f"A cash item for the Currency {name}"),
+                        currency=currency
+                    )
+                except t_exceptions.IntegrityError:
+                    raise AlreadyExists(_(
+                        "You chose to support cash for the currency but an item with the same name already exists.\n"
+                        "If you want to support cash for the currency, you must change the name of the item.\n\n"
+                        "The creation of the currency has been taken into account."
+                        ))
+
+            return currency
 
 
 @post_save(Cluster)
