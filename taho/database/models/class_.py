@@ -114,7 +114,7 @@ class Class(BaseModel):
         The cluster the class belongs to.
     name: :class:`str`
         The class's name.
-    emoji: Optional[:class:`str`]
+    emoji: Optional[:class:`~taho.Emoji`]
         The class's emoji.
     description: Optional[:class:`str`]
         The class's description.

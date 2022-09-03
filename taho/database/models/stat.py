@@ -132,7 +132,7 @@ class Stat(BaseModel, StuffShortcutable):
         The cluster the stat belongs to.
     name: :class:`str`
         The stat's name.
-    emoji: Optional[:class:`str`]
+    emoji: Optional[:class:`~taho.Emoji`]
         The stat's emoji.
     rp_effect: Optional[:class:`~taho.enums.RPEffect`]
         The stat's RP effect.

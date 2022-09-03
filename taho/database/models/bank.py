@@ -146,7 +146,7 @@ class Bank(BaseModel):
         The bank's ID.
     name: :class:`str`
         The bank's name.
-    emoji: Optional[:class:`str`]
+    emoji: Optional[:class:`~taho.Emoji`]
         The bank's emoji.
     description: Optional[:class:`str`]
         The bank's description.

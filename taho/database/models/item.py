@@ -156,7 +156,7 @@ class Item(BaseModel, StuffShortcutable):
         The item's cluster.
     name: :class:`str`
         The item's name.
-    emoji: Optional[:class:`str`]
+    emoji: Optional[:class:`~taho.Emoji`]
         The item's emoji.
     description: Optional[:class:`str`]
         The item's description.
