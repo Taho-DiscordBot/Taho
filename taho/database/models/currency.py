@@ -289,8 +289,34 @@ class Currency(BaseModel, StuffShortcutable):
             The converted amount.
         """
         return amount * (self.exchange_rate / currency.exchange_rate)
-        return amount * (self.rate / currency.rate)
     
+@post_save(Currency)
+async def cluster_post_save(_, instance: Currency, created: bool, *args, **kwargs) -> None:
+    """|coro|
+
+    Automatically define the right value for is_default.
+
+
+    .. warning::
+
+        This function is used as a signal, it's not meant to be called manually.
+
+    Parameters
+    ----------
+    instance: :class:`.Currency`
+        The saved cluster.
+    created: :class:`bool`
+        Whether the currency was created or not.
+    """
+    if instance.is_default:
+        await Currency.filter(cluster_id=instance.cluster_id, is_default=True, pk__not=instance.id).update(is_default=False)
+    elif not instance.is_default:
+        try:
+            await Currency.get(cluster_id=instance.cluster_id, is_default=True)
+        except t_exceptions.DoesNotExist:
+            await Currency.filter(cluster_id=instance.cluster_id, pk__not=instance.id).first().update(is_default=True)
+    
+
 
 class CurrencyAmount(BaseModel, StuffShortcutable, TradeStuffShortcutable, _CurrencyAmount):
     """|shortcutable|
