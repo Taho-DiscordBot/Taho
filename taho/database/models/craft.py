@@ -25,11 +25,12 @@ from __future__ import annotations
 from .base import BaseModel
 from typing import TYPE_CHECKING
 from tortoise import fields
-from tortoise.validators import MinValueValidator, MaxValueValidator
+from .reward import RewardPack, Reward
+from taho.enums import RewardType
+from .access_rule import AccessRule
 
 if TYPE_CHECKING:
-    from taho.abc import StuffShortcutable
-    from typing import Union, List, Dict
+    from typing import List, Dict
 
 __all__ = (
     "Craft",
@@ -77,6 +78,24 @@ class Craft(BaseModel):
                 - :attr:`max_length` ``255``
             
             Python: :class:`str`
+        
+        .. collapse:: emoji
+
+            Tortoise: :class:`tortoise.fields.CharField`
+
+                - :attr:`max_length` ``255``
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+        
+        .. collapse:: description
+
+            Tortoise: :class:`tortoise.fields.TextField`
+
+                - :attr:`null` ``True``
+            
+            Python: Optional[:class:`str`]
+
 
         .. collapse:: cluster
 
@@ -99,21 +118,16 @@ class Craft(BaseModel):
 
             Python: Optional[:class:`int`]
         
-        .. collapse:: success
-
-            Tortoise: :class:`tortoise.fields.DecimalField`
-
-                - :attr:`max_digits` 32
-                - :attr:`decimal_places` 2
-            
-            Python: :class:`float`
-        
     Attributes
     -----------
     id: :class:`int`
         The craft's ID.
     name: :class:`str`
         The craft's name.
+    emoji: Optional[:class:`~taho.Emoji`]
+        The craft's emoji.
+    description: Optional[:class:`str`]
+        The craft's description.
     cluster: :class:`~taho.database.models.Cluster`
         The cluster where the craft is.
     time: :class:`int`
@@ -122,9 +136,7 @@ class Craft(BaseModel):
     per: :class:`int`
         How many times the craft can be done per
         day.
-    success: :class:`float`
-        The chance of success (0.0 - 1.0).
-    
+
 
     .. note:: 
 
@@ -132,6 +144,8 @@ class Craft(BaseModel):
 
             - x = time
             - y = per
+        
+        For an infinite cooldown, set ``x`` to ``-1`` and ``y`` to ``0``.
         
         The craft can be done x times every y seconds.
     """
@@ -142,12 +156,27 @@ class Craft(BaseModel):
 
     cluster = fields.ForeignKeyField("main.Cluster", related_name="crafts")
     name = fields.CharField(max_length=255)
+    emoji = fields.CharField(max_length=255, null=True)
+    description = fields.TextField(null=True)
     time = fields.IntField()
     per = fields.IntField()
-    success = fields.DecimalField(max_digits=32, decimal_places=2, null=True)
 
-    accesses: fields.ReverseRelation["CraftAccessRule"]
+    access_rules: fields.ReverseRelation["CraftAccessRule"]
     reward_packs: fields.ReverseRelation["CraftRewardPack"]
+
+    def __str__(self) -> str:
+        return self.get_display()
+    
+    def get_display(self) -> str:
+        """
+        Returns the craft's display.
+
+        Returns
+        -------
+        :class:`str`
+            The craft's display.
+        """
+        return f"**{self.emoji} {self.name}**" if self.emoji else f"**{self.name}**"
 
     async def get_rewards(self) -> Dict[float, List[CraftReward]]:
         """
@@ -184,9 +213,10 @@ class Craft(BaseModel):
         
         return rewards
     
-class CraftRewardPack(BaseModel):
+
+class CraftRewardPack(RewardPack):
     """
-    Represents a reward pack for an craft.
+    Represents a reward pack for a craft.
 
     .. container:: operations
 
@@ -229,9 +259,10 @@ class CraftRewardPack(BaseModel):
 
             Tortoise: :class:`tortoise.fields.IntEnumField`
 
-                - :attr:`enum` :class:`~taho.enums.CraftRewardType`
+                - :attr:`enum` :class:`~taho.enums.RewardType`
+                - :attr:`null` ``True``
             
-            Python: :class:`~taho.enums.CraftRewardType`
+            Python: Optional[:class:`~taho.enums.RewardType`]
         
         .. collapse:: luck
 
@@ -247,15 +278,15 @@ class CraftRewardPack(BaseModel):
     -----------
     id: :class:`int`
         The reward pack's ID.
-    craft: :class:`~taho.database.models.Craft`
+    craft: :class:`.Craft`
         |coro_attr|
 
         The reward pack's craft.
-    type: :class:`~taho.enums.CraftRewardType`
+    type: :class:`~taho.enums.RewardType`
         The craft reward's type.
     luck: :class:`float`
         The reward pack's luck.
-    rewards: List[:class:`~taho.database.models.CraftReward`]
+    rewards: List[:class:`.CraftReward`]
         |coro_attr|
 
         The rewards included in the reward pack.
@@ -263,17 +294,16 @@ class CraftRewardPack(BaseModel):
     class Meta:
         table = "craft_reward_packs"
     
-    id = fields.IntField(pk=True)
 
     craft = fields.ForeignKeyField('main.Craft', related_name='reward_packs')
 
-    luck = fields.FloatField(default=1, validators=[MinValueValidator(0), MaxValueValidator(1)])
+    type = fields.IntEnumField(RewardType, null=True)
 
     rewards: fields.ReverseRelation["CraftReward"]
 
-class CraftReward(BaseModel):
+class CraftReward(Reward):
     """
-    Represents an craft reward.
+    Represents a craft reward.
 
     .. container:: operations
 
@@ -366,23 +396,79 @@ class CraftReward(BaseModel):
     class Meta:
         table = "craft_rewards"
     
+    pack = fields.ForeignKeyField("main.CraftRewardPack", related_name="rewards")
+
+class CraftAccessRule(AccessRule):
+    """Represents an access rule to a craft.
+
+    .. container:: operations
+
+        .. describe:: x == y
+
+            Checks if two rules are equal.
+
+        .. describe:: x != y
+
+            Checks if two rules are not equal.
+        
+        .. describe:: hash(x)
+
+            Returns the rule's hash.
+        
+    .. container:: fields
+
+        .. collapse:: id
+            
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`pk` True
+
+            Python: :class:`int`
+            
+        .. collapse:: craft
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.Craft`
+                - :attr:`related_name` ``access_rules``
+            
+            Python: :class:`~taho.database.models.Craft`
+        
+        .. collapse:: have_access
+
+            Tortoise: :class:`tortoise.fields.BooleanField`
+
+            Python: :class:`bool`
+        
+        .. collapse:: access_shortcut
+
+            Tortoise: :class:`tortoise.fields.ForeignKeyField`
+
+                - :attr:`related_model` :class:`~taho.database.models.AccessRuleShortcut`
+            
+            Python: :class:`~taho.database.models.StuffShortcut`
+        
+    Attributes
+    -----------
+    id: :class:`int`
+        The craft access's ID.
+    craft: :class:`~taho.database.models.Craft`
+        |coro_attr|
+
+        The craft linked to this access.
+    have_access: :class:`bool`
+        Whether the user/role has access to the craft.
+    access_shortcut: :class:`~taho.database.models.AccessRuleShortcut`
+        |coro_attr|
+        
+        The shortcut to the entity which has access to the craft.
+    """
+    class Meta:
+        table = "craft_access_rules"
+    
     id = fields.IntField(pk=True)
 
-    pack = fields.ForeignKeyField("main.CraftRewardPack", related_name="rewards")
-    stuff_shortcut = fields.ForeignKeyField("main.StuffShortcut")
-    regeneration = fields.BooleanField(default=False)
-    durability = fields.BooleanField(default=False)
-    amount = fields.DecimalField(max_digits=10, decimal_places=2, default=1)
-    
-    async def get_stuff(self, force: bool = False) -> StuffShortcutable:
-        from taho.database.db_utils import get_stuff # avoid circular import
-
-        return await get_stuff(self, force=force)
-    
-    async def get_stuff_amount(self, force: bool = False) -> Union[float, int]:
-        from taho.database.db_utils import get_stuff_amount # avoid circular import
-
-        return await get_stuff_amount(self, force=force)
+    craft = fields.ForeignKeyField("main.Craft", related_name="access_rules")
 
 class CraftHistory(BaseModel):
     """Represents a craft done by a user.
@@ -429,6 +515,14 @@ class CraftHistory(BaseModel):
             
             Python: :class:`~taho.database.models.User`
         
+        .. collapse:: amount
+
+            Tortoise: :class:`tortoise.fields.IntField`
+
+                - :attr:`default` ``1``
+            
+            Python: :class:`int`
+        
         .. collapse:: done_at
 
             Tortoise: :class:`tortoise.fields.DatetimeField`
@@ -445,6 +539,8 @@ class CraftHistory(BaseModel):
         The craft done.
     user: :class:`~taho.database.models.User`
         The user who did the craft.
+    amount: :class:`int`
+        The amount of the craft done.
     done_at: :class:`datetime.datetime`
         When the craft was done.
     """
@@ -455,78 +551,6 @@ class CraftHistory(BaseModel):
 
     craft = fields.ForeignKeyField("main.Craft", related_name="craft_history")
     user = fields.ForeignKeyField("main.User", related_name="craft_history")
+    amount = fields.IntField(default=1)
     done_at = fields.DatetimeField(auto_now_add=True)
 
-class CraftAccessRule(BaseModel):
-    """Represents an access to a craft.
-
-    .. container:: operations
-
-        .. describe:: x == y
-
-            Checks if two craft accesses are equal.
-
-        .. describe:: x != y
-
-            Checks if two craft accesses are not equal.
-        
-        .. describe:: hash(x)
-
-            Returns the craft access's hash.
-        
-    .. container:: fields
-
-        .. collapse:: id
-            
-            Tortoise: :class:`tortoise.fields.IntField`
-
-                - :attr:`pk` True
-
-            Python: :class:`int`
-            
-        .. collapse:: craft
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.Craft`
-                - :attr:`related_name` ``accesses``
-            
-            Python: :class:`~taho.database.models.Craft`
-        
-        .. collapse:: have_access
-
-            Tortoise: :class:`tortoise.fields.BooleanField`
-
-            Python: :class:`bool`
-        
-        .. collapse:: access_shortcut
-
-            Tortoise: :class:`tortoise.fields.ForeignKeyField`
-
-                - :attr:`related_model` :class:`~taho.database.models.AccessRuleShortcut`
-            
-            Python: :class:`~taho.database.models.StuffShortcut`
-        
-    Attributes
-    -----------
-    id: :class:`int`
-        The craft access's ID.
-    craft: :class:`~taho.database.models.Craft`
-        |coro_attr|
-
-        The craft linked to this access.
-    have_access: :class:`bool`
-        Whether the user/role has access to the craft.
-    access_shortcut: :class:`~taho.database.models.AccessRuleShortcut`
-        |coro_attr|
-        
-        The shortcut to the entity which has access to the craft.
-    """
-    class Meta:
-        table = "craft_access"
-    
-    id = fields.IntField(pk=True)
-
-    craft = fields.ForeignKeyField("main.Craft", related_name="accesses")
-    have_access = fields.BooleanField()
-    stuff_shortcut = fields.ForeignKeyField("main.AccessRuleShortcut")
