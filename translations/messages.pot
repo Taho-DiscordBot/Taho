@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-03 14:46+0000\n"
+"POT-Creation-Date: 2022-09-03 15:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,8 +33,8 @@ msgstr ""
 msgid "List all banks"
 msgstr ""
 
-#: cogs/bank.py:53 cogs/bank.py:391 cogs/currency.py:54 cogs/currency.py:333
-#: cogs/item.py:53 cogs/item.py:345
+#: cogs/bank.py:53 cogs/bank.py:391 cogs/craft.py:53 cogs/craft.py:296
+#: cogs/currency.py:54 cogs/currency.py:333 cogs/item.py:53 cogs/item.py:345
 msgid "Select an action"
 msgstr ""
 
@@ -95,7 +95,7 @@ msgstr ""
 msgid "Withdrawal fee (as a %% of the withdraw)"
 msgstr ""
 
-#: cogs/bank.py:304 cogs/currency.py:195 cogs/item.py:188
+#: cogs/bank.py:304 cogs/craft.py:188 cogs/currency.py:195 cogs/item.py:188
 msgid "Name"
 msgstr ""
 
@@ -103,7 +103,7 @@ msgstr ""
 msgid "The name of the bank"
 msgstr ""
 
-#: cogs/bank.py:318 cogs/currency.py:236 cogs/item.py:202
+#: cogs/bank.py:318 cogs/craft.py:202 cogs/currency.py:236 cogs/item.py:202
 msgid "Emoji"
 msgstr ""
 
@@ -111,7 +111,7 @@ msgstr ""
 msgid "The emoji of the bank"
 msgstr ""
 
-#: cogs/bank.py:324 cogs/item.py:208
+#: cogs/bank.py:324 cogs/craft.py:208 cogs/item.py:208
 msgid "Description"
 msgstr ""
 
@@ -127,7 +127,7 @@ msgstr ""
 msgid "The interests and fees will be converted to this currency."
 msgstr ""
 
-#: cogs/bank.py:345 cogs/item.py:290
+#: cogs/bank.py:345 cogs/craft.py:240 cogs/item.py:290
 msgid "Access rules"
 msgstr ""
 
@@ -144,7 +144,7 @@ msgstr ""
 msgid "Manage banks"
 msgstr ""
 
-#: cogs/bank.py:394 cogs/currency.py:336 cogs/item.py:348
+#: cogs/bank.py:394 cogs/craft.py:299 cogs/currency.py:336 cogs/item.py:348
 msgid "action"
 msgstr ""
 
@@ -187,6 +187,123 @@ msgid ""
 "more information about it.\n"
 "\n"
 "%(banks)s"
+msgstr ""
+
+#: cogs/craft.py:46 cogs/craft.py:259 cogs/craft.py:289
+msgid "Create a craft"
+msgstr ""
+
+#: cogs/craft.py:47 cogs/craft.py:290
+msgid "Edit an existing craft"
+msgstr ""
+
+#: cogs/craft.py:48 cogs/craft.py:291
+msgid "Delete an existing craft"
+msgstr ""
+
+#: cogs/craft.py:49 cogs/craft.py:292
+msgid "List all crafts"
+msgstr ""
+
+#: cogs/craft.py:95
+msgid "Select a craft"
+msgstr ""
+
+#: cogs/craft.py:113
+msgid "Please select only one craft."
+msgstr ""
+
+#: cogs/craft.py:189
+msgid "The name of the craft"
+msgstr ""
+
+#: cogs/craft.py:203
+msgid "The emoji of the craft"
+msgstr ""
+
+#: cogs/craft.py:209
+msgid "The description of the craft"
+msgstr ""
+
+#: cogs/craft.py:218
+msgid "Time (**x**)"
+msgstr ""
+
+#: cogs/craft.py:228
+msgid "Per (**y**)"
+msgstr ""
+
+#: cogs/craft.py:245 cogs/item.py:295 taho/forms/fields/reward.py:203
+msgid "Rewards"
+msgstr ""
+
+#: cogs/craft.py:253
+#, python-format
+msgid "Edit %(craft_name)s"
+msgstr ""
+
+#: cogs/craft.py:261
+msgid ""
+"Please fill out the form below.\n"
+"You can use the buttons below to navigate the form.\n"
+"A title with `*` indicates a required field, one with `x` indicates that "
+"it cannot be defined.\n"
+"\n"
+"\n"
+"ℹ️ **Cooldown explanation:**\n"
+"The cooldown is the time between two crafts. It is defined by **x** and "
+"**y**: you can do the craft **x** times every **y** seconds (you can find"
+" x and y in the form, as *Time* and *Per*).\n"
+"For an infinite cooldown, set **x** to `-1`.\n"
+msgstr ""
+
+#: cogs/craft.py:283
+msgid "craft"
+msgstr ""
+
+#: cogs/craft.py:284
+msgid "Manage crafts"
+msgstr ""
+
+#: cogs/craft.py:330
+#, python-format
+msgid "You have successfully created the craft **%(craft_display)s**."
+msgstr ""
+
+#: cogs/craft.py:340
+msgid "There are no crafts to edit."
+msgstr ""
+
+#: cogs/craft.py:368
+#, python-format
+msgid "You have successfully edited the craft **%(craft_display)s**."
+msgstr ""
+
+#: cogs/craft.py:378
+msgid "There are no crafts to delete."
+msgstr ""
+
+#: cogs/craft.py:400
+#, python-format
+msgid "Are you sure you want to delete the craft **%(craft)s**?"
+msgstr ""
+
+#: cogs/craft.py:417
+#, python-format
+msgid "You have successfully deleted the craft **%(craft)s**."
+msgstr ""
+
+#: cogs/craft.py:428
+msgid "There are no crafts to list."
+msgstr ""
+
+#: cogs/craft.py:437
+#, python-format
+msgid ""
+"Here is a list of all crafts, select a craft in the selects below to get "
+"more information about it.\n"
+"\n"
+"%(crafts)s"
 msgstr ""
 
 #: cogs/currency.py:47 cogs/currency.py:310 cogs/currency.py:326
@@ -398,10 +515,6 @@ msgstr ""
 msgid "Cooldown"
 msgstr ""
 
-#: cogs/item.py:295 taho/forms/fields/reward.py:203
-msgid "Rewards"
-msgstr ""
-
 #: cogs/item.py:316
 #, python-format
 msgid "Edit %(item_name)s"
@@ -511,16 +624,16 @@ msgstr ""
 msgid "%(min_amount)s **%(stuff_name)s** %(additional_info)s"
 msgstr ""
 
-#: taho/database/models/cluster.py:935
+#: taho/database/models/cluster.py:941
 msgid "A currency with the same name already exists."
 msgstr ""
 
-#: taho/database/models/cluster.py:944
+#: taho/database/models/cluster.py:950
 #, python-format
 msgid "A cash item for the Currency %(name)s."
 msgstr ""
 
-#: taho/database/models/cluster.py:948
+#: taho/database/models/cluster.py:954
 msgid ""
 "You chose to support cash for the currency but an item with the same name"
 " already exists.\n"
