@@ -154,7 +154,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
 
     hotbars: fields.ReverseRelation["Hotbar"] # The hotbars of the user
     npcs: fields.ReverseRelation["NPCOwner"] # The npcs owned by the user
-    permissions: fields.OneToOneRelation["UserPermission"] # The permissions of the user
+    permissions: fields.OneToOneNullableRelation["UserPermission"] # The permissions of the user
     roles: fields.ReverseRelation["UserRole"] # The roles of the user
     infos: fields.ReverseRelation["UserInfo"] # The infos about the user (displayed
     # as a list in user's profile)
@@ -386,7 +386,7 @@ class User(BaseModel, OwnerShortcutable, AccessRuleShortcutable):
         """
         Get the permissions of the user.
         """
-        return (await self.permissions).get_permission()
+        return (await self.permissions).get_permissions()
 
 @post_save(User)
 async def user_post_save(_, instance: User, created: bool, *args, **kwargs) -> None:
@@ -411,7 +411,8 @@ async def user_post_save(_, instance: User, created: bool, *args, **kwargs) -> N
     if created:
         # Create the permissions
         await UserPermission.create(
-            user=instance, 
+            user=instance,
+            permissions=0
         )
 
 class UserStat(BaseModel):
@@ -544,13 +545,13 @@ class UserPermission(BaseModel):
     class Meta:
         table = "user_permissions"
 
-    user = fields.OneToOneField("main.User", pk=True, related_name="permission")
-    permission = fields.BigIntField(default=0)
+    user = fields.OneToOneField("main.User", pk=True, related_name="permissions")
+    permissions = fields.BigIntField(default=0)
 
-    def get_permission(self) -> Permissions:
+    def get_permissions(self) -> Permissions:
         """
         Create a discord.py :class:`~discord.Permissions` 
-        object from the permission.
+        object from the permissions.
 
         Returns
         --------
@@ -558,7 +559,7 @@ class UserPermission(BaseModel):
             The discord.py :class:`~discord.Permissions` object.
 
         """
-        return Permissions(self.permission)
+        return Permissions(self.permissions)
 
 class UserRole(BaseModel):
     """Represents a role of a :class:`~taho.database.models.User`.
