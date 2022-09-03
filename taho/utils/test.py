@@ -110,7 +110,7 @@ async def check_guilds_test(bot: Bot) -> Dict[str, Union[List[discord.Guild], Li
             raise UsersNotInGuilds(f"The guild Taho Unit Test {i} has not at least 2 users.")
 
         for m in guild.members:
-            if m.id not in users and m.id != bot.user.id:
+            if m.id not in users and not m.bot:
                 users.append(m.id)
         
         _roles = [
