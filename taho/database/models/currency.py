@@ -103,7 +103,7 @@ class Currency(BaseModel, StuffShortcutable):
             
             Python: Optional[:class:`str`]
         
-        .. collapse:: rate
+        .. collapse:: exchange_rate
 
             Tortoise: :class:`tortoise.fields.DecimalField`
 
@@ -140,13 +140,13 @@ class Currency(BaseModel, StuffShortcutable):
         ex: 'EUR'
     emoji: Optional[:class:`~taho.emoji.Emoji`]
         The currency's emoji.
-    rate: :class:`float`
-        The currency's rate.
+    exchange_rate: :class:`float`
+        The currency's exchange_rate.
         It is used to convert one currency to another.
 
         .. warning::
 
-            Please avoid setting the rate to 0, 
+            Please avoid setting the exchange_rate to 0, 
             as this will cause a division by zero.
     is_default: :class:`bool`
         Whether the currency is the default one.
@@ -166,7 +166,7 @@ class Currency(BaseModel, StuffShortcutable):
     symbol = fields.CharField(max_length=255)
     code = fields.CharField(max_length=255, null=True)
     emoji = fields.CharField(max_length=255, null=True)
-    rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
+    exchange_rate = fields.DecimalField(max_digits=20, decimal_places=10, default=1)
     is_default = fields.BooleanField(default=False)
 
     item: fields.OneToOneNullableRelation["Item"]
