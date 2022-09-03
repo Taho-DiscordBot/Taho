@@ -46,6 +46,7 @@ if TYPE_CHECKING:
     from .item import Item
     from .stat import Stat
     from .currency import Currency
+    from .craft import Craft
     import discord
 
 __all__ = (
@@ -133,6 +134,10 @@ class Cluster(BaseModel):
         |coro_attr|
 
         The cluster's currencies.
+    crafts: List[:class:`~taho.database.models.Craft`]
+        |coro_attr|
+
+        The cluster's crafts.
     """
     class Meta:
         table = "clusters"
@@ -149,6 +154,7 @@ class Cluster(BaseModel):
     stats: fields.ReverseRelation["Stat"]
     roles: fields.ReverseRelation["Role"]
     currencies: fields.ReverseRelation["Currency"]
+    crafts: fields.ReverseRelation["Craft"]
 
     async def __aiter__(self) -> AsyncGenerator[Server]:
         async for server in self.servers:
@@ -952,6 +958,96 @@ class Cluster(BaseModel):
                         ))
 
             return currency
+
+    async def create_craft(
+        self, 
+        name: str, 
+        time: int,
+        emoji: Optional[Emoji] = None,
+        per: Optional[int] = None,
+        description: Optional[str] = None,
+        access_rules: List[AbstractAccessRule] = [],
+        reward_packs: List[AbstractRewardPack] = [],
+        ) -> Item:
+        """|coro|
+
+        Create a craft in the cluster.
+
+        Parameters
+        -----------
+        name: :class:`str`
+            The name of the craft.
+        emoji: Optional[:class:`~taho.Emoji`]
+            The emoji of the craft.
+        description: Optional[:class:`str`]
+            The description of the craft.
+        time: :class:`int`
+            The number of time the craft can be done in `per` seconds.
+            For infinite cooldown, set `time` to ``-1``.
+        per: Optional[:class:`int`]
+            The craft can be done ``time`` times in ``per`` seconds.
+        access_rules: Optional[List[:class:`~taho.utils.AbstractAccessRule`]]
+            The access rules of the craft.
+        rewards: Optional[List[:class:`~taho.utils.AbstractRewardPack`]]
+            The rewards of the craft.
+
+        Raises
+        -------
+        ~taho.exceptions.AlreadyExists
+            A craft with the same name already exists.
+        ValueError
+            If ``time`` is null (==0).
+            If ``per`` is negative (<=0).
+            If ``durability`` is negative (<=-1) or equal to 0.
+            If ``type`` is :attr:`~taho.enums.ItemType.currency` and
+            ``currency`` is not defined.
+            If ``time`` is not ``-1`` and ``per`` is not defined.
+        """
+        from .craft import Craft, CraftAccessRule, CraftRewardPack, CraftReward # avoid circular import
+
+        # Check validity of the options time and per
+        if time == -1:
+            per = 0
+        elif per is None:
+            raise ValueError("If 'time' is not -1, 'per' must be defined.")
+        elif time == 0:
+            raise ValueError("'time' must be greater than 0 (or equals to -1).")
+        elif per <= 0:
+            raise ValueError("'per' must be greater than 0.")
+        try:
+            # Create the craft
+            craft = await Craft.create(
+                cluster=self, 
+                name=name, 
+                time=time,
+                per=per,
+                emoji=emoji,
+                description=description
+                )
+        except t_exceptions.IntegrityError:
+            raise AlreadyExists("A craft with the same name already exists.")
+        else:
+            queries = []
+
+            # Register coroutines to create the access rules and rewards
+            if access_rules:
+                for rule in access_rules:
+                    queries.append(rule.to_db_access(
+                        CraftAccessRule,
+                        craft
+                        ))
+            if reward_packs:
+                for pack in reward_packs:
+                    queries.append(pack.to_db_pack(
+                        CraftRewardPack,
+                        CraftReward,
+                        craft
+                        ))
+            
+            # Execute the coroutines
+            await asyncio.gather(*queries)
+
+            return craft
 
 
 @post_save(Cluster)
