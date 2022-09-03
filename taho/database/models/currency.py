@@ -24,12 +24,17 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
-from tortoise import fields
+from tortoise import fields, exceptions as t_exceptions
+from tortoise.signals import post_save
 from taho.abc import StuffShortcutable, TradeStuffShortcutable
 from taho.currency_amount import CurrencyAmount as _CurrencyAmount
+from taho.babel import _
+from taho.enums import ItemType
+import asyncio
 
 if TYPE_CHECKING:
     from .item import Item
+    from typing import Dict, Any
 
 
 __all__ = (
@@ -188,7 +193,76 @@ class Currency(BaseModel, StuffShortcutable):
             return f"{self.emoji} {self.code}" if self.emoji else self.code
         else:
             return f"{self.emoji} {self.name}" if self.emoji else self.name
+        
+    async def to_dict(self, to_edit: bool = False) -> Dict[str, Any]:
+        """
+        |coro|
+        
+        Returns the currency's dictionary.
 
+        Parameters
+        -----------
+        to_edit: :class:`bool`
+            Whether to return the currency's edit dictionary.
+            This will remove several keys from the dictionary.
+        
+        Returns
+        -------
+        :class:`dict`
+            The currency's dictionary.
+        """
+        currency_dict = {
+            "id": self.id,
+            "cluster_id": self.cluster_id,
+            "name": self.name,
+            "symbol": self.symbol,
+            "code": self.code,
+            "emoji": self.emoji,
+            "exchange_rate": float(self.exchange_rate),
+            "is_default": self.is_default,
+            "item": await self.item
+        }
+
+        if to_edit:
+            currency_dict.pop("cluster_id", None)
+
+        return currency_dict
+
+    async def edit(self, **options) -> None:
+        """|coro|
+
+        Edits the currency.
+
+        Parameters
+        -----------
+        options: :class:`dict`
+            The fields to edit.
+            The keys are the field names.
+        """
+        edit_dict = {}
+        queries = []
+        for option, value in options.items():
+            if option == "supports_cash":
+                if value and not self.item_id:
+                    cluster = await self.cluster
+                    name = options.get("name", None) or self.name
+                    emoji = options.get("emoji", None) or self.emoji
+                    queries.append(
+                        cluster.create_item(
+                            name=name,
+                            type=ItemType.currency,
+                            emoji=emoji,
+                            description=_(f"A cash item for the Currency {name}"),
+                            currency=self
+                        )
+                    )
+                elif not value and self.item_id:
+                    queries.append(self.item.delete())
+        
+        self.update_from_dict(edit_dict)
+
+        await self.save()
+        await asyncio.gather(*queries)
     
     async def convert(self, currency: Currency, amount: float) -> float:
         """|coro|
@@ -207,13 +281,14 @@ class Currency(BaseModel, StuffShortcutable):
         Raises
         ------
         DivisionByZero
-            If the currency's rate is 0.
+            If the currency's exchange_rate is 0.
 
         Returns
         -------
         :class:`float`
             The converted amount.
         """
+        return amount * (self.exchange_rate / currency.exchange_rate)
         return amount * (self.rate / currency.rate)
     
 
