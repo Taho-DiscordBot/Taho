@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-09-03 15:25+0000\n"
+"POT-Creation-Date: 2022-09-05 13:53+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,170 +17,300 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.10.3\n"
 
-#: cogs/bank.py:46 cogs/bank.py:368 cogs/bank.py:384
-msgid "Create a bank"
+#: cogs/manage.py:49
+msgid "item"
 msgstr ""
 
-#: cogs/bank.py:47 cogs/bank.py:385
-msgid "Edit an existing bank"
+#: cogs/manage.py:50
+msgid "Manage items"
 msgstr ""
 
-#: cogs/bank.py:48 cogs/bank.py:386
-msgid "Delete an existing bank"
+#: cogs/manage.py:55 cogs/manage_/item.py:50 cogs/manage_/item.py:324
+msgid "Create an item"
 msgstr ""
 
-#: cogs/bank.py:49 cogs/bank.py:387
-msgid "List all banks"
+#: cogs/manage.py:56 cogs/manage_/item.py:51
+msgid "Edit an existing item"
 msgstr ""
 
-#: cogs/bank.py:53 cogs/bank.py:391 cogs/craft.py:53 cogs/craft.py:296
-#: cogs/currency.py:54 cogs/currency.py:333 cogs/item.py:53 cogs/item.py:345
+#: cogs/manage.py:57 cogs/manage_/item.py:52
+msgid "Delete an existing item"
+msgstr ""
+
+#: cogs/manage.py:58 cogs/manage_/item.py:53
+msgid "List all items"
+msgstr ""
+
+#: cogs/manage.py:62 cogs/manage.py:85 cogs/manage.py:108 cogs/manage.py:131
+#: cogs/manage.py:154 cogs/manage.py:177 cogs/manage_/bank.py:56
+#: cogs/manage_/class_.py:56 cogs/manage_/craft.py:56
+#: cogs/manage_/currency.py:57 cogs/manage_/item.py:57 cogs/manage_/stat.py:57
 msgid "Select an action"
 msgstr ""
 
-#: cogs/bank.py:95
+#: cogs/manage.py:65 cogs/manage.py:88 cogs/manage.py:111 cogs/manage.py:134
+#: cogs/manage.py:157 cogs/manage.py:180
+msgid "action"
+msgstr ""
+
+#: cogs/manage.py:72
+msgid "currency"
+msgstr ""
+
+#: cogs/manage.py:73
+msgid "Manage currencies"
+msgstr ""
+
+#: cogs/manage.py:78 cogs/manage_/currency.py:50 cogs/manage_/currency.py:311
+msgid "Create a currency"
+msgstr ""
+
+#: cogs/manage.py:79 cogs/manage_/currency.py:51
+msgid "Edit an existing currency"
+msgstr ""
+
+#: cogs/manage.py:80 cogs/manage_/currency.py:52
+msgid "Delete an existing currency"
+msgstr ""
+
+#: cogs/manage.py:81 cogs/manage_/currency.py:53
+msgid "List all currencies"
+msgstr ""
+
+#: cogs/manage.py:95
+msgid "craft"
+msgstr ""
+
+#: cogs/manage.py:96
+msgid "Manage crafts"
+msgstr ""
+
+#: cogs/manage.py:101 cogs/manage_/craft.py:49 cogs/manage_/craft.py:260
+msgid "Create a craft"
+msgstr ""
+
+#: cogs/manage.py:102 cogs/manage_/craft.py:50
+msgid "Edit an existing craft"
+msgstr ""
+
+#: cogs/manage.py:103 cogs/manage_/craft.py:51
+msgid "Delete an existing craft"
+msgstr ""
+
+#: cogs/manage.py:104 cogs/manage_/craft.py:52
+msgid "List all crafts"
+msgstr ""
+
+#: cogs/manage.py:118
+msgid "bank"
+msgstr ""
+
+#: cogs/manage.py:119
+msgid "Manage banks"
+msgstr ""
+
+#: cogs/manage.py:124 cogs/manage_/bank.py:49 cogs/manage_/bank.py:369
+msgid "Create a bank"
+msgstr ""
+
+#: cogs/manage.py:125 cogs/manage_/bank.py:50
+msgid "Edit an existing bank"
+msgstr ""
+
+#: cogs/manage.py:126 cogs/manage_/bank.py:51
+msgid "Delete an existing bank"
+msgstr ""
+
+#: cogs/manage.py:127 cogs/manage_/bank.py:52
+msgid "List all banks"
+msgstr ""
+
+#: cogs/manage.py:141
+msgid "stat"
+msgstr ""
+
+#: cogs/manage.py:142
+msgid "Manage stats"
+msgstr ""
+
+#: cogs/manage.py:147 cogs/manage_/stat.py:50 cogs/manage_/stat.py:311
+msgid "Create a stat"
+msgstr ""
+
+#: cogs/manage.py:148 cogs/manage_/stat.py:51
+msgid "Edit an existing stat"
+msgstr ""
+
+#: cogs/manage.py:149 cogs/manage_/stat.py:52
+msgid "Delete an existing stat"
+msgstr ""
+
+#: cogs/manage.py:150 cogs/manage_/stat.py:53
+msgid "List all stats"
+msgstr ""
+
+#: cogs/manage.py:164
+msgid "class"
+msgstr ""
+
+#: cogs/manage.py:165
+msgid "Manage classes"
+msgstr ""
+
+#: cogs/manage.py:170 cogs/manage_/class_.py:49 cogs/manage_/class_.py:234
+msgid "Create a class"
+msgstr ""
+
+#: cogs/manage.py:171 cogs/manage_/class_.py:50
+msgid "Edit an existing class"
+msgstr ""
+
+#: cogs/manage.py:172 cogs/manage_/class_.py:51
+msgid "Delete an existing class"
+msgstr ""
+
+#: cogs/manage.py:173 cogs/manage_/class_.py:52
+msgid "List all classes"
+msgstr ""
+
+#: cogs/manage_/bank.py:98
 msgid "Select a bank"
 msgstr ""
 
-#: cogs/bank.py:113
+#: cogs/manage_/bank.py:116
 msgid "Please select only one bank."
 msgstr ""
 
-#: cogs/bank.py:172
+#: cogs/manage_/bank.py:173
 msgid "Allow currency exchange"
 msgstr ""
 
-#: cogs/bank.py:173
+#: cogs/manage_/bank.py:174
 msgid "Can this bank exchange currencies for its customers?"
 msgstr ""
 
-#: cogs/bank.py:180 cogs/currency.py:258 cogs/currency.py:279
-#: taho/utils/utils_.py:122
+#: cogs/manage_/bank.py:181 cogs/manage_/currency.py:259
+#: cogs/manage_/currency.py:280 cogs/manage_/stat.py:259
+#: cogs/manage_/stat.py:280 taho/utils/utils_.py:122
 msgid "Yes"
 msgstr ""
 
-#: cogs/bank.py:184 cogs/currency.py:263 cogs/currency.py:284
-#: taho/utils/utils_.py:124
+#: cogs/manage_/bank.py:185 cogs/manage_/currency.py:264
+#: cogs/manage_/currency.py:285 cogs/manage_/stat.py:264
+#: cogs/manage_/stat.py:285 taho/utils/utils_.py:124
 msgid "No"
 msgstr ""
 
-#: cogs/bank.py:191
+#: cogs/manage_/bank.py:192
 msgid "Allowed currencies"
 msgstr ""
 
-#: cogs/bank.py:192
+#: cogs/manage_/bank.py:193
 msgid "Accounts can only support these currencies."
 msgstr ""
 
-#: cogs/bank.py:202
+#: cogs/manage_/bank.py:203
 #, python-format
 msgid "Exchange fee (as a %% of the amount exchanged)"
 msgstr ""
 
-#: cogs/bank.py:214
+#: cogs/manage_/bank.py:215
 msgid "Account opening fee"
 msgstr ""
 
-#: cogs/bank.py:222
+#: cogs/manage_/bank.py:223
 #, python-format
 msgid "Interests (as a %% of the balance)"
 msgstr ""
 
-#: cogs/bank.py:231
+#: cogs/manage_/bank.py:232
 msgid "Account maintenance fees (recurrent)"
 msgstr ""
 
-#: cogs/bank.py:239
+#: cogs/manage_/bank.py:240
 #, python-format
 msgid "Withdrawal fee (as a %% of the withdraw)"
 msgstr ""
 
-#: cogs/bank.py:304 cogs/craft.py:188 cogs/currency.py:195 cogs/item.py:188
+#: cogs/manage_/bank.py:305 cogs/manage_/class_.py:189
+#: cogs/manage_/craft.py:189 cogs/manage_/currency.py:196
+#: cogs/manage_/item.py:190 cogs/manage_/stat.py:196
 msgid "Name"
 msgstr ""
 
-#: cogs/bank.py:305
+#: cogs/manage_/bank.py:306
 msgid "The name of the bank"
 msgstr ""
 
-#: cogs/bank.py:318 cogs/craft.py:202 cogs/currency.py:236 cogs/item.py:202
+#: cogs/manage_/bank.py:319 cogs/manage_/class_.py:203
+#: cogs/manage_/craft.py:203 cogs/manage_/currency.py:237
+#: cogs/manage_/item.py:204 cogs/manage_/stat.py:237
 msgid "Emoji"
 msgstr ""
 
-#: cogs/bank.py:319
+#: cogs/manage_/bank.py:320
 msgid "The emoji of the bank"
 msgstr ""
 
-#: cogs/bank.py:324 cogs/craft.py:208 cogs/item.py:208
+#: cogs/manage_/bank.py:325 cogs/manage_/class_.py:209
+#: cogs/manage_/craft.py:209 cogs/manage_/item.py:210
 msgid "Description"
 msgstr ""
 
-#: cogs/bank.py:325
+#: cogs/manage_/bank.py:326
 msgid "The description of the bank"
 msgstr ""
 
-#: cogs/bank.py:334
+#: cogs/manage_/bank.py:335
 msgid "Default currency"
 msgstr ""
 
-#: cogs/bank.py:335
+#: cogs/manage_/bank.py:336
 msgid "The interests and fees will be converted to this currency."
 msgstr ""
 
-#: cogs/bank.py:345 cogs/craft.py:240 cogs/item.py:290
+#: cogs/manage_/bank.py:346 cogs/manage_/craft.py:241 cogs/manage_/item.py:292
 msgid "Access rules"
 msgstr ""
 
-#: cogs/bank.py:362
+#: cogs/manage_/bank.py:363
 #, python-format
 msgid "Edit %(bank_name)s"
 msgstr ""
 
-#: cogs/bank.py:378
-msgid "bank"
-msgstr ""
-
-#: cogs/bank.py:379
-msgid "Manage banks"
-msgstr ""
-
-#: cogs/bank.py:394 cogs/craft.py:299 cogs/currency.py:336 cogs/item.py:348
-msgid "action"
-msgstr ""
-
-#: cogs/bank.py:425
+#: cogs/manage_/bank.py:407
 #, python-format
 msgid "You have successfully created the bank **%(bank_display)s**."
 msgstr ""
 
-#: cogs/bank.py:435
+#: cogs/manage_/bank.py:417
 msgid "There are no banks to edit."
 msgstr ""
 
-#: cogs/bank.py:463
+#: cogs/manage_/bank.py:445
 #, python-format
 msgid "You have successfully edited the bank **%(bank_display)s**."
 msgstr ""
 
-#: cogs/bank.py:473
+#: cogs/manage_/bank.py:455
 msgid "There are no banks to delete."
 msgstr ""
 
-#: cogs/bank.py:495
+#: cogs/manage_/bank.py:477
 #, python-format
 msgid "Are you sure you want to delete the bank **%(bank)s**?"
 msgstr ""
 
-#: cogs/bank.py:512
+#: cogs/manage_/bank.py:494
 #, python-format
 msgid "You have successfully deleted the bank **%(bank)s**."
 msgstr ""
 
-#: cogs/bank.py:523
+#: cogs/manage_/bank.py:505
 msgid "There are no banks to list."
 msgstr ""
 
-#: cogs/bank.py:532
+#: cogs/manage_/bank.py:514
 #, python-format
 msgid ""
 "Here is a list of all banks, select a bank in the selects below to get "
@@ -189,60 +319,119 @@ msgid ""
 "%(banks)s"
 msgstr ""
 
-#: cogs/craft.py:46 cogs/craft.py:259 cogs/craft.py:289
-msgid "Create a craft"
+#: cogs/manage_/class_.py:98
+msgid "Select a class"
 msgstr ""
 
-#: cogs/craft.py:47 cogs/craft.py:290
-msgid "Edit an existing craft"
+#: cogs/manage_/class_.py:116
+msgid "Please select only one class_."
 msgstr ""
 
-#: cogs/craft.py:48 cogs/craft.py:291
-msgid "Delete an existing craft"
+#: cogs/manage_/class_.py:190
+msgid "The name of the class"
 msgstr ""
 
-#: cogs/craft.py:49 cogs/craft.py:292
-msgid "List all crafts"
+#: cogs/manage_/class_.py:204
+msgid "The emoji of the class"
 msgstr ""
 
-#: cogs/craft.py:95
+#: cogs/manage_/class_.py:210
+msgid "The description of the class"
+msgstr ""
+
+#: cogs/manage_/class_.py:219
+msgid "Stats"
+msgstr ""
+
+#: cogs/manage_/class_.py:220
+msgid "The stats of the class"
+msgstr ""
+
+#: cogs/manage_/class_.py:228
+#, python-format
+msgid "Edit %(class_name)s"
+msgstr ""
+
+#: cogs/manage_/class_.py:272
+#, python-format
+msgid "You have successfully created the class **%(class_display)s**."
+msgstr ""
+
+#: cogs/manage_/class_.py:282
+msgid "There are no classes to edit."
+msgstr ""
+
+#: cogs/manage_/class_.py:310
+#, python-format
+msgid "You have successfully edited the class **%(class_display)s**."
+msgstr ""
+
+#: cogs/manage_/class_.py:320
+msgid "There are no classes to delete."
+msgstr ""
+
+#: cogs/manage_/class_.py:342
+#, python-format
+msgid "Are you sure you want to delete the class **%(class_)s**?"
+msgstr ""
+
+#: cogs/manage_/class_.py:359
+#, python-format
+msgid "You have successfully deleted the class **%(class_)s**."
+msgstr ""
+
+#: cogs/manage_/class_.py:370
+msgid "There are no classes to list."
+msgstr ""
+
+#: cogs/manage_/class_.py:379
+#, python-format
+msgid ""
+"Here is a list of all classes, select a class in the selects below to get"
+" more information about it.\n"
+"\n"
+"%(classes)s"
+msgstr ""
+
+#: cogs/manage_/craft.py:98
 msgid "Select a craft"
 msgstr ""
 
-#: cogs/craft.py:113
+#: cogs/manage_/craft.py:116
 msgid "Please select only one craft."
 msgstr ""
 
-#: cogs/craft.py:189
+#: cogs/manage_/craft.py:190
 msgid "The name of the craft"
 msgstr ""
 
-#: cogs/craft.py:203
+#: cogs/manage_/craft.py:204
 msgid "The emoji of the craft"
 msgstr ""
 
-#: cogs/craft.py:209
+#: cogs/manage_/craft.py:210
 msgid "The description of the craft"
 msgstr ""
 
-#: cogs/craft.py:218
+#: cogs/manage_/craft.py:219
 msgid "Time (**x**)"
 msgstr ""
 
-#: cogs/craft.py:228
+#: cogs/manage_/craft.py:229
 msgid "Per (**y**)"
 msgstr ""
 
-#: cogs/craft.py:245 cogs/item.py:295 taho/forms/fields/reward.py:203
+#: cogs/manage_/craft.py:246 cogs/manage_/item.py:297
+#: taho/forms/fields/reward.py:203
 msgid "Rewards"
 msgstr ""
 
-#: cogs/craft.py:253
+#: cogs/manage_/craft.py:254
 #, python-format
 msgid "Edit %(craft_name)s"
 msgstr ""
 
-#: cogs/craft.py:261
+#: cogs/manage_/craft.py:262
 msgid ""
 "Please fill out the form below.\n"
 "You can use the buttons below to navigate the form.\n"
@@ -257,47 +446,39 @@ msgid ""
 "For an infinite cooldown, set **x** to `-1`.\n"
 msgstr ""
 
-#: cogs/craft.py:283
-msgid "craft"
-msgstr ""
-
-#: cogs/craft.py:284
-msgid "Manage crafts"
-msgstr ""
-
-#: cogs/craft.py:330
+#: cogs/manage_/craft.py:312
 #, python-format
 msgid "You have successfully created the craft **%(craft_display)s**."
 msgstr ""
 
-#: cogs/craft.py:340
+#: cogs/manage_/craft.py:322
 msgid "There are no crafts to edit."
 msgstr ""
 
-#: cogs/craft.py:368
+#: cogs/manage_/craft.py:350
 #, python-format
 msgid "You have successfully edited the craft **%(craft_display)s**."
 msgstr ""
 
-#: cogs/craft.py:378
+#: cogs/manage_/craft.py:360
 msgid "There are no crafts to delete."
 msgstr ""
 
-#: cogs/craft.py:400
+#: cogs/manage_/craft.py:382
 #, python-format
 msgid "Are you sure you want to delete the craft **%(craft)s**?"
 msgstr ""
 
-#: cogs/craft.py:417
+#: cogs/manage_/craft.py:399
 #, python-format
 msgid "You have successfully deleted the craft **%(craft)s**."
 msgstr ""
 
-#: cogs/craft.py:428
+#: cogs/manage_/craft.py:410
 msgid "There are no crafts to list."
 msgstr ""
 
-#: cogs/craft.py:437
+#: cogs/manage_/craft.py:419
 #, python-format
 msgid ""
 "Here is a list of all crafts, select a craft in the selects below to get "
@@ -306,86 +487,70 @@ msgid ""
 "%(crafts)s"
 msgstr ""
 
-#: cogs/currency.py:47 cogs/currency.py:310 cogs/currency.py:326
-msgid "Create a currency"
-msgstr ""
-
-#: cogs/currency.py:48 cogs/currency.py:327
-msgid "Edit an existing currency"
-msgstr ""
-
-#: cogs/currency.py:49 cogs/currency.py:328
-msgid "Delete an existing currency"
-msgstr ""
-
-#: cogs/currency.py:50 cogs/currency.py:329
-msgid "List all currencies"
-msgstr ""
-
-#: cogs/currency.py:96
+#: cogs/manage_/currency.py:99
 msgid "Select a currency"
 msgstr ""
 
-#: cogs/currency.py:114
+#: cogs/manage_/currency.py:117
 msgid "Please select only one currency."
 msgstr ""
 
-#: cogs/currency.py:196
+#: cogs/manage_/currency.py:197
 msgid "The name of the currency (ex: Dollar)"
 msgstr ""
 
-#: cogs/currency.py:209
+#: cogs/manage_/currency.py:210 cogs/manage_/stat.py:210
 msgid "Symbol"
 msgstr ""
 
-#: cogs/currency.py:210
+#: cogs/manage_/currency.py:211
 msgid "The symbol of the currency (ex: $)"
 msgstr ""
 
-#: cogs/currency.py:222
+#: cogs/manage_/currency.py:223 cogs/manage_/stat.py:223
 msgid "Code"
 msgstr ""
 
-#: cogs/currency.py:223
+#: cogs/manage_/currency.py:224
 msgid "The code of the currency (ex: USD)"
 msgstr ""
 
-#: cogs/currency.py:237
+#: cogs/manage_/currency.py:238
 msgid "The emoji of the currency (ex: :dollar:)"
 msgstr ""
 
-#: cogs/currency.py:242
+#: cogs/manage_/currency.py:243 cogs/manage_/stat.py:243
 msgid "Exchange rate"
 msgstr ""
 
-#: cogs/currency.py:243
+#: cogs/manage_/currency.py:244
 msgid "The exchange rate of the currency (ex: 1.0)"
 msgstr ""
 
-#: cogs/currency.py:253
+#: cogs/manage_/currency.py:254 cogs/manage_/stat.py:254
 msgid "Is default"
 msgstr ""
 
-#: cogs/currency.py:254
+#: cogs/manage_/currency.py:255
 msgid "Whether the currency is the default currency or not."
 msgstr ""
 
-#: cogs/currency.py:271
+#: cogs/manage_/currency.py:272 cogs/manage_/stat.py:272
 msgid "Supports cash"
 msgstr ""
 
-#: cogs/currency.py:272
+#: cogs/manage_/currency.py:273
 msgid ""
 "Whether the currency supports cash or not. If yes, it will create an "
 "item, named like the currency, that can be stored in inventories."
 msgstr ""
 
-#: cogs/currency.py:295
+#: cogs/manage_/currency.py:296
 #, python-format
 msgid "Edit %(currency_name)s"
 msgstr ""
 
-#: cogs/currency.py:299
+#: cogs/manage_/currency.py:300
 msgid ""
 "Whether the currency supports cash or not. If yes, it will create an "
 "item, named like the currency, that can be stored in inventories.\n"
@@ -394,47 +559,39 @@ msgid ""
 "item used for cash will be deleted."
 msgstr ""
 
-#: cogs/currency.py:320
-msgid "currency"
-msgstr ""
-
-#: cogs/currency.py:321
-msgid "Manage currencies"
-msgstr ""
-
-#: cogs/currency.py:370
+#: cogs/manage_/currency.py:352
 #, python-format
 msgid "You have successfully created the currency **%(currency_display)s**."
 msgstr ""
 
-#: cogs/currency.py:380
+#: cogs/manage_/currency.py:362
 msgid "There are no currencies to edit."
 msgstr ""
 
-#: cogs/currency.py:408
+#: cogs/manage_/currency.py:390
 #, python-format
 msgid "You have successfully edited the currency **%(currency_display)s**."
 msgstr ""
 
-#: cogs/currency.py:418
+#: cogs/manage_/currency.py:400
 msgid "There are no currencies to delete."
 msgstr ""
 
-#: cogs/currency.py:440
+#: cogs/manage_/currency.py:422
 #, python-format
 msgid "Are you sure you want to delete the currency **%(currency)s**?"
 msgstr ""
 
-#: cogs/currency.py:457
+#: cogs/manage_/currency.py:439
 #, python-format
 msgid "You have successfully deleted the currency **%(currency)s**."
 msgstr ""
 
-#: cogs/currency.py:468
+#: cogs/manage_/currency.py:450
 msgid "There are no currencies to list."
 msgstr ""
 
-#: cogs/currency.py:477
+#: cogs/manage_/currency.py:459
 #, python-format
 msgid ""
 "Here is a list of all currencies, select a currency in the selects below "
@@ -443,130 +600,199 @@ msgid ""
 "%(currencies)s"
 msgstr ""
 
-#: cogs/item.py:46 cogs/item.py:322 cogs/item.py:338
-msgid "Create an item"
-msgstr ""
-
-#: cogs/item.py:47 cogs/item.py:339
-msgid "Edit an existing item"
-msgstr ""
-
-#: cogs/item.py:48 cogs/item.py:340
-msgid "Delete an existing item"
-msgstr ""
-
-#: cogs/item.py:49 cogs/item.py:341
-msgid "List all items"
-msgstr ""
-
-#: cogs/item.py:95
+#: cogs/manage_/item.py:99
 msgid "Select an item"
 msgstr ""
 
-#: cogs/item.py:113
+#: cogs/manage_/item.py:117
 msgid "Please select only one item."
 msgstr ""
 
-#: cogs/item.py:189
+#: cogs/manage_/item.py:191
 msgid "The name of the item"
 msgstr ""
 
-#: cogs/item.py:203
+#: cogs/manage_/item.py:205
 msgid "The emoji of the item"
 msgstr ""
 
-#: cogs/item.py:209
+#: cogs/manage_/item.py:211
 msgid "The description of the item"
 msgstr ""
 
-#: cogs/item.py:218
+#: cogs/manage_/item.py:220
 msgid "Type"
 msgstr ""
 
-#: cogs/item.py:222 taho/enums/item.py:70
+#: cogs/manage_/item.py:224 taho/enums/item.py:70
 msgid "Resource"
 msgstr ""
 
-#: cogs/item.py:224
+#: cogs/manage_/item.py:226
 msgid "Resources are the basic items."
 msgstr ""
 
-#: cogs/item.py:227 taho/enums/item.py:71
+#: cogs/manage_/item.py:229 taho/enums/item.py:71
 msgid "Consumable"
 msgstr ""
 
-#: cogs/item.py:229
+#: cogs/manage_/item.py:231
 msgid "Consumables have durability and can be used."
 msgstr ""
 
-#: cogs/item.py:232 cogs/item.py:252 taho/enums/item.py:72
+#: cogs/manage_/item.py:234 cogs/manage_/item.py:254 taho/enums/item.py:72
 msgid "Currency"
 msgstr ""
 
-#: cogs/item.py:234
+#: cogs/manage_/item.py:236
 msgid "Currency items are used as Cash for a specific Currency."
 msgstr ""
 
-#: cogs/item.py:264 taho/forms/fields/reward_pack.py:336
+#: cogs/manage_/item.py:266 taho/forms/fields/reward_pack.py:336
 msgid "Durability"
 msgstr ""
 
-#: cogs/item.py:278
+#: cogs/manage_/item.py:280
 msgid "Cooldown"
 msgstr ""
 
-#: cogs/item.py:316
+#: cogs/manage_/item.py:318
 #, python-format
 msgid "Edit %(item_name)s"
 msgstr ""
 
-#: cogs/item.py:332
-msgid "item"
-msgstr ""
-
-#: cogs/item.py:333
-msgid "Manage items"
-msgstr ""
-
-#: cogs/item.py:379
+#: cogs/manage_/item.py:362
 #, python-format
 msgid "You have successfully created the item **%(item_display)s**."
 msgstr ""
 
-#: cogs/item.py:389
+#: cogs/manage_/item.py:372
 msgid "There are no items to edit."
 msgstr ""
 
-#: cogs/item.py:417
+#: cogs/manage_/item.py:400
 #, python-format
 msgid "You have successfully edited the item **%(item_display)s**."
 msgstr ""
 
-#: cogs/item.py:427
+#: cogs/manage_/item.py:410
 msgid "There are no items to delete."
 msgstr ""
 
-#: cogs/item.py:449
+#: cogs/manage_/item.py:432
 #, python-format
 msgid "Are you sure you want to delete the item **%(item)s**?"
 msgstr ""
 
-#: cogs/item.py:466
+#: cogs/manage_/item.py:449
 #, python-format
 msgid "You have successfully deleted the item **%(item)s**."
 msgstr ""
 
-#: cogs/item.py:477
+#: cogs/manage_/item.py:460
 msgid "There are no items to list."
 msgstr ""
 
-#: cogs/item.py:486
+#: cogs/manage_/item.py:469
 #, python-format
 msgid ""
 "Here is a list of all items, select an item in the selects below to get "
 "more information about it.\n"
 "\n"
 "%(items)s"
+msgstr ""
+
+#: cogs/manage_/stat.py:99
+msgid "Select a stat"
+msgstr ""
+
+#: cogs/manage_/stat.py:117
+msgid "Please select only one stat."
+msgstr ""
+
+#: cogs/manage_/stat.py:197
+msgid "The name of the stat (ex: Dollar)"
+msgstr ""
+
+#: cogs/manage_/stat.py:211
+msgid "The symbol of the stat (ex: $)"
+msgstr ""
+
+#: cogs/manage_/stat.py:224
+msgid "The code of the stat (ex: USD)"
+msgstr ""
+
+#: cogs/manage_/stat.py:238
+msgid "The emoji of the stat (ex: :dollar:)"
+msgstr ""
+
+#: cogs/manage_/stat.py:244
+msgid "The exchange rate of the stat (ex: 1.0)"
+msgstr ""
+
+#: cogs/manage_/stat.py:255
+msgid "Whether the stat is the default stat or not."
+msgstr ""
+
+#: cogs/manage_/stat.py:273
+msgid ""
+"Whether the stat supports cash or not. If yes, it will create an item, "
+"named like the stat, that can be stored in inventories."
+msgstr ""
+
+#: cogs/manage_/stat.py:296
+#, python-format
+msgid "Edit %(stat_name)s"
+msgstr ""
+
+#: cogs/manage_/stat.py:300
+msgid ""
+"Whether the stat supports cash or not. If yes, it will create an item, "
+"named like the stat, that can be stored in inventories.\n"
+"\n"
+":warning: If you change this value from **Yes** to **No**, the current "
+"item used for cash will be deleted."
+msgstr ""
+
+#: cogs/manage_/stat.py:352
+#, python-format
+msgid "You have successfully created the stat **%(stat_display)s**."
+msgstr ""
+
+#: cogs/manage_/stat.py:362
+msgid "There are no stats to edit."
+msgstr ""
+
+#: cogs/manage_/stat.py:390
+#, python-format
+msgid "You have successfully edited the stat **%(stat_display)s**."
+msgstr ""
+
+#: cogs/manage_/stat.py:400
+msgid "There are no stats to delete."
+msgstr ""
+
+#: cogs/manage_/stat.py:422
+#, python-format
+msgid "Are you sure you want to delete the stat **%(stat)s**?"
+msgstr ""
+
+#: cogs/manage_/stat.py:439
+#, python-format
+msgid "You have successfully deleted the stat **%(stat)s**."
+msgstr ""
+
+#: cogs/manage_/stat.py:450
+msgid "There are no stats to list."
+msgstr ""
+
+#: cogs/manage_/stat.py:459
+#, python-format
+msgid ""
+"Here is a list of all stats, select a stat in the selects below to get "
+"more information about it.\n"
+"\n"
+"%(stats)s"
 msgstr ""
 
 #: taho/base_view.py:56
@@ -583,9 +809,18 @@ msgstr ""
 msgid "❌ %(entity)s"
 msgstr ""
 
+#: taho/abstract/class_stat.py:118
+#, python-format
+msgid "*%(stat_display)s*: **%(value)s**"
+msgstr ""
+
+#: taho/abstract/class_stat.py:119
+msgid "Unanswered"
+msgstr ""
+
 #: taho/abstract/info.py:122
 #, python-format
-msgid "*%(info_text)s*: **%(value)s"
+msgid "*%(info_text)s*: **%(value)s**"
 msgstr ""
 
 #: taho/abstract/reward.py:180
@@ -693,7 +928,8 @@ msgstr ""
 
 #: taho/forms/fields/access.py:211 taho/forms/fields/access.py:355
 #: taho/forms/fields/reward_pack.py:322 taho/forms/fields/reward_pack.py:564
-#: taho/forms/fields/reward_pack.py:663 taho/forms/form.py:47
+#: taho/forms/fields/reward_pack.py:663 taho/forms/fields/stat.py:278
+#: taho/forms/fields/stat.py:431 taho/forms/form.py:47
 #: taho/views/confirmation.py:52
 msgid "Cancel"
 msgstr ""
@@ -703,7 +939,7 @@ msgid "Respond"
 msgstr ""
 
 #: taho/forms/fields/access.py:68 taho/forms/fields/reward_pack.py:77
-#: taho/forms/form.py:49
+#: taho/forms/fields/stat.py:70 taho/forms/form.py:49
 msgid "Finish"
 msgstr ""
 
@@ -780,6 +1016,7 @@ msgid "The value %(value)s is forbidden."
 msgstr ""
 
 #: taho/forms/fields/access.py:56 taho/forms/fields/reward_pack.py:61
+#: taho/forms/fields/stat.py:58
 msgid "What do you want to do?"
 msgstr ""
 
@@ -820,7 +1057,8 @@ msgstr ""
 
 #: taho/forms/fields/access.py:204 taho/forms/fields/access.py:349
 #: taho/forms/fields/reward_pack.py:315 taho/forms/fields/reward_pack.py:558
-#: taho/forms/fields/reward_pack.py:658 taho/views/confirmation.py:44
+#: taho/forms/fields/reward_pack.py:658 taho/forms/fields/stat.py:271
+#: taho/forms/fields/stat.py:425 taho/views/confirmation.py:44
 msgid "Confirm"
 msgstr ""
 
@@ -850,7 +1088,7 @@ msgstr ""
 #: taho/forms/fields/field.py:131 taho/forms/fields/infos.py:121
 #: taho/forms/fields/infos.py:126 taho/forms/fields/number.py:120
 #: taho/forms/fields/reward.py:230 taho/forms/fields/select.py:200
-#: taho/forms/fields/text.py:120
+#: taho/forms/fields/stat.py:583 taho/forms/fields/text.py:120
 msgid "*Unanswered*"
 msgstr ""
 
@@ -955,15 +1193,15 @@ msgstr ""
 msgid "Delete the pack"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:148
+#: taho/forms/fields/reward_pack.py:148 taho/forms/fields/stat.py:182
 msgid "Reward amount"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:151
+#: taho/forms/fields/reward_pack.py:151 taho/forms/fields/stat.py:185
 msgid "Minimum amount"
 msgstr ""
 
-#: taho/forms/fields/reward_pack.py:152
+#: taho/forms/fields/reward_pack.py:152 taho/forms/fields/stat.py:186
 msgid "Minimum amount, can be negative."
 msgstr ""
 
@@ -1078,6 +1316,61 @@ msgstr ""
 
 #: taho/forms/fields/select.py:173
 msgid "No choices available."
+msgstr ""
+
+#: taho/forms/fields/stat.py:61
+msgid "Add a stat"
+msgstr ""
+
+#: taho/forms/fields/stat.py:65
+msgid "Remove a stat"
+msgstr ""
+
+#: taho/forms/fields/stat.py:86
+msgid "**No stats have been set yet.**"
+msgstr ""
+
+#: taho/forms/fields/stat.py:101
+#, python-format
+msgid ""
+"The class's stats are a list of stats that are added to the user's stats "
+"when they have the class.\n"
+"You can add stats by selecting the **Add stats to the list** option, then"
+" selecting the stats you want, and the amount to add. *Note that the "
+"amount can be negative, and that the points are added to the maximum of "
+"the stat.*\n"
+"%(stat_list)s"
+msgstr ""
+
+#: taho/forms/fields/stat.py:239
+#, python-format
+msgid "Amount set to **%(amount)s**."
+msgstr ""
+
+#: taho/forms/fields/stat.py:264
+msgid "Amount"
+msgstr ""
+
+#: taho/forms/fields/stat.py:315
+msgid "Pick stats in the lists."
+msgstr ""
+
+#: taho/forms/fields/stat.py:341
+msgid "There are no stat to add."
+msgstr ""
+
+#: taho/forms/fields/stat.py:450
+msgid ""
+"Select the stats you want to remove in the list below.\n"
+"\n"
+msgstr ""
+
+#: taho/forms/fields/stat.py:483
+msgid "Select stats to remove in the list"
+msgstr ""
+
+#: taho/forms/fields/stat.py:562
+msgid "There are no stats configured, so you can't add stats."
 msgstr ""
 
 #: taho/views/confirmation.py:70 taho/views/confirmation.py:74
