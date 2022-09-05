@@ -24,8 +24,7 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import discord
-from discord.ext import commands
-from discord import app_commands, SelectOption
+from discord import SelectOption
 from discord.app_commands import Choice, locale_str as _d
 from discord.ui import Select
 from taho import forms, utils, _, views, ngettext, BaseView
@@ -35,6 +34,10 @@ if TYPE_CHECKING:
     from typing import List, Literal, Optional
     from taho import Bot, TahoContext
     from discord.abc import Snowflake
+
+__all__ = (
+    "ManageBank",
+)
 
 class BankActionChoiceView(BaseView):
     def __init__(self, user: Optional[Snowflake] = None, *args, **kwargs):
@@ -124,10 +127,8 @@ class BankChoiceView(BaseView):
             await interaction.response.defer(ephemeral=True)
             self.stop()
 
-class BankCog(commands.Cog):
-    """The description for Bank goes here."""
-
-    def __init__(self, bot: Bot):
+class ManageBank:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
     
     async def _get_infos_fields(
@@ -374,26 +375,7 @@ class BankCog(commands.Cog):
         )
         return form
 
-    @commands.hybrid_command(
-        name=_d("bank"),
-        description=_d("Manage banks")
-    )
-    @utils.check_perm(manage_bank=True)
-    @app_commands.choices(
-        action=[
-            Choice(name=_d("Create a bank"), value="create"),
-            Choice(name=_d("Edit an existing bank"), value="edit"),
-            Choice(name=_d("Delete an existing bank"), value="delete"),
-            Choice(name=_d("List all banks"), value="list")
-        ]
-    )
-    @app_commands.describe(
-        action=_d("Select an action"),
-    )
-    @app_commands.rename(
-        action=_d("action")
-    )
-    async def bank(self, ctx: TahoContext, action: Choice[str] = None):
+    async def callback(self, ctx: TahoContext, action: Choice[str] = None):
         if not action:
             view = BankActionChoiceView(user=ctx.author)
             await ctx.send(view=view)
@@ -445,7 +427,7 @@ class BankCog(commands.Cog):
 
             if not bank:
                 return
-            
+                
             bank_dict = await bank.to_dict(to_edit=True)
             
             form = await self.get_bank_form(ctx, bank_dict=bank_dict)
@@ -549,7 +531,4 @@ class BankCog(commands.Cog):
             form = await self.get_bank_form(ctx, bank_dict=bank_dict, is_info=True)
 
             await form.send(ctx=ctx, ephemeral=True)
-            
 
-async def setup(bot: Bot):
-    await bot.add_cog(BankCog(bot))

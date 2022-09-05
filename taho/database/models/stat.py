@@ -151,6 +151,7 @@ class Stat(BaseModel, StuffShortcutable):
     cluster = fields.ForeignKeyField("main.Cluster", related_name="stats")
     name = fields.CharField(max_length=255)
     emoji = fields.CharField(max_length=255, null=True)
+    description = fields.TextField(null=True)
     rp_effect = fields.IntEnumField(RPEffect, null=True)
     maximum = fields.IntField(null=True)
     regeneration = fields.IntEnumField(RegenerationType, default=RegenerationType.no_regeneration)

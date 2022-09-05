@@ -25,6 +25,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from .base import BaseModel
 from tortoise import fields
+from taho.abstract import AbstractClassStat
 
 if TYPE_CHECKING:
     from typing import Optional
@@ -137,9 +138,6 @@ class Class(BaseModel):
     def __str__(self) -> str:
         return self.name
 
-
-    
-
 class ClassStat(BaseModel):
     """Represents a stat of a class.
 
@@ -210,3 +208,17 @@ class ClassStat(BaseModel):
     stat: str = fields.ForeignKeyField("main.Stat", related_name="classes")
     value: int = fields.IntField()
 
+    async def to_abstract(self) -> AbstractClassStat:
+        """|coro|
+
+        Returns the class stat as an abstract class stat.
+
+        Returns
+        --------
+        :class:`~taho.utils.AbstractClassStat`
+            The abstract stat.
+        """
+        return AbstractClassStat(
+            stat=await self.stat,
+            value=self.value
+        )

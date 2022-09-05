@@ -24,9 +24,8 @@ DEALINGS IN THE SOFTWARE.
 from __future__ import annotations
 from typing import TYPE_CHECKING
 import discord
-from discord.ext import commands
-from discord import app_commands, SelectOption
-from discord.app_commands import Choice, locale_str as _d
+from discord import SelectOption
+from discord.app_commands import Choice
 from discord.ui import Select
 from taho import forms, utils, _, views, ngettext, BaseView
 from taho.database import Currency
@@ -36,6 +35,10 @@ if TYPE_CHECKING:
     from typing import List, Literal, Optional
     from taho import Bot, TahoContext
     from discord.abc import Snowflake
+
+__all__ = (
+    "ManageCurrency",
+)
 
 class CurrencyActionChoiceView(BaseView):
     def __init__(self, user: Optional[Snowflake] = None, *args, **kwargs):
@@ -125,12 +128,10 @@ class CurrencyChoiceView(BaseView):
             await interaction.response.defer(ephemeral=True)
             self.stop()
 
-class CurrencyCog(commands.Cog):
-    """The description for Currency goes here."""
-
+class ManageCurrency:
     def __init__(self, bot: Bot):
         self.bot = bot
-    
+
     async def get_currency_form(
         self, 
         ctx: TahoContext, 
@@ -316,26 +317,7 @@ class CurrencyCog(commands.Cog):
         )
         return form
 
-    @commands.hybrid_command(
-        name=_d("currency"),
-        description=_d("Manage currencies")
-    )
-    @utils.check_perm(manage_currency=True)
-    @app_commands.choices(
-        action=[
-            Choice(name=_d("Create a currency"), value="create"),
-            Choice(name=_d("Edit an existing currency"), value="edit"),
-            Choice(name=_d("Delete an existing currency"), value="delete"),
-            Choice(name=_d("List all currencies"), value="list")
-        ]
-    )
-    @app_commands.describe(
-        action=_d("Select an action"),
-    )
-    @app_commands.rename(
-        action=_d("action")
-    )
-    async def currency(self, ctx: TahoContext, action: Choice[str] = None):
+    async def callback(self, ctx: TahoContext, action: Choice[str] = None):
         if not action:
             view = CurrencyActionChoiceView(user=ctx.author)
             await ctx.send(view=view)
@@ -494,7 +476,3 @@ class CurrencyCog(commands.Cog):
             form = await self.get_currency_form(ctx, currency_dict=currency_dict, is_info=True)
 
             await form.send(ctx=ctx, ephemeral=True)
-            
-
-async def setup(bot: Bot):
-    await bot.add_cog(CurrencyCog(bot))

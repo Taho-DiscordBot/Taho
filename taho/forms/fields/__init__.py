@@ -33,3 +33,4 @@ from .reward_pack import *
 from .empty_reward_pack import *
 from .currency import *
 from .infos import *
+from .stat import *

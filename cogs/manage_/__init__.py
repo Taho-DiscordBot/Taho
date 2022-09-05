@@ -21,7 +21,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from .access_rule import *
-from .info import *
-from .reward import *
-from .class_stat import *
+from .item import *
+from .bank import *
+from .craft import *
+from .currency import *
+from .class_ import *
+from .stat import *

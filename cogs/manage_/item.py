@@ -28,25 +28,29 @@ from discord.ext import commands
 from discord import app_commands, SelectOption
 from discord.app_commands import Choice, locale_str as _d
 from discord.ui import Select
-from taho import forms, utils, _, views, ngettext, RewardType, BaseView, ItemType as CraftType
-from taho.database import Craft
+from taho import forms, utils, _, views, ngettext, ItemType, RewardType, BaseView
+from taho.database import Item
 
 if TYPE_CHECKING:
     from typing import List, Literal, Optional
     from taho import Bot, TahoContext
     from discord.abc import Snowflake
 
-class CraftActionChoiceView(BaseView):
+__all__ = (
+    "ManageItem",
+)
+    
+class ItemActionChoiceView(BaseView):
     def __init__(self, user: Optional[Snowflake] = None, *args, **kwargs):
         super().__init__(user, *args, **kwargs)
 
         self.value: Literal["create", "delete", "edit", "list"] = None
 
         actions = {
-            "create": _("Create a craft"),
-            "edit": _("Edit an existing craft"),
-            "delete": _("Delete an existing craft"),
-            "list": _("List all crafts"),
+            "create": _("Create an item"),
+            "edit": _("Edit an existing item"),
+            "delete": _("Delete an existing item"),
+            "list": _("List all items"),
         }
 
         self.select = Select(
@@ -66,19 +70,19 @@ class CraftActionChoiceView(BaseView):
         await interaction.response.defer(ephemeral=True)
         self.stop()
 
-class CraftChoiceView(BaseView):
-    def __init__(self, crafts: List[Craft], user: Optional[Snowflake] = None, multiple: bool = False):
+class ItemChoiceView(BaseView):
+    def __init__(self, items: List[Item], user: Optional[Snowflake] = None, multiple: bool = False):
         super().__init__(user)
 
-        self.value: Craft = None
+        self.value: Item = None
         self.multiple = multiple
 
         choices = [
             forms.Choice(
-                label=craft.name,
-                value=craft,
-                emoji=craft.emoji
-            ) for craft in crafts
+                label=item.name,
+                value=item,
+                emoji=item.emoji
+            ) for item in items
         ]
 
         self.choices_map = {
@@ -92,7 +96,7 @@ class CraftChoiceView(BaseView):
 
         self.selects = [
             Select(
-                placeholder=_("Select a craft"),
+                placeholder=_("Select an item"),
                 options=choices,
                 max_values=1 if not self.multiple else len(choices)
             ) for choices in choices_list
@@ -110,7 +114,7 @@ class CraftChoiceView(BaseView):
         
         if len(values) > 1 and not self.multiple:
             await interaction.response.send_message(
-                _("Please select only one craft."),
+                _("Please select only one item."),
                 ephemeral=True
             )
         else:
@@ -124,33 +128,31 @@ class CraftChoiceView(BaseView):
             await interaction.response.defer(ephemeral=True)
             self.stop()
 
-class CraftCog(commands.Cog):
-    """The description for Craft goes here."""
-
+class ManageItem:
     def __init__(self, bot: Bot):
         self.bot = bot
     
-    async def get_craft_form(
+    async def get_item_form(
         self, 
         ctx: TahoContext, 
-        craft: Craft=None, 
-        craft_dict: dict=None,
+        item: Item=None, 
+        item_dict: dict=None,
         is_info: bool=False
         ) -> forms.Form:
         """|coro|
         
-        Get a form to create or edit a craft.
+        Get a form to create or edit an item.
         The form will be prefilled with the information
-        from ``craft`` if given.
+        from ``item`` if given.
 
         Parameters
         -----------
         ctx: :class:`TahoContext`
             The context of the command.
-        craft: Optional[:class:`~taho.database.models.Craft`]
-            The craft to prefill the form with.
-        craft_dict: Optional[:class:`dict`]
-            The craft to prefill the form with.
+        item: Optional[:class:`~taho.database.models.Item`]
+            The item to prefill the form with.
+        item_dict: Optional[:class:`dict`]
+            The item to prefill the form with.
         is_info: :class:`bool`
             Whether the form is for info or not.
             If ``True``, the form will not be editable.
@@ -160,25 +162,25 @@ class CraftCog(commands.Cog):
         Raises
         -------
         TypeError
-            If both ``craft`` and ``craft_dict`` are given.
-            If ``is_info`` is ``True`` and neither ``craft`` nor ``craft_dict`` are given.
+            If both ``item`` and ``item_dict`` are given.
+            If ``is_info`` is ``True`` and neither ``item`` nor ``item_dict`` are given.
         
         Returns
         --------
         :class:`~taho.forms.Form`
-            The form to create or edit a craft.
+            The form to create or edit an item.
         """
-        if craft and craft_dict:
-            raise TypeError("Cannot prefill form with both craft and craft_dict.")
-        elif is_info and not (craft or craft_dict):
-            raise TypeError("Cannot get info form without craft or craft_dict.")
+        if item and item_dict:
+            raise TypeError("Cannot prefill form with both item and item_dict.")
+        elif is_info and not (item or item_dict):
+            raise TypeError("Cannot get info form without item or item_dict.")
         cluster = await ctx.get_cluster()
-        forbidden_names = await cluster.crafts.all().values_list("name", flat=True)
+        forbidden_names = await cluster.items.all().values_list("name", flat=True)
 
-        if craft:
-            fields_default = await craft.to_dict()
-        elif craft_dict:
-            fields_default = craft_dict
+        if item:
+            fields_default = await item.to_dict()
+        elif item_dict:
+            fields_default = item_dict
         else:
             fields_default = None
 
@@ -186,7 +188,7 @@ class CraftCog(commands.Cog):
             forms.Text(
                 name="name",
                 label=_("Name"),
-                description=_("The name of the craft"),
+                description=_("The name of the item"),
                 required=True,
                 max_length=32,
                 min_length=3,
@@ -200,39 +202,89 @@ class CraftCog(commands.Cog):
             forms.Emoji(
                 name="emoji",
                 label=_("Emoji"),
-                description=_("The emoji of the craft"),
+                description=_("The emoji of the item"),
                 required=False
             ),
             forms.Text(
                 name="description",
                 label=_("Description"),
-                description=_("The description of the craft"),
+                description=_("The description of the item"),
                 required=False,
                 validators=[
                     lambda x: forms.min_length(x, 3),
                     lambda x: forms.max_length(x, 100),
                 ]
             ),
-            forms.Number(
-                name="time",
-                label=_("Time (**x**)"),
+            forms.Select(
+                name="type",
+                label=_("Type"),
+                required=True,
+                choices=[
+                    forms.Choice(
+                        label=_("Resource"),
+                        value=ItemType.resource,
+                        description=_("Resources are the basic items."),
+                    ),
+                    forms.Choice(
+                        label=_("Consumable"),
+                        value=ItemType.consumable,
+                        description=_("Consumables have durability and can be used."),
+                    ),
+                    forms.Choice(
+                        label=_("Currency"),
+                        value=ItemType.currency,
+                        description=_("Currency items are used as Cash for a specific Currency."),
+                    ),
+                ],
+                validators=[
+                    lambda x: forms.required(x),
+                ],
+            ),
+            forms.Currency(
+                cluster_id=cluster.id,
+                db_filters={
+                    "item__id__isnull": True
+                } if not fields_default else {
+                    "item__id__in": [
+                        fields_default["id"],
+                        None
+                    ]
+                },
+                name="currency",
+                label=_("Currency"),
                 required=True,
                 validators=[
                     lambda x: forms.required(x),
+                ],
+                appear_validators=[
+                    lambda f: f["type"] == ItemType.currency,
+                ],
+
+            ),
+            forms.Number(
+                name="durability",
+                label=_("Durability"),
+                required=True,
+                validators=[
+                    lambda x: forms.required(x),
+                    lambda x: forms.is_int(x),
                     lambda x: forms.min_value(x, -1),
                     lambda x: forms.forbidden_value(x, 0),
                 ],
+                appear_validators=[
+                    lambda f: f["type"] == ItemType.consumable,
+                ]
             ),
             forms.Number(
-                name="per",
-                label=_("Per (**y**)"),
+                name="cooldown",
+                label=_("Cooldown"),
                 required=True,
                 validators=[
-                    lambda x: forms.required(x),
-                    lambda x: forms.min_value(x, 1),
+                    lambda x: forms.is_number(x),
+                    lambda x: forms.min_value(x, 0),
                 ],
                 appear_validators=[
-                    lambda f: f["time"] not in (None, -1)
+                    lambda f: f["type"] == ItemType.consumable,
                 ]
             ),
             forms.AccessRule(
@@ -244,63 +296,43 @@ class CraftCog(commands.Cog):
                 name="reward_packs",
                 label=_("Rewards"),
                 required=False,
+                reward_types=[
+                    {
+                        "reward_types": [RewardType.passive,RewardType.active,RewardType.equip],
+                        "conditions": [lambda f: f["type"] == ItemType.consumable],
+                    },
+                    {
+                        "reward_types": [RewardType.passive],
+                        "conditions": [lambda f: f["type"] in (ItemType.resource, ItemType.currency)],
+                    }
+                ],
+                appear_validators=[
+                    lambda f: f["type"] is not None,
+                ]
             )
         ]
         if fields_default:
             if is_info:
                 form_title = fields_default["name"]
             else:
-                form_title = _("Edit %(craft_name)s", craft_name=fields_default["name"])
+                form_title = _("Edit %(item_name)s", item_name=fields_default["name"])
 
 
             for field in fields:
                 await field.set_value(fields_default.get(field.name, None))
         else:
-            form_title = _("Create a craft")
-
-        description = _(
-            "Please fill out the form below.\n"
-            "You can use the buttons below to navigate the form.\n"
-            "A title with `*` indicates a required field, "
-            "one with `x` indicates that it cannot be defined.\n"
-            "\n\n"
-            "ℹ️ **Cooldown explanation:**\n"
-            "The cooldown is the time between two crafts. "
-            "It is defined by **x** and **y**: you can do the craft "
-            "**x** times every **y** seconds (you can find x and y in the form, as *Time* and *Per*).\n"
-            "For an infinite cooldown, set **x** to `-1`.\n"
-            )
+            form_title = _("Create an item")
     
         form = forms.Form(
             title=form_title,
             fields=fields,
             is_info=is_info,
-            description=description
         )
         return form
 
-    @commands.hybrid_command(
-        name=_d("craft"),
-        description=_d("Manage crafts")
-    )
-    @utils.check_perm(manage_craft=True)
-    @app_commands.choices(
-        action=[
-            Choice(name=_d("Create a craft"), value="create"),
-            Choice(name=_d("Edit an existing craft"), value="edit"),
-            Choice(name=_d("Delete an existing craft"), value="delete"),
-            Choice(name=_d("List all crafts"), value="list")
-        ]
-    )
-    @app_commands.describe(
-        action=_d("Select an action"),
-    )
-    @app_commands.rename(
-        action=_d("action")
-    )
-    async def craft(self, ctx: TahoContext, action: Choice[str] = None):
+    async def callback(self, ctx: TahoContext, action: Choice[str] = None):
         if not action:
-            view = CraftActionChoiceView(user=ctx.author)
+            view = ItemActionChoiceView(user=ctx.author)
             await ctx.send(view=view)
             await view.wait(delete_after=True)
 
@@ -313,7 +345,7 @@ class CraftCog(commands.Cog):
 
         if action == "create":
             
-            form = await self.get_craft_form(ctx)
+            form = await self.get_item_form(ctx)
                 
             await form.send(ctx=ctx)
 
@@ -322,83 +354,83 @@ class CraftCog(commands.Cog):
             if form.is_canceled():
                 return
 
-            craft = await cluster.create_craft(**form.to_dict())
+            item = await cluster.create_item(**form.to_dict())
         
             await ctx.send(
                 content=_(
-                "You have successfully created the craft **%(craft_display)s**.",
-                craft_display=str(craft)
+                "You have successfully created the item **%(item_display)s**.",
+                item_display=str(item)
                 ),
                 ephemeral=True
             )
 
         elif action == "edit":
-            crafts = await cluster.crafts.all()
+            items = await cluster.items.all()
 
-            if not crafts:
+            if not items:
                 await ctx.send(
-                    _("There are no crafts to edit."),
+                    _("There are no items to edit."),
                     ephemeral=True
                 )
                 return
             
-            view = CraftChoiceView(crafts, user=ctx.author)
+            view = ItemChoiceView(items, user=ctx.author)
             await ctx.send(view=view)
 
             await view.wait(delete_after=True)
-            craft = view.value
+            item = view.value
 
-            if not craft:
+            if not item:
                 return
             
-            craft_dict = await craft.to_dict(to_edit=True)
+            item_dict = await item.to_dict(to_edit=True)
             
-            form = await self.get_craft_form(ctx, craft_dict=craft_dict)
+            form = await self.get_item_form(ctx, item_dict=item_dict)
             await form.send(ctx=ctx)
             await form.wait()
 
             if form.is_canceled():
                 return
 
-            await craft.edit(**form.to_dict())
+            await item.edit(**form.to_dict())
         
             await ctx.send(
                 content=_(
-                    "You have successfully edited the craft **%(craft_display)s**.",
-                    craft_display=str(craft)
+                    "You have successfully edited the item **%(item_display)s**.",
+                    item_display=str(item)
                 ),
                 ephemeral=True
             )
 
         elif action == "delete":
-            crafts = await cluster.crafts.all()
+            items = await cluster.items.all()
 
-            if not crafts:
+            if not items:
                 await ctx.send(
-                    _("There are no crafts to delete."),
+                    _("There are no items to delete."),
                     ephemeral=True
                 )
                 return
             
-            view = CraftChoiceView(crafts, user=ctx.author, multiple=True)
+            view = ItemChoiceView(items, user=ctx.author, multiple=True)
             await ctx.send(view=view)
 
             await view.wait(delete_after=True)
-            crafts = view.value
+            items = view.value
 
-            if not crafts:
+            if not items:
                 return
             
-            crafts_display = ", ".join(str(craft) for craft in crafts) if len(crafts) > 1\
-                else str(crafts[0])
+            items_display = ", ".join(str(item) for item in items) if len(items) > 1\
+                else str(items[0])
             
             confirmation = views.ConfirmationView(user=ctx.author)
             msg = await ctx.send(
                 ngettext(
-                    "Are you sure you want to delete the craft **%(craft)s**?",
-                    "Are you sure you want to delete the crafts **%(craft)s**?",
-                    num=len(crafts),
-                    craft=crafts_display
+                    "Are you sure you want to delete the item **%(item)s**?",
+                    "Are you sure you want to delete the items **%(item)s**?",
+                    num=len(items),
+                    item=items_display
                 ),
                 view=confirmation
                 )
@@ -408,53 +440,50 @@ class CraftCog(commands.Cog):
             if confirmation.value is False:
                 return
             
-            await Craft.filter(id__in=[craft.id for craft in crafts]).delete()
+            await Item.filter(id__in=[item.id for item in items]).delete()
             
             await ctx.send(
                 ngettext(
-                    "You have successfully deleted the craft **%(craft)s**.",
-                    "You have successfully deleted the crafts **%(craft)s**.",
-                    num=len(crafts),
-                    craft=crafts_display
+                    "You have successfully deleted the item **%(item)s**.",
+                    "You have successfully deleted the items **%(item)s**.",
+                    num=len(items),
+                    item=items_display
                 ),
                 ephemeral=True
             )
 
         elif action == "list":
-            crafts = await cluster.crafts.all()
+            items = await cluster.items.all()
 
-            if not crafts:
+            if not items:
                 await ctx.send(
-                    _("There are no crafts to list."),
+                    _("There are no items to list."),
                     ephemeral=True
                 )
                 return
 
             content = _(
-                "Here is a list of all crafts, select a craft in the selects "
+                "Here is a list of all items, select an item in the selects "
                 "below to get more information about it.\n\n"
-                "%(crafts)s",
-                crafts="\n".join(craft.get_display(long=True) for craft in crafts)
+                "%(items)s",
+                items="\n".join(item.get_display(long=True) for item in items)
             )
-            view = CraftChoiceView(crafts, user=ctx.author)
+            view = ItemChoiceView(items, user=ctx.author)
             msg = await ctx.send(content=content, view=view)
 
             await view.wait()
 
-            craft = view.value
+            item = view.value
 
-            if not craft:
+            if not item:
                 await msg.edit(view=None)
                 return
             
             await msg.delete(delay=0)
 
-            craft_dict = await craft.to_dict()
+            item_dict = await item.to_dict()
 
-            form = await self.get_craft_form(ctx, craft_dict=craft_dict, is_info=True)
+            form = await self.get_item_form(ctx, item_dict=item_dict, is_info=True)
 
             await form.send(ctx=ctx, ephemeral=True)
-            
 
-async def setup(bot: Bot):
-    await bot.add_cog(CraftCog(bot))
